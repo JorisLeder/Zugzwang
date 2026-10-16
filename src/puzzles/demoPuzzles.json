@@ -1,0 +1,205 @@
+[
+ {
+  "id": "demo-1",
+  "fen": "6k1/5ppp/8/1b6/8/8/5PPP/3R2K1 b - - 0 1",
+  "moves": [
+   "b5c4",
+   "d1d8"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "backRankMate",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Läufer kann sich nicht mehr auf e8 dazwischenstellen. Td8# setzt auf der Grundreihe matt, weil die eigenen Bauern dem König die Flucht versperren.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Läufer kann sich nicht mehr auf e8 dazwischenstellen. "
+    },
+    {
+     "type": "move",
+     "san": "Rd8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt auf der Grundreihe matt, weil die eigenen Bauern dem König die Flucht versperren."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "back_rank"
+   ]
+  }
+ },
+ {
+  "id": "demo-2",
+  "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 2",
+  "moves": [
+   "d8g5",
+   "c1g5"
+  ],
+  "rating": 250,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "opening",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Die schwarze Dame steht auf g5 ungedeckt auf der Diagonale deines Läufers. Mit Lxg5 gewinnst du die Dame.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Die schwarze Dame steht auf g5 ungedeckt auf der Diagonale deines Läufers. Mit "
+    },
+    {
+     "type": "move",
+     "san": "Bxg5"
+    },
+    {
+     "type": "text",
+     "text": " gewinnst du die Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "demo-3",
+  "fen": "7k/8/6K1/8/8/8/8/1Q6 b - - 0 1",
+  "moves": [
+   "h8g8",
+   "b1b8"
+  ],
+  "rating": 200,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Dein König auf g6 deckt alle Felder auf der siebten Reihe. Db8# setzt auf der Grundreihe matt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Dein König auf g6 deckt alle Felder auf der siebten Reihe. "
+    },
+    {
+     "type": "move",
+     "san": "Qb8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt auf der Grundreihe matt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "demo-4",
+  "fen": "r3k3/7p/8/1N6/8/8/8/4K3 b q - 0 1",
+  "moves": [
+   "h7h6",
+   "b5c7",
+   "e8d7",
+   "c7a8"
+  ],
+  "rating": 400,
+  "ratingDeviation": 80,
+  "themes": [
+   "fork",
+   "short",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Sc7+ ist eine Gabel: Dein Springer greift König und Turm gleichzeitig an. Nach dem Königszug schlägst du mit Sxa8 den Turm.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Nc7+"
+    },
+    {
+     "type": "text",
+     "text": " ist eine Gabel: Dein Springer greift König und Turm gleichzeitig an. Nach dem Königszug schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Nxa8"
+    },
+    {
+     "type": "text",
+     "text": " den Turm."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "fork"
+   ]
+  }
+ },
+ {
+  "id": "demo-5",
+  "fen": "2r3k1/5ppp/8/8/8/3N4/5PPP/6K1 b - - 0 1",
+  "moves": [
+   "c8c5",
+   "d3c5"
+  ],
+  "rating": 250,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der schwarze Turm auf c5 ist ungedeckt und steht im Angriff deines Springers. Mit Sxc5 gewinnst du ihn.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der schwarze Turm auf c5 ist ungedeckt und steht im Angriff deines Springers. Mit "
+    },
+    {
+     "type": "move",
+     "san": "Nxc5"
+    },
+    {
+     "type": "text",
+     "text": " gewinnst du ihn."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ }
+]

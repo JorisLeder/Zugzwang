@@ -1,0 +1,1902 @@
+[
+ {
+  "id": "seed-0001",
+  "fen": "6k1/p4ppp/2b5/8/8/8/P4PPP/4R1K1 b - - 0 1",
+  "moves": [
+   "c6d5",
+   "e1e8"
+  ],
+  "rating": 400,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "backRankMate",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Läufer deckt das Feld e8 nicht mehr. Te8# setzt matt, weil die eigenen Bauern dem König die Flucht versperren.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Läufer deckt das Feld e8 nicht mehr. "
+    },
+    {
+     "type": "move",
+     "san": "Re8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, weil die eigenen Bauern dem König die Flucht versperren."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "back_rank"
+   ]
+  }
+ },
+ {
+  "id": "seed-0002",
+  "fen": "r1bq1rk1/ppp2pp1/5n2/8/8/3B3Q/PPP2PPP/5RK1 b - - 0 1",
+  "moves": [
+   "f6g4",
+   "h3h7"
+  ],
+  "rating": 450,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "kingsideAttack",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Springer hat f6 verlassen und deckt h7 nicht mehr. Dh7# setzt matt, denn dein Läufer auf d3 schützt die Dame.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Springer hat f6 verlassen und deckt h7 nicht mehr. "
+    },
+    {
+     "type": "move",
+     "san": "Qh7#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, denn dein Läufer auf d3 schützt die Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0003",
+  "fen": "5r1k/pp4pp/8/q5N1/8/8/PP1Q1PPP/6K1 b - - 0 1",
+  "moves": [
+   "f8g8",
+   "g5f7"
+  ],
+  "rating": 500,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "smotheredMate",
+   "mate",
+   "oneMove",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der König ist von seinen eigenen Figuren eingeschlossen. Sf7# ist ein ersticktes Matt – keine Figur kann den Springer schlagen.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der König ist von seinen eigenen Figuren eingeschlossen. "
+    },
+    {
+     "type": "move",
+     "san": "Nf7#"
+    },
+    {
+     "type": "text",
+     "text": " ist ein ersticktes Matt – keine Figur kann den Springer schlagen."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0004",
+  "fen": "r4rk1/pppq1p1p/5npQ/8/8/8/PBP2PPP/5RK1 b - - 0 1",
+  "moves": [
+   "f6e4",
+   "h6g7"
+  ],
+  "rating": 500,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "kingsideAttack",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Springer auf f6 hat die lange Diagonale freigegeben. Dg7# setzt matt, weil dein Läufer auf b2 die Dame deckt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Springer auf f6 hat die lange Diagonale freigegeben. "
+    },
+    {
+     "type": "move",
+     "san": "Qg7#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, weil dein Läufer auf b2 die Dame deckt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0005",
+  "fen": "7k/8/6K1/1p6/8/8/8/R7 b - - 0 1",
+  "moves": [
+   "b5b4",
+   "a1a8"
+  ],
+  "rating": 350,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Dein König auf g6 nimmt dem schwarzen König die Felder auf der siebten Reihe. Ta8# setzt matt, weil der Turm die ganze Grundreihe beherrscht.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Dein König auf g6 nimmt dem schwarzen König die Felder auf der siebten Reihe. "
+    },
+    {
+     "type": "move",
+     "san": "Ra8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, weil der Turm die ganze Grundreihe beherrscht."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0006",
+  "fen": "7k/1P4pp/8/p7/8/8/5PPP/6K1 b - - 0 1",
+  "moves": [
+   "a5a4",
+   "b7b8q"
+  ],
+  "rating": 400,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "promotion",
+   "backRankMate",
+   "mate",
+   "oneMove",
+   "endgame",
+   "pawnEndgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der schwarze König ist hinter seinen Bauern eingesperrt. Dein Bauer wandelt mit b8=D# in eine Dame um und setzt sofort matt – b8=T# ginge auch.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der schwarze König ist hinter seinen Bauern eingesperrt. Dein Bauer wandelt mit "
+    },
+    {
+     "type": "move",
+     "san": "b8=Q#"
+    },
+    {
+     "type": "text",
+     "text": " in eine Dame um und setzt sofort matt – "
+    },
+    {
+     "type": "move",
+     "san": "b8=R#"
+    },
+    {
+     "type": "text",
+     "text": " ginge auch."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "promotion",
+    "back_rank"
+   ]
+  }
+ },
+ {
+  "id": "seed-0007",
+  "fen": "r1bq2k1/pp3ppp/2p5/8/8/8/PPPQ1PPP/4R1K1 b - - 0 1",
+  "moves": [
+   "d8a5",
+   "e1e8"
+  ],
+  "rating": 400,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "backRankMate",
+   "mate",
+   "oneMove",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Die schwarze Dame hat die Grundreihe verlassen und deckt e8 nicht mehr. Te8# setzt matt, denn die eigenen Bauern versperren dem König die Flucht.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Die schwarze Dame hat die Grundreihe verlassen und deckt e8 nicht mehr. "
+    },
+    {
+     "type": "move",
+     "san": "Re8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, denn die eigenen Bauern versperren dem König die Flucht."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "back_rank"
+   ]
+  }
+ },
+ {
+  "id": "seed-0008",
+  "fen": "7k/R7/8/4p3/8/8/2K5/1R6 b - - 0 1",
+  "moves": [
+   "e5e4",
+   "b1b8"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Dein Turm auf a7 sperrt die siebte Reihe. Tb8# setzt matt – die beiden Türme arbeiten wie eine Treppe zusammen.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Dein Turm auf a7 sperrt die siebte Reihe. "
+    },
+    {
+     "type": "move",
+     "san": "Rb8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt – die beiden Türme arbeiten wie eine Treppe zusammen."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0009",
+  "fen": "2kr1b1r/pp1nqppp/8/8/5B2/8/PPP1BPPP/3Q1RK1 b - - 0 1",
+  "moves": [
+   "b7b6",
+   "e2a6"
+  ],
+  "rating": 600,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "bodenMate",
+   "mate",
+   "oneMove",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Bauernzug hat das Feld b7 geöffnet. La6# setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – ein Bodens Matt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Bauernzug hat das Feld b7 geöffnet. "
+    },
+    {
+     "type": "move",
+     "san": "Ba6#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – ein Bodens Matt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0010",
+  "fen": "1r5k/R7/p4N2/4p3/8/8/5PPP/6K1 b - - 0 1",
+  "moves": [
+   "a6a5",
+   "a7h7"
+  ],
+  "rating": 550,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "arabianMate",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Springer auf f6 deckt die Felder g8 und h7. Th7# setzt matt – das ist das Arabische Matt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Springer auf f6 deckt die Felder g8 und h7. "
+    },
+    {
+     "type": "move",
+     "san": "Rh7#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt – das ist das Arabische Matt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0011",
+  "fen": "5k2/8/5K2/7p/8/8/8/1Q6 b - - 0 1",
+  "moves": [
+   "h5h4",
+   "b1b8"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Dein König auf f6 nimmt dem schwarzen König alle Felder auf der siebten Reihe. Db8# setzt auf der Grundreihe matt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Dein König auf f6 nimmt dem schwarzen König alle Felder auf der siebten Reihe. "
+    },
+    {
+     "type": "move",
+     "san": "Qb8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt auf der Grundreihe matt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0012",
+  "fen": "rnbqr1k1/ppp1bppp/3p1n2/6N1/3P4/2N1B2Q/PPP2PPP/R4RK1 b - - 0 1",
+  "moves": [
+   "f6d5",
+   "h3h7",
+   "g8f8",
+   "h7h8"
+  ],
+  "rating": 1000,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn2",
+   "kingsideAttack",
+   "short",
+   "mate",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Dxh7+ treibt den König nach f8, denn dein Springer deckt h7. Mit Dh8# setzt du matt – der eigene Läufer auf e7 versperrt dem König die Flucht.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Qxh7+"
+    },
+    {
+     "type": "text",
+     "text": " treibt den König nach f8, denn dein Springer deckt h7. Mit "
+    },
+    {
+     "type": "move",
+     "san": "Qh8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt du matt – der eigene Läufer auf e7 versperrt dem König die Flucht."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0013",
+  "fen": "k7/8/1K6/6p1/8/8/8/7R b - - 0 1",
+  "moves": [
+   "g5g4",
+   "h1h8"
+  ],
+  "rating": 250,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Dein König auf b6 hält den schwarzen König in der Ecke fest. Mit Th8# setzt der Turm auf der Grundreihe matt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Dein König auf b6 hält den schwarzen König in der Ecke fest. Mit "
+    },
+    {
+     "type": "move",
+     "san": "Rh8#"
+    },
+    {
+     "type": "text",
+     "text": " setzt der Turm auf der Grundreihe matt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0014",
+  "fen": "rnbq1rk1/ppp1bppp/5n2/6N1/7Q/2NB4/PPP2PPP/R1B2RK1 b - - 0 1",
+  "moves": [
+   "f6d5",
+   "h4h7"
+  ],
+  "rating": 500,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "kingsideAttack",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Springer hat f6 verlassen – jetzt verteidigt niemand mehr h7. Dxh7# setzt matt, weil Springer und Läufer deine Dame decken.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Springer hat f6 verlassen – jetzt verteidigt niemand mehr h7. "
+    },
+    {
+     "type": "move",
+     "san": "Qxh7#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, weil Springer und Läufer deine Dame decken."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0015",
+  "fen": "3r2k1/p4ppp/8/8/4N3/8/P4PPP/6K1 b - - 0 1",
+  "moves": [
+   "d8d6",
+   "e4d6"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der schwarze Turm auf d6 steht ungedeckt im Angriff deines Springers. Mit Sxd6 gewinnst du einen ganzen Turm.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der schwarze Turm auf d6 steht ungedeckt im Angriff deines Springers. Mit "
+    },
+    {
+     "type": "move",
+     "san": "Nxd6"
+    },
+    {
+     "type": "text",
+     "text": " gewinnst du einen ganzen Turm."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0016",
+  "fen": "5rk1/ppp2ppp/8/4q3/8/3P4/PPP2PPP/3Q1RK1 b - - 0 1",
+  "moves": [
+   "e5e4",
+   "d3e4"
+  ],
+  "rating": 250,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Die schwarze Dame auf e4 steht im Angriff deines Bauern auf d3. Mit dxe4 gewinnst du die Dame für einen Bauern.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Die schwarze Dame auf e4 steht im Angriff deines Bauern auf d3. Mit "
+    },
+    {
+     "type": "move",
+     "san": "dxe4"
+    },
+    {
+     "type": "text",
+     "text": " gewinnst du die Dame für einen Bauern."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0017",
+  "fen": "2br2k1/2p2ppp/1p6/8/8/2N5/1PP2PPP/R5K1 b - - 0 1",
+  "moves": [
+   "c8a6",
+   "a1a6"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der schwarze Läufer auf a6 ist ungedeckt. Dein Turm auf a1 schlägt ihn mit Txa6 – eine ganze Figur mehr für dich.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der schwarze Läufer auf a6 ist ungedeckt. Dein Turm auf a1 schlägt ihn mit "
+    },
+    {
+     "type": "move",
+     "san": "Rxa6"
+    },
+    {
+     "type": "text",
+     "text": " – eine ganze Figur mehr für dich."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0018",
+  "fen": "r1b2rk1/ppp2ppp/2n5/7q/8/2NP4/PPP2PPP/R1BQ1RK1 b - - 0 1",
+  "moves": [
+   "h5g5",
+   "c1g5"
+  ],
+  "rating": 350,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Die schwarze Dame ist nach g5 geflüchtet – genau auf die Diagonale deines Läufers. Lxg5 gewinnt die Dame.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Die schwarze Dame ist nach g5 geflüchtet – genau auf die Diagonale deines Läufers. "
+    },
+    {
+     "type": "move",
+     "san": "Bxg5"
+    },
+    {
+     "type": "text",
+     "text": " gewinnt die Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0019",
+  "fen": "2r5/p4pkp/6p1/8/8/3B2P1/P4PKP/8 b - - 0 1",
+  "moves": [
+   "c8c4",
+   "d3c4"
+  ],
+  "rating": 250,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der schwarze Turm auf c4 ist ungedeckt und steht auf der Diagonale deines Läufers. Mit Lxc4 gewinnst du den Turm.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der schwarze Turm auf c4 ist ungedeckt und steht auf der Diagonale deines Läufers. Mit "
+    },
+    {
+     "type": "move",
+     "san": "Bxc4"
+    },
+    {
+     "type": "text",
+     "text": " gewinnst du den Turm."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0020",
+  "fen": "r1bq1rk1/pppn1pbp/5np1/8/3P4/2NB1N2/PPP2PPP/R1BQ1RK1 b - - 0 1",
+  "moves": [
+   "d7c5",
+   "d4c5"
+  ],
+  "rating": 450,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Springer auf c5 greift deinen Läufer an, ist aber selbst ungedeckt. Dein Bauer schlägt ihn mit dxc5.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Springer auf c5 greift deinen Läufer an, ist aber selbst ungedeckt. Dein Bauer schlägt ihn mit "
+    },
+    {
+     "type": "move",
+     "san": "dxc5"
+    },
+    {
+     "type": "text",
+     "text": "."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0021",
+  "fen": "r1bq1rk1/ppp2ppp/2nb4/3p4/3P4/2N5/PPPNBPPP/R1BQ1RK1 b - - 0 1",
+  "moves": [
+   "d6h2",
+   "g1h2"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Läufer auf h2 gibt zwar Schach, ist aber ungedeckt. Schlag ihn mit Kxh2 – dein König darf ungedeckte Figuren schlagen.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Läufer auf h2 gibt zwar Schach, ist aber ungedeckt. Schlag ihn mit "
+    },
+    {
+     "type": "move",
+     "san": "Kxh2"
+    },
+    {
+     "type": "text",
+     "text": " – dein König darf ungedeckte Figuren schlagen."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0022",
+  "fen": "4r1k1/pp3ppp/8/q7/8/3Q4/PPP2PPP/5RK1 b - - 0 1",
+  "moves": [
+   "e8e2",
+   "d3e2"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der schwarze Turm auf e2 steht ungedeckt neben deiner Dame. Mit Dxe2 gewinnst du ihn.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der schwarze Turm auf e2 steht ungedeckt neben deiner Dame. Mit "
+    },
+    {
+     "type": "move",
+     "san": "Qxe2"
+    },
+    {
+     "type": "text",
+     "text": " gewinnst du ihn."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0023",
+  "fen": "8/5k2/p5pp/1p6/1P1n4/P5PP/3B2K1/8 b - - 0 1",
+  "moves": [
+   "d4f3",
+   "g2f3"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Springer auf f3 ist ungedeckt und steht direkt neben deinem König. Schlag ihn mit Kxf3.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Springer auf f3 ist ungedeckt und steht direkt neben deinem König. Schlag ihn mit "
+    },
+    {
+     "type": "move",
+     "san": "Kxf3"
+    },
+    {
+     "type": "text",
+     "text": "."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0024",
+  "fen": "4r1k1/pp1b1ppp/1q6/7Q/5B2/7P/PPP2PP1/3R2K1 b - - 0 1",
+  "moves": [
+   "b6d4",
+   "d1d4"
+  ],
+  "rating": 250,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Die schwarze Dame auf d4 steht auf der offenen Linie deines Turms und ist ungedeckt. Txd4 gewinnt die Dame.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Die schwarze Dame auf d4 steht auf der offenen Linie deines Turms und ist ungedeckt. "
+    },
+    {
+     "type": "move",
+     "san": "Rxd4"
+    },
+    {
+     "type": "text",
+     "text": " gewinnt die Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0025",
+  "fen": "rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2",
+  "moves": [
+   "g2g4",
+   "d8h4"
+  ],
+  "rating": 200,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "opening"
+  ],
+  "openingTags": [
+   "Barnes_Opening"
+  ],
+  "source": "seed",
+  "explanation": {
+   "plain": "Weiß hat mit zwei Bauernzügen die Diagonale zu seinem König geöffnet. Dh4# setzt matt – das ist das Narrenmatt, das schnellste Matt im Schach.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Weiß hat mit zwei Bauernzügen die Diagonale zu seinem König geöffnet. "
+    },
+    {
+     "type": "move",
+     "san": "Qh4#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt – das ist das Narrenmatt, das schnellste Matt im Schach."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0026",
+  "fen": "rnb1k1nr/pppp1ppp/8/2b1p3/2B1P2q/2N5/PPPP1PPP/R1BQK1NR w KQkq - 4 4",
+  "moves": [
+   "g1f3",
+   "h4f2"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "mate",
+   "oneMove",
+   "opening",
+   "attackingF2F7"
+  ],
+  "openingTags": [
+   "Bishops_Opening"
+  ],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Bauer auf f2 ist nur vom König gedeckt. Dxf2# setzt matt, weil dein Läufer auf c5 die Dame schützt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Bauer auf f2 ist nur vom König gedeckt. "
+    },
+    {
+     "type": "move",
+     "san": "Qxf2#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, weil dein Läufer auf c5 die Dame schützt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0027",
+  "fen": "rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3",
+  "moves": [
+   "c4f7",
+   "e8f7"
+  ],
+  "rating": 300,
+  "ratingDeviation": 80,
+  "themes": [
+   "hangingPiece",
+   "oneMove",
+   "opening",
+   "advantage"
+  ],
+  "openingTags": [
+   "Bishops_Opening"
+  ],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Läufer auf f7 gibt zwar Schach, ist aber ungedeckt. Schlag ihn mit Kxf7 – du gewinnst eine Figur für einen Bauern.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Läufer auf f7 gibt zwar Schach, ist aber ungedeckt. Schlag ihn mit "
+    },
+    {
+     "type": "move",
+     "san": "Kxf7"
+    },
+    {
+     "type": "text",
+     "text": " – du gewinnst eine Figur für einen Bauern."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "hanging_piece"
+   ]
+  }
+ },
+ {
+  "id": "seed-0028",
+  "fen": "4r1k1/p4ppp/8/8/8/2B5/P4PPP/6K1 w - - 0 1",
+  "moves": [
+   "c3d4",
+   "e8e1"
+  ],
+  "rating": 400,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "backRankMate",
+   "mate",
+   "oneMove",
+   "endgame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der weiße Läufer deckt das Feld e1 nicht mehr. Te1# setzt matt, weil die eigenen Bauern dem König die Flucht versperren.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der weiße Läufer deckt das Feld e1 nicht mehr. "
+    },
+    {
+     "type": "move",
+     "san": "Re1#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, weil die eigenen Bauern dem König die Flucht versperren."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "back_rank"
+   ]
+  }
+ },
+ {
+  "id": "seed-0029",
+  "fen": "r2q1rk1/ppp2p1p/6p1/3N4/8/8/PPP2PPP/R3R1K1 b - - 0 1",
+  "moves": [
+   "d8d7",
+   "d5f6",
+   "g8g7",
+   "f6d7"
+  ],
+  "rating": 700,
+  "ratingDeviation": 80,
+  "themes": [
+   "fork",
+   "short",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Nach Sf6+ greift dein Springer König und Dame gleichzeitig an – eine Gabel. Der König muss weichen, dann schlägst du mit Sxd7 die Dame.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Nach "
+    },
+    {
+     "type": "move",
+     "san": "Nf6+"
+    },
+    {
+     "type": "text",
+     "text": " greift dein Springer König und Dame gleichzeitig an – eine Gabel. Der König muss weichen, dann schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Nxd7"
+    },
+    {
+     "type": "text",
+     "text": " die Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "fork"
+   ]
+  }
+ },
+ {
+  "id": "seed-0030",
+  "fen": "5rk1/pp3ppp/1b6/3N4/8/8/PP3PPP/3R2K1 b - - 0 1",
+  "moves": [
+   "f8c8",
+   "d5e7",
+   "g8f8",
+   "e7c8"
+  ],
+  "rating": 800,
+  "ratingDeviation": 80,
+  "themes": [
+   "fork",
+   "short",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Mit Se7+ greift dein Springer König und Turm gleichzeitig an. Nach dem Königszug schlägst du mit Sxc8 den Turm.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Mit "
+    },
+    {
+     "type": "move",
+     "san": "Ne7+"
+    },
+    {
+     "type": "text",
+     "text": " greift dein Springer König und Turm gleichzeitig an. Nach dem Königszug schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Nxc8"
+    },
+    {
+     "type": "text",
+     "text": " den Turm."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "fork"
+   ]
+  }
+ },
+ {
+  "id": "seed-0031",
+  "fen": "r1b1r1k1/ppp1qppp/2n5/8/8/2N5/PPP1QPPP/R1B1R1K1 b - - 0 1",
+  "moves": [
+   "e7d7",
+   "e2e8",
+   "d7e8",
+   "e1e8"
+  ],
+  "rating": 900,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn2",
+   "backRankMate",
+   "sacrifice",
+   "deflection",
+   "short",
+   "mate",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Das Damenopfer Dxe8+ lockt die schwarze Dame von d7 nach e8. Nach dem Zurückschlagen setzt Txe8# auf der Grundreihe matt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Das Damenopfer "
+    },
+    {
+     "type": "move",
+     "san": "Qxe8+"
+    },
+    {
+     "type": "text",
+     "text": " lockt die schwarze Dame von d7 nach e8. Nach dem Zurückschlagen setzt "
+    },
+    {
+     "type": "move",
+     "san": "Rxe8#"
+    },
+    {
+     "type": "text",
+     "text": " auf der Grundreihe matt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "back_rank"
+   ]
+  }
+ },
+ {
+  "id": "seed-0032",
+  "fen": "r2r2k1/ppp2ppp/8/4q3/8/3R4/PPP2PPP/3R2K1 b - - 0 1",
+  "moves": [
+   "e5b2",
+   "d3d8",
+   "a8d8",
+   "d1d8"
+  ],
+  "rating": 1000,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn2",
+   "backRankMate",
+   "short",
+   "mate",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Die schwarze Dame hat sich mit dem Bauernraub von der Grundreihe entfernt. Nach Txd8+ und dem Zurückschlagen setzt dein zweiter Turm mit Txd8# matt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Die schwarze Dame hat sich mit dem Bauernraub von der Grundreihe entfernt. Nach "
+    },
+    {
+     "type": "move",
+     "san": "Rxd8+"
+    },
+    {
+     "type": "text",
+     "text": " und dem Zurückschlagen setzt dein zweiter Turm mit "
+    },
+    {
+     "type": "move",
+     "san": "Rxd8#"
+    },
+    {
+     "type": "text",
+     "text": " matt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "back_rank"
+   ]
+  }
+ },
+ {
+  "id": "seed-0033",
+  "fen": "1r6/4k3/5p2/p5p1/8/P5P1/1P3K2/7R b - - 0 1",
+  "moves": [
+   "b8b7",
+   "h1h7",
+   "e7d6",
+   "h7b7"
+  ],
+  "rating": 1000,
+  "ratingDeviation": 80,
+  "themes": [
+   "skewer",
+   "short",
+   "endgame",
+   "rookEndgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Th7+ ist ein Spieß: Der König muss die siebte Reihe verlassen. Danach schlägst du mit Txb7 den Turm dahinter.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Rh7+"
+    },
+    {
+     "type": "text",
+     "text": " ist ein Spieß: Der König muss die siebte Reihe verlassen. Danach schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Rxb7"
+    },
+    {
+     "type": "text",
+     "text": " den Turm dahinter."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "skewer"
+   ]
+  }
+ },
+ {
+  "id": "seed-0034",
+  "fen": "r2r2k1/pb1q1ppp/1p6/2p5/8/2NB4/PPP2PPP/2BR1RK1 b - - 0 1",
+  "moves": [
+   "d8e8",
+   "d3h7",
+   "g8h7",
+   "d1d7"
+  ],
+  "rating": 1100,
+  "ratingDeviation": 80,
+  "themes": [
+   "discoveredAttack",
+   "short",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Lxh7+ gibt Schach und öffnet gleichzeitig die d-Linie für deinen Turm – ein Abzugsangriff. Nachdem der König den Läufer geschlagen hat, gewinnt Txd7 die ungedeckte Dame.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Bxh7+"
+    },
+    {
+     "type": "text",
+     "text": " gibt Schach und öffnet gleichzeitig die d-Linie für deinen Turm – ein Abzugsangriff. Nachdem der König den Läufer geschlagen hat, gewinnt "
+    },
+    {
+     "type": "move",
+     "san": "Rxd7"
+    },
+    {
+     "type": "text",
+     "text": " die ungedeckte Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "discovered_attack"
+   ]
+  }
+ },
+ {
+  "id": "seed-0035",
+  "fen": "r4rk1/p3b1pp/1p3q2/2p1p3/8/1P1B4/P1P1QPPP/R4RK1 b - - 0 1",
+  "moves": [
+   "f6f7",
+   "d3c4"
+  ],
+  "rating": 1200,
+  "ratingDeviation": 80,
+  "themes": [
+   "pin",
+   "quietMove",
+   "oneMove",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Lc4 fesselt die schwarze Dame an ihren König: Sie darf die Diagonale nicht verlassen. Schwarz verliert die Dame für deinen Läufer.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Bc4"
+    },
+    {
+     "type": "text",
+     "text": " fesselt die schwarze Dame an ihren König: Sie darf die Diagonale nicht verlassen. Schwarz verliert die Dame für deinen Läufer."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "pin"
+   ]
+  }
+ },
+ {
+  "id": "seed-0036",
+  "fen": "rnbqkb1r/pppp1ppp/5n2/8/4N3/8/PPPP1PPP/R1BQR1K1 b kq - 0 1",
+  "moves": [
+   "f6g4",
+   "e4f6"
+  ],
+  "rating": 700,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn1",
+   "doubleCheck",
+   "mate",
+   "oneMove",
+   "opening"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Zieht dein Springer von e4 nach f6, gibt er Schach und öffnet zugleich die e-Linie für deinen Turm – ein Doppelschach. Sf6# setzt matt, denn gegen ein Doppelschach hilft nur ein Königszug, und der König hat kein freies Feld. Sd6# geht genauso.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Zieht dein Springer von e4 nach f6, gibt er Schach und öffnet zugleich die e-Linie für deinen Turm – ein Doppelschach. "
+    },
+    {
+     "type": "move",
+     "san": "Nf6#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt, denn gegen ein Doppelschach hilft nur ein Königszug, und der König hat kein freies Feld. "
+    },
+    {
+     "type": "move",
+     "san": "Nd6#"
+    },
+    {
+     "type": "text",
+     "text": " geht genauso."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate",
+    "double_check"
+   ]
+  }
+ },
+ {
+  "id": "seed-0037",
+  "fen": "r1bqkb1r/pppp1ppp/2n5/4p3/2B1n3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5",
+  "moves": [
+   "c3e4",
+   "d7d5"
+  ],
+  "rating": 900,
+  "ratingDeviation": 80,
+  "themes": [
+   "fork",
+   "oneMove",
+   "opening",
+   "equality"
+  ],
+  "openingTags": [
+   "Italian_Game",
+   "Italian_Game_Two_Knights_Defense"
+  ],
+  "source": "seed",
+  "explanation": {
+   "plain": "Weiß hat deinen Springer auf e4 zurückgeschlagen. Mit d5 greift dein Bauer Läufer und Springer gleichzeitig an – eine Bauerngabel, mit der du die Figur zurückgewinnst.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Weiß hat deinen Springer auf e4 zurückgeschlagen. Mit "
+    },
+    {
+     "type": "move",
+     "san": "d5"
+    },
+    {
+     "type": "text",
+     "text": " greift dein Bauer Läufer und Springer gleichzeitig an – eine Bauerngabel, mit der du die Figur zurückgewinnst."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "fork"
+   ]
+  }
+ },
+ {
+  "id": "seed-0038",
+  "fen": "4q3/8/3k2p1/7p/7P/6P1/1B4K1/R7 b - - 0 1",
+  "moves": [
+   "d6e6",
+   "a1e1",
+   "e6f7",
+   "e1e8"
+  ],
+  "rating": 1000,
+  "ratingDeviation": 80,
+  "themes": [
+   "skewer",
+   "short",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Te1+ ist ein Spieß: Der König muss die e-Linie verlassen. Danach schlägst du mit Txe8 die Dame, die hinter ihm stand.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Re1+"
+    },
+    {
+     "type": "text",
+     "text": " ist ein Spieß: Der König muss die e-Linie verlassen. Danach schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Rxe8"
+    },
+    {
+     "type": "text",
+     "text": " die Dame, die hinter ihm stand."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "skewer"
+   ]
+  }
+ },
+ {
+  "id": "seed-0039",
+  "fen": "rnbqkb1r/pppp1ppp/8/4N3/4n3/8/PPPPQPPP/RNB1KB1R b KQkq - 1 4",
+  "moves": [
+   "e4f6",
+   "e5c6",
+   "f8e7",
+   "c6d8"
+  ],
+  "rating": 850,
+  "ratingDeviation": 80,
+  "themes": [
+   "discoveredAttack",
+   "short",
+   "opening",
+   "crushing"
+  ],
+  "openingTags": [
+   "Russian_Game"
+  ],
+  "source": "seed",
+  "explanation": {
+   "plain": "Nach Sc6+ gibt deine Dame Abzugsschach, und der Springer greift gleichzeitig die schwarze Dame an. Schwarz muss das Schach abwehren, dann schlägst du mit Sxd8 die Dame.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Nach "
+    },
+    {
+     "type": "move",
+     "san": "Nc6+"
+    },
+    {
+     "type": "text",
+     "text": " gibt deine Dame Abzugsschach, und der Springer greift gleichzeitig die schwarze Dame an. Schwarz muss das Schach abwehren, dann schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Nxd8"
+    },
+    {
+     "type": "text",
+     "text": " die Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "discovered_attack"
+   ]
+  }
+ },
+ {
+  "id": "seed-0040",
+  "fen": "rn1qkbnr/ppp2p1p/3p2p1/4N3/2B1P1b1/2N5/PPPP1PPP/R1BQK2R b KQkq - 0 5",
+  "moves": [
+   "g4d1",
+   "c4f7",
+   "e8e7",
+   "c3d5"
+  ],
+  "rating": 1100,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn2",
+   "sacrifice",
+   "attackingF2F7",
+   "short",
+   "mate",
+   "opening"
+  ],
+  "openingTags": [
+   "Philidor_Defense"
+  ],
+  "source": "seed",
+  "explanation": {
+   "plain": "Schwarz hat deine Dame geschlagen, aber jetzt fehlt ihm die Zeit. Nach Lxf7+ muss der König nach e7, und Sd5# setzt matt – das ist das Seekadettenmatt.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Schwarz hat deine Dame geschlagen, aber jetzt fehlt ihm die Zeit. Nach "
+    },
+    {
+     "type": "move",
+     "san": "Bxf7+"
+    },
+    {
+     "type": "text",
+     "text": " muss der König nach e7, und "
+    },
+    {
+     "type": "move",
+     "san": "Nd5#"
+    },
+    {
+     "type": "text",
+     "text": " setzt matt – das ist das Seekadettenmatt."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0041",
+  "fen": "3q1rk1/ppp2ppp/8/8/5n2/8/PPPQ1PPP/2B2RK1 w - - 0 1",
+  "moves": [
+   "d2c3",
+   "f4e2",
+   "g1h1",
+   "e2c3"
+  ],
+  "rating": 750,
+  "ratingDeviation": 80,
+  "themes": [
+   "fork",
+   "short",
+   "middlegame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Se2+ ist eine Springergabel: Dein Springer gibt Schach und greift gleichzeitig die Dame auf c3 an. Nach dem Königszug schlägst du mit Sxc3 die Dame.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Ne2+"
+    },
+    {
+     "type": "text",
+     "text": " ist eine Springergabel: Dein Springer gibt Schach und greift gleichzeitig die Dame auf c3 an. Nach dem Königszug schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Nxc3"
+    },
+    {
+     "type": "text",
+     "text": " die Dame."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "fork"
+   ]
+  }
+ },
+ {
+  "id": "seed-0042",
+  "fen": "r1b2rk1/ppp2ppp/8/8/6nq/1Q3N2/PPP1BPPP/R2R2K1 w - - 0 1",
+  "moves": [
+   "f3e5",
+   "h4h2",
+   "g1f1",
+   "h2h1"
+  ],
+  "rating": 1100,
+  "ratingDeviation": 80,
+  "themes": [
+   "mateIn2",
+   "kingsideAttack",
+   "short",
+   "mate",
+   "middlegame"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Der Springer hat f3 verlassen und deckt h2 nicht mehr. Dxh2+ treibt den König nach f1, dann setzt Dh1# matt – der eigene Läufer auf e2 versperrt die Flucht.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Der Springer hat f3 verlassen und deckt h2 nicht mehr. "
+    },
+    {
+     "type": "move",
+     "san": "Qxh2+"
+    },
+    {
+     "type": "text",
+     "text": " treibt den König nach f1, dann setzt "
+    },
+    {
+     "type": "move",
+     "san": "Qh1#"
+    },
+    {
+     "type": "text",
+     "text": " matt – der eigene Läufer auf e2 versperrt die Flucht."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "mate"
+   ]
+  }
+ },
+ {
+  "id": "seed-0043",
+  "fen": "8/ppp4k/8/PPP5/8/8/7K/8 b - - 0 1",
+  "moves": [
+   "h7g7",
+   "b5b6",
+   "a7b6",
+   "c5c6",
+   "b7c6",
+   "a5a6"
+  ],
+  "rating": 1300,
+  "ratingDeviation": 80,
+  "themes": [
+   "pawnEndgame",
+   "advancedPawn",
+   "sacrifice",
+   "long",
+   "endgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Mit b6 opferst du einen Bauern, um die schwarze Bauernkette aufzubrechen. Nach c6 und a6 ist dein a-Bauer nicht mehr aufzuhalten.",
+   "segments": [
+    {
+     "type": "text",
+     "text": "Mit "
+    },
+    {
+     "type": "move",
+     "san": "b6"
+    },
+    {
+     "type": "text",
+     "text": " opferst du einen Bauern, um die schwarze Bauernkette aufzubrechen. Nach "
+    },
+    {
+     "type": "move",
+     "san": "c6"
+    },
+    {
+     "type": "text",
+     "text": " und "
+    },
+    {
+     "type": "move",
+     "san": "a6"
+    },
+    {
+     "type": "text",
+     "text": " ist dein a-Bauer nicht mehr aufzuhalten."
+    }
+   ],
+   "source": "rule",
+   "motifs": []
+  }
+ },
+ {
+  "id": "seed-0044",
+  "fen": "8/5p2/pq2pk2/7Q/8/8/PP3PPP/6K1 b - - 0 1",
+  "moves": [
+   "b6b2",
+   "h5h8",
+   "f6e7",
+   "h8b2"
+  ],
+  "rating": 1100,
+  "ratingDeviation": 80,
+  "themes": [
+   "skewer",
+   "short",
+   "endgame",
+   "queenEndgame",
+   "crushing"
+  ],
+  "openingTags": [],
+  "source": "seed",
+  "explanation": {
+   "plain": "Dh8+ ist ein Spieß auf der langen Diagonale: Der König muss weichen. Danach schlägst du mit Dxb2 die Dame hinter ihm.",
+   "segments": [
+    {
+     "type": "move",
+     "san": "Qh8+"
+    },
+    {
+     "type": "text",
+     "text": " ist ein Spieß auf der langen Diagonale: Der König muss weichen. Danach schlägst du mit "
+    },
+    {
+     "type": "move",
+     "san": "Qxb2"
+    },
+    {
+     "type": "text",
+     "text": " die Dame hinter ihm."
+    }
+   ],
+   "source": "rule",
+   "motifs": [
+    "skewer"
+   ]
+  }
+ }
+]

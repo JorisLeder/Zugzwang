@@ -36,14 +36,14 @@ export interface SkillParams {
   plausibilityTemperature: number;
 }
 
-/** Skill parameters by Elo (100 → very weak … 790 → weak). */
+/** Skill parameters by Elo (100 → very weak … 790 → weak). Gross errors fall geometrically from 65 % to 18 %. */
 export function skillParams(elo: number): SkillParams {
   const t = clamp((elo - 100) / 600, 0, 1);
   return {
     skillLevel: clamp(Math.round(lerp(0, 3, t)), 0, 3),
-    depth: clamp(Math.round(lerp(1, 5, t)), 1, 5),
+    depth: clamp(Math.round(lerp(1, 6, t)), 1, 6),
     movetimeMs: 300,
-    grossErrorRate: Number(lerp(0.6, 0.2, t).toFixed(3)),
+    grossErrorRate: Number((0.65 * Math.pow(0.18 / 0.65, t)).toFixed(3)),
     plausibilityTemperature: Number(lerp(1.6, 1.0, t).toFixed(3)),
   };
 }
@@ -72,12 +72,12 @@ export function humanParams(elo: number, style?: BotProfile['style']): HumanPara
   const aggressive = style === 'aggressive' || style === 'tactical' || style === 'gambit';
   const quiet = style === 'solid' || style === 'positional' || style === 'cautious';
   return {
-    depth: clamp(Math.round(lerp(5, 10, t)), 3, 12),
+    depth: clamp(Math.round(lerp(7, 12, t)), 3, 14),
     multiPv: clamp(Math.round(lerp(12, 8, t)), 8, 12),
-    movetimeMs: 650,
-    temperature: Number((0.075 * Math.pow(0.012 / 0.075, t)).toFixed(4)),
-    blindness: Number(lerp(0.35, 0.05, t).toFixed(3)),
-    shallowDepth: t < 0.5 ? 1 : 2,
+    movetimeMs: 700,
+    temperature: Number((0.06 * Math.pow(0.016 / 0.06, t)).toFixed(4)),
+    blindness: Number(lerp(0.2, 0.03, t).toFixed(3)),
+    shallowDepth: clamp(Math.round(lerp(2, 5, t)), 1, 6),
     natural: {
       recapture: 1.2,
       check: aggressive ? 0.8 : 0.4,
@@ -97,7 +97,14 @@ export interface EloParams {
   depth: number;
 }
 
+/**
+ * Offset from the bot's (human-scale) Elo to Stockfish's `UCI_Elo`. Stockfish's limiter is anchored to engine
+ * rating lists at longer time controls; with ≤ 1 s per move it plays clearly below its nominal value, so the strong
+ * bots ask for more (measured by the calibration: the 2200 bot must lose less than the 2000 bot).
+ */
+export const UCI_ELO_OFFSET = 400;
+
 /** Elo-bot parameters. */
 export function eloParams(elo: number): EloParams {
-  return { uciElo: Math.round(elo), movetimeMs: 500, depth: 16 };
+  return { uciElo: Math.round(elo + UCI_ELO_OFFSET), movetimeMs: 800, depth: 20 };
 }

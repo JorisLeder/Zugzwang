@@ -171,8 +171,9 @@ describe('model parameters (D-16)', () => {
     }
   });
 
-  it('strong bots use UCI_Elo = their Elo', () => {
-    expect(eloParams(2200).uciElo).toBe(2200);
+  it('strong bots use UCI_LimitStrength with an Elo above the weaker bots', () => {
+    expect(eloParams(2200).uciElo).toBeGreaterThanOrEqual(2200);
+    expect(eloParams(2500).uciElo).toBeGreaterThan(eloParams(2200).uciElo);
     expect(eloParams(2500).movetimeMs).toBeLessThanOrEqual(1000);
   });
 });

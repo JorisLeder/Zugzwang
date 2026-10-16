@@ -36,13 +36,6 @@ function arg(name: string): string | undefined {
   return i >= 0 ? process.argv[i + 1] : undefined;
 }
 
-/** Stable small hash of a string (per-bot seed). */
-function hash(s: string): number {
-  let h = 2166136261;
-  for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-  return h >>> 0;
-}
-
 /** Evenly spaced subset of `n` positions (deterministic). */
 export function spread<T>(items: T[], n: number | undefined): T[] {
   if (!n || n >= items.length) return items;
@@ -99,7 +92,7 @@ async function measure(bots: BotProfile[], positions: CalibrationPosition[], ref
   const stats: BotStats[] = [];
   try {
     for (const bot of bots) {
-      const sb = new StockfishBotEngine(play, { random: createSeededRandom(seed + hash(bot.id)), useRepertoire: false });
+      const sb = new StockfishBotEngine(play, { random: createSeededRandom(seed), useRepertoire: false });
       const samples: MoveSample[] = [];
       for (const [i, pos] of positions.entries()) {
         const move = await sb.chooseMove({ bot, startFen: pos.startFen, moves: pos.moves });

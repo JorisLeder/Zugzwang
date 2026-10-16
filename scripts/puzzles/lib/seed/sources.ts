@@ -160,7 +160,7 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
   },
   {
     id: 'seed-0018',
-    fen: 'r1b2rk1/ppp2ppp/2n5/7q/3P4/2N5/PPP2PPP/R1BQ1RK1 b - - 0 1',
+    fen: 'r1b2rk1/ppp2ppp/2n5/7q/8/2NP4/PPP2PPP/R1BQ1RK1 b - - 0 1',
     line: ['Qg5', 'Bxg5'],
     rating: 350,
     themes: ['hangingPiece', 'oneMove', 'middlegame', 'crushing'],
@@ -208,7 +208,7 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
   },
   {
     id: 'seed-0024',
-    fen: '4r1k1/pp1b1ppp/1q6/8/5B2/5Q2/PPP2PPP/3R2K1 b - - 0 1',
+    fen: '4r1k1/pp1b1ppp/1q6/7Q/5B2/7P/PPP2PP1/3R2K1 b - - 0 1',
     line: ['Qd4', 'Rxd4'],
     rating: 250,
     themes: ['hangingPiece', 'oneMove', 'middlegame', 'crushing'],
@@ -253,7 +253,7 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
   // ---------------------------------------------------------------- medium
   {
     id: 'seed-0029',
-    fen: 'r2q1rk1/ppp2p1p/6p1/3N4/8/8/PPP1QPPP/5RK1 b - - 0 1',
+    fen: 'r2q1rk1/ppp2p1p/6p1/3N4/8/8/PPP2PPP/R3R1K1 b - - 0 1',
     line: ['Qd7', 'Nf6+', 'Kg7', 'Nxd7'],
     rating: 700,
     themes: ['fork', 'short', 'middlegame', 'crushing'],
@@ -293,11 +293,11 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
   },
   {
     id: 'seed-0034',
-    fen: 'r2r2k1/pb1q1ppp/1p6/2p5/8/2NB1N2/PPP2PPP/2BR1RK1 b - - 0 1',
+    fen: 'r2r2k1/pb1q1ppp/1p6/2p5/8/2NB4/PPP2PPP/2BR1RK1 b - - 0 1',
     line: ['Re8', 'Bxh7+', 'Kxh7', 'Rxd7'],
     rating: 1100,
     themes: ['discoveredAttack', 'short', 'middlegame', 'crushing'],
-    explanation: '[[Bxh7+]] ist ein Abzugsschach: Der Läufer gibt Schach und macht die d-Linie für deinen Turm frei. Nachdem der König den Läufer geschlagen hat, gewinnt [[Rxd7]] die ungedeckte Dame.',
+    explanation: '[[Bxh7+]] gibt Schach und öffnet gleichzeitig die d-Linie für deinen Turm – ein Abzugsangriff. Nachdem der König den Läufer geschlagen hat, gewinnt [[Rxd7]] die ungedeckte Dame.',
   },
   {
     id: 'seed-0035',
@@ -309,23 +309,26 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
   },
   {
     id: 'seed-0036',
-    fen: 'rnbqk1nr/ppp1bppp/3p4/4p3/2P1P3/2NP4/PP2NPPP/R1BQKB1R b KQkq - 0 1',
-    line: ['Bh4', 'Qa4+', 'c6', 'Qxh4'],
-    rating: 900,
-    themes: ['fork', 'short', 'opening', 'crushing'],
-    explanation: '[[Qa4+]] ist ein Doppelangriff: Deine Dame gibt Schach und greift gleichzeitig den ungedeckten Läufer auf h4 an. Nach der Abwehr des Schachs schlägst du mit [[Qxh4]] den Läufer.',
+    fen: 'rnbqkb1r/pppp1ppp/5n2/8/4N3/8/PPPP1PPP/R1BQR1K1 b kq - 0 1',
+    line: ['Ng4', 'Nf6#'],
+    rating: 700,
+    themes: ['mateIn1', 'doubleCheck', 'mate', 'oneMove', 'opening'],
+    explanation:
+      'Zieht dein Springer von e4 nach f6, gibt er Schach und öffnet zugleich die e-Linie für deinen Turm – ein Doppelschach. [[Nf6#]] setzt matt, denn gegen ein Doppelschach hilft nur ein Königszug, und der König hat kein freies Feld. [[Nd6#]] geht genauso.',
   },
   {
     id: 'seed-0037',
-    fen: 'rnbq1rk1/ppppbppp/5n2/8/3PP3/2NB1N2/PPP2PPP/R1BQ1RK1 b - - 0 1',
-    line: ['Bd6', 'e5'],
+    fen: after('e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Nf6', 'Nc3', 'Nxe4'),
+    line: ['Nxe4', 'd5'],
     rating: 900,
-    themes: ['fork', 'oneMove', 'middlegame', 'advantage'],
-    explanation: '[[e5]] ist eine Bauerngabel: Dein Bauer greift Läufer und Springer gleichzeitig an. Schwarz kann nur eine der beiden Figuren retten.',
+    themes: ['fork', 'oneMove', 'opening', 'equality'],
+    openingTags: ['Italian_Game', 'Italian_Game_Two_Knights_Defense'],
+    explanation:
+      'Weiß hat deinen Springer auf e4 zurückgeschlagen. Mit [[d5]] greift dein Bauer Läufer und Springer gleichzeitig an – eine Bauerngabel, mit der du die Figur zurückgewinnst.',
   },
   {
     id: 'seed-0038',
-    fen: '4q3/8/3k2p1/7p/7P/5BP1/6K1/R7 b - - 0 1',
+    fen: '4q3/8/3k2p1/7p/7P/6P1/1B4K1/R7 b - - 0 1',
     line: ['Ke6', 'Re1+', 'Kf7', 'Rxe8'],
     rating: 1000,
     themes: ['skewer', 'short', 'endgame', 'crushing'],
@@ -367,8 +370,8 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
   },
   {
     id: 'seed-0043',
-    fen: '8/ppp3k1/8/PPP5/8/8/6K1/8 b - - 0 1',
-    line: ['Kf7', 'b6', 'axb6', 'c6', 'bxc6', 'a6'],
+    fen: '8/ppp4k/8/PPP5/8/8/7K/8 b - - 0 1',
+    line: ['Kg7', 'b6', 'axb6', 'c6', 'bxc6', 'a6'],
     rating: 1300,
     themes: ['pawnEndgame', 'advancedPawn', 'sacrifice', 'long', 'endgame', 'crushing'],
     explanation: 'Mit [[b6]] opferst du einen Bauern, um die schwarze Bauernkette aufzubrechen. Nach [[c6]] und [[a6]] ist dein a-Bauer nicht mehr aufzuhalten.',
@@ -391,7 +394,7 @@ export const DEMO_SOURCES: SeedPuzzleSource[] = [
     line: ['Bc4', 'Rd8#'],
     rating: 300,
     themes: ['mateIn1', 'backRankMate', 'mate', 'oneMove', 'endgame'],
-    explanation: 'Der Läufer deckt das Feld e8 nicht mehr. [[Rd8#]] setzt auf der Grundreihe matt, weil die eigenen Bauern dem König die Flucht versperren.',
+    explanation: 'Der Läufer kann sich nicht mehr auf e8 dazwischenstellen. [[Rd8#]] setzt auf der Grundreihe matt, weil die eigenen Bauern dem König die Flucht versperren.',
   },
   {
     id: 'demo-2',

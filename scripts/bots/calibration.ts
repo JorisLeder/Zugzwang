@@ -208,7 +208,8 @@ export function renderReport(stats: BotStats[], criteria: CriterionResult[], met
     `- Positions: ${meta.positions} positions (every position before a move with more than one legal move) from the`,
     `  fixture games: ${meta.games.join(', ')} (\`scripts/bots/fixtureGames.ts\`).`,
     '- Each bot chooses one move per position with its production model (`createBotEngineWithOptions`, Node Stockfish',
-    `  \`${meta.engineId}\`), without the opening repertoire, seeded random (seed ${meta.seed} + bot id).`,
+    `  \`${meta.engineId}\`), without the opening repertoire; every bot uses the same random seed ${meta.seed} (common random numbers – the
+  differences between bots are less noisy).`,
     `- Reference: Stockfish depth ${meta.referenceDepth} on the position before and after the move. Expected-points loss`,
     '  L = max(0, EP(best) − EP(played)), EP = win% / 100 from the mover\'s point of view (Lichess formula, D-07/D-08);',
     "  the reference engine's own best move counts as L = 0.",
