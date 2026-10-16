@@ -24,7 +24,6 @@ export function Component() {
             options={[
               { value: 'dark', label: STRINGS_DE.themeDark },
               { value: 'light', label: STRINGS_DE.themeLight },
-              { value: 'system', label: STRINGS_DE.themeSystem },
             ]}
           />
         </div>

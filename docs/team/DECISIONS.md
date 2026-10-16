@@ -260,3 +260,83 @@ records it in RULES.md. Bot names/avatars: created by WP-04 (original, no chess.
 the wave-1 design review. Fonts: Inter self-hosted via `@fontsource-variable/inter` (OFL-1.1). Radix: the umbrella
 package `radix-ui` provides the primitives DESIGN §11 lists.
 Reason: DESIGN.md §12 open points 4–5 and §11 dependency requests.
+
+---
+
+*Round 1 – manager check of WP-00 (integration of wave 0).*
+
+**D-43 – Theme "System" (follow the OS)?**
+Decision: The settings UI offers only *Dunkel* (default) and *Hell*. The contract value `theme: 'system'` stays in
+`Settings`/`settingsSchema` (no contract churn, harmless for stored data) but is never offered in V1; WP-00's settings
+placeholder no longer shows it, and WP-09 must not add it.
+Reason: PRD §6 Einstellungen lists "Hell/Dunkel", the PRD stack row says "Dunkles Design als Standard, helles wählbar",
+and DESIGN §2 says "There is no automatic switch by OS preference". A third option is not a PRD requirement.
+
+**D-44 – Attack and FEN helpers in `lib/chess`.**
+Decision: The manager added `src/lib/chess/board.ts` (frozen like the rest of `lib/chess`): `attackersOf`,
+`isSquareAttacked`, `boardPieces`, `kingSquare`, `parseFen`, `buildFen`, `nullMoveFen`, with tests.
+Reason: chess.js may only be imported in `src/lib/chess` (lint rule, CONSTRAINTS §3), but WP-02 (motif detectors, SEE,
+`findThreats`), WP-04 (rule-based errors of weak bots) and WP-01 (position editor) need attack maps, piece lists and a
+null move. Without the helpers they would be blocked or would re-implement attack rules by hand. Attacks count pinned
+pieces (a pinned piece still attacks and gives check, FIDE 3.9) and ignore en passant (it is a move, not an attack on a square).
+
+**D-45 – Test bundle for component tests.**
+Decision: `createFakeAppServices(overrides?)` in `@/core/testing` builds a complete `AppServices` from fakes;
+`src/app/App.test.tsx` uses it; tests must not call `createAppServices(readAppConfig({}))`. The dom test setup loads
+`fake-indexeddb/auto`.
+Reason: Once wave 1 replaces the placeholder factories, `createAppServices` creates Stockfish workers and a Dexie
+database, which jsdom lacks – every component test would then depend on every other package.
+
+**D-46 – Parallel e2e dev servers.**
+Decision: In Vite mode `e2e`, each `E2E_PORT` gets its own dependency cache (`node_modules/.vite/e2e-<port>`), all
+runtime dependencies are pre-bundled (`optimizeDeps.include`), and HMR is off. Wave coders run e2e with `--workers=1`.
+Reason: Up to six coders run dev-server e2e at the same time in one tree on 4 cores. A shared optimiser cache and HMR
+would reload or break each other's pages mid-test (verified: touching `src/app/routes.tsx` during a page session in
+e2e mode causes no reload and no console error).
+
+**D-47 – Piece artwork licence.**
+Decision: Use react-chessboard's default pieces. They are the "Cburnett" set by Colin M. L. Burnett; we use them under
+GPL-2.0-or-later (compatible with the app's GPL-3.0 situation) with attribution in `THIRD_PARTY_NOTICES.md`.
+Reason: react-chessboard `src/pieces.tsx` (commit d2dc982) names the source (Wikimedia Commons, "By en:User:Cburnett",
+CC BY-SA 3.0); lichess-org/lila `COPYING.md` lists the same set (`public/piece/cburnett`) as GPLv2+ by Colin M. L. Burnett.
+
+**D-48 – Commits.**
+Decision: The WP-00 coder's commit `c3bb5b6 WP-00 Foundation` (made on the orchestrator's explicit instruction, also
+containing the round-0 planning documents) is accepted. From wave 1 on, coders never commit; the manager commits after
+each integration check (CONSTRAINTS §6).
+Reason: The instructions conflicted; the result is correct and the history is clean. One committer avoids partial commits
+of eight parallel packages.
+
+**D-49 – WP-00's own decisions (CONVENTIONS §15).**
+Decision: Accepted as binding: epoch default for `Settings.updatedAt`; `Score` mate 0 = side to move is mated;
+`ChessGame.move()` refuses moves after the end and `undo()` clears a manual end; Board `MoveRecord.ply` relative to the
+shown position; bot rating opponent = bot Elo from `WhiteElo`/`BlackElo` with RD 50 (bot games must write the header,
+now in WP-04's instructions); `puzzle_attempts.puzzle_rd`; `profiles.id` as owner column; `useSettings()`/`useUpdateSettings()`;
+`handle.public`/`handle.bare` route flags.
+Reason: Each fills a gap the backlog left open, none contradicts the PRD or CONSTRAINTS, and all are documented and tested.
+
+**D-50 – Wave-1 acceptance criteria that need persistence.**
+Decision: Until WP-08 is integrated the app runs on the in-memory data layer, which a reload wipes. Wave-1 packages prove
+"after reload/second device" behaviour with remount or two-instance tests on one shared `createMemoryDataServices()`;
+the corresponding e2e tests are written now as `test.fixme(true, 'needs WP-08 persistence …')` and enabled by the
+manager in the integration round.
+Reason: The criteria stay testable in wave 1 without coupling eight parallel packages to WP-08's progress.
+
+**D-51 – Engine workers are created lazily.**
+Decision: `createEngineService` must not create its Web Worker at construction; it starts on `init()` or the first call.
+Without `Worker` (jsdom, Node) construction succeeds and `init()` reports the error state.
+Reason: `createAppServices` builds both engines at app start; eager workers would download and start two Stockfish
+WASM instances on every page (first-load budget ≤ 2.5 s, Lighthouse ≥ 85) and crash jsdom tests.
+
+**D-52 – Lesson fixture course in e2e builds.**
+Decision: The lesson loader (WP-06) adds the fixture course `fixture-course` only when `config.e2e` is true; production
+never shows it. WP-06's e2e tests use only that course.
+Reason: WP-07 writes `content/lessons/` in parallel; WP-06's tests must not depend on half-finished content, and test
+content must not reach learners.
+
+**D-53 – Resignation against a side that cannot mate (FIDE 5.1.2).**
+Decision: Keep the implemented rule: resigning loses, unless the opponent cannot checkmate by any series of legal moves –
+then the game is drawn (`ChessGame.resign`, fixture F8). Confirmed by the manager via the FIDE Rules Commission's
+Article 5 page (rcc.fide.com/article5), which states this exception; the rules auditor should upgrade RULES.md §2.5 from
+[SUBSTANCE]/[UNCONFIRMED] wording accordingly in the wave-1 rules review.
+Reason: User request to check rules against the official rulebook; RULES.md had marked the exact 2023 wording unconfirmed.

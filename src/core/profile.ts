@@ -7,7 +7,10 @@ import type { PuzzleThemeId } from './puzzles';
 
 /** User settings (stored in `profiles.settings`, last writer wins by `updatedAt`). */
 export interface Settings {
-  /** Design: dark is the default (DESIGN §2); `system` follows the OS. */
+  /**
+   * Design: dark is the default (DESIGN §2). The UI offers only Dunkel/Hell (D-43); `system` (follow the OS) is kept
+   * in the contract for stored data and later use but is never offered in V1.
+   */
   theme: 'dark' | 'light' | 'system';
   /** Brettdesign: Moos (default) or Holz. */
   boardTheme: 'moos' | 'holz';

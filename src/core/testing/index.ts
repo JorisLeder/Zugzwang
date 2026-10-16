@@ -8,4 +8,5 @@ export { FakeEngineService, type FakeEngineLines, type FakeEngineOptions } from 
 export { FakeExplanationService } from './fakeExplain';
 export { createFakeUciTransport, type FakeUciOptions, type FakeUciSearch, type FakeUciTransport } from './fakeUciTransport';
 export { FIXTURE_BOTS, FIXTURE_COURSE, FIXTURE_GAME, FIXTURE_LESSON, FIXTURE_PUZZLES, type FixtureGame } from './fixtures';
+export { createFakeAppServices, type FakeAppServicesOverrides } from './fakeAppServices';
 export { createMemoryDataServices, type MemoryDataOptions, type MemoryDataServices } from './memoryData';

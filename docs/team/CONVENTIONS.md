@@ -74,12 +74,15 @@ files.
 | Lint | `npm run lint` | `npx eslint <your paths>` |
 | Unit tests | `npm test` | `npx vitest run <your paths>` |
 | Build | `npm run build` (→ `dist/`) | `npx vite build --outDir .build/<WP-id> --emptyOutDir` (never write `dist/`) |
-| E2E | `npm run e2e` (production preview on port 4173) | `E2E_SERVER=dev E2E_PORT=<port> npx playwright test e2e/<area> --output test-results/<WP-id>` |
-| Content | `npm run validate:content` | same (results cached in `.cache/validate/`); `-- --quick` skips engine checks; `-- --only <name>` |
+| E2E | `npm run e2e` (production preview on port 4173) | `E2E_SERVER=dev E2E_PORT=<port> npx playwright test e2e/<area> --workers=1 --output test-results/<WP-id>` |
+| Content | `npm run validate:content` | `npm run validate:content -- --only <name>` (results cached in `.cache/validate/`); `-- --quick` skips engine checks |
 
 E2E ports: WP-01 5201, WP-03 5203, WP-04 5204, WP-05 5205, WP-06 5206, WP-08 5208, WP-09 5209 (PWA preview 5219),
 WP-10 5210, WP-12 5212, FIX packages 5230–5299 (assigned per FIX). `E2E_REUSE=1` reuses a running server on the port.
 Never run `playwright install` – Chromium 1194 is preinstalled in `/opt/pw-browsers`.
+In mode `e2e` the Vite dev server uses its own dependency cache per port (`node_modules/.vite/e2e-<port>`), pre-bundles
+all runtime dependencies and has HMR switched off, so edits by other coders never reload the page under test (D-46).
+Changed files are served on the next request; restart the server for a clean snapshot.
 
 ---
 
@@ -125,6 +128,11 @@ Never run `playwright install` – Chromium 1194 is preinstalled in `/opt/pw-bro
   `ChessRulesError` (`messageDe`).
 - Helpers: `uciToSan`, `uciLineToSan`, `sanToUci` (accepts German letters and `0-0`), `formatSan(san, 'de'|'en')`,
   `pieceNameDe`, `PIECE_VALUES`, `materialBalance`, `cannotMate`, `positionKey`.
+- Board inspection (`board.ts`, added by the manager, D-44): `attackersOf(fen, square, byColor)` and
+  `isSquareAttacked(…)` (attacks, pinned pieces included, e.p. excluded, position need not be legal),
+  `boardPieces(fen)`, `kingSquare(fen, color)`, `parseFen(fen)`/`buildFen(parts)` (split/join the six fields, no
+  validation – use `validateFen` for user input), `nullMoveFen(fen)` (pass the move for threat detection; `null` when
+  the side to move is in check). Use these instead of hand-parsing FENs or importing chess.js.
 - The 65 FIDE fixtures of RULES.md §6.2 run in `src/lib/chess/rules-fixtures.test.ts`.
 
 ---
@@ -206,8 +214,12 @@ Never run `playwright install` – Chromium 1194 is preinstalled in `/opt/pw-bro
 - Engine tests use the real Node engine with small depths (≤ 12 unless the test is about depth) and dispose it in
   `afterAll`.
 - Component tests render with `@testing-library/react`; components using `useServices()` need
-  `<ServicesProvider services={createAppServices(readAppConfig({}))}>` or a bundle built from fakes; routing via
-  `MemoryRouter`.
+  `<ServicesProvider services={createFakeAppServices(overrides?)}>` (`@/core/testing`, D-45: memory data, fake engines,
+  fake analysis/bots/explanations, `e2e: true`); routing via `MemoryRouter`. Do **not** use
+  `createAppServices(readAppConfig({}))` in tests – after wave 1 it builds the real workers and database.
+- The dom project loads `fake-indexeddb/auto`; node tests that need IndexedDB import it themselves.
+- "After reload" behaviour on the wave-1 memory data layer: remount with the same `createMemoryDataServices()` instance;
+  reload e2e tests are `test.fixme` until WP-08 is integrated (D-50).
 - E2E: import `test`/`expect` from `e2e/support/fixtures.ts` (fails on console errors and page errors; allow-list with
   `test.use({ allowedConsoleErrors: [/…/] })`); board helpers `clickMove`, `dragMove`, `readFen`, `pieceOn`,
   `waitForFenChange` from `e2e/support/board.ts`; `freshStart(page, path)` and `hasHorizontalScroll` from
@@ -290,3 +302,7 @@ Keep routes lazy, keep heavy libraries (react-chessboard, engine glue, content) 
 - `profiles` has no `user_id`; its owner column is `id` (`USER_ID_COLUMN`).
 - `useSettings()` returns the settings object (or a selected part); `useUpdateSettings()` persists patches.
 - Public routes are marked with `handle.public`, shell-less routes with `handle.bare`.
+
+All of the above were accepted by the manager (D-49). Manager additions after WP-00: D-43 (no "System" theme option),
+D-44 (`lib/chess` board inspection), D-45 (`createFakeAppServices`), D-46 (isolated e2e dev servers), D-47 (piece
+artwork licence confirmed).

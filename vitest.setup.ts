@@ -1,7 +1,9 @@
 /**
  * Setup for the `dom` Vitest project (jsdom): jest-dom matchers, cleanup and small browser shims
- * that jsdom lacks (matchMedia, ResizeObserver, scrollIntoView, pointer capture).
+ * that jsdom lacks (IndexedDB via fake-indexeddb, matchMedia, ResizeObserver, scrollIntoView, pointer capture).
+ * Node-project tests that need IndexedDB import `fake-indexeddb/auto` themselves.
  */
+import 'fake-indexeddb/auto';
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';

@@ -22,20 +22,30 @@ If you need a change there, do not make it: list it under `needs` in your report
 
 **Interfaces.** Packages talk to each other only through the contracts in `src/core` and the public `index.ts` of a
 package folder. Never import another package's internal files. Until a dependency is integrated, test against the fakes
-in `src/core/testing` (e.g. `FakeEngineService` with scripted lines). Acceptance criteria that need the real
+in `src/core/testing` (e.g. `FakeEngineService` with scripted lines, `createFakeAppServices()` for a whole bundle). Acceptance criteria that need the real
 implementation of another package of the same wave (real engine, real data layer, real board) are re-verified by the
 manager in the integration round; in your wave prove them with fakes and say so in your report.
 
 **Parallel-safe commands** (all coders share one working tree, D-22):
-- Never run `npm install`/`npm add`, never `git commit`, never write to `dist/`.
+- Never run `npm install`/`npm add`, never `git commit` (the manager commits after integration, D-48), never write to `dist/`.
 - Type check: `npm run typecheck`. Your own paths must be error-free; list errors in foreign paths in your report, do not fix them.
 - Lint: `npx eslint <your paths>`.
 - Unit tests: `npx vitest run <your paths>`.
 - Build: `npx vite build --outDir .build/<WP-id> --emptyOutDir`.
-- E2E: `E2E_SERVER=dev E2E_PORT=<your port> npx playwright test e2e/<your area> --output test-results/<WP-id>`.
+- E2E: `E2E_SERVER=dev E2E_PORT=<your port> npx playwright test e2e/<your area> --workers=1 --output test-results/<WP-id>`
+  (the machine has 4 cores shared by all coders; each port gets its own Vite cache and HMR is off in e2e mode, D-46).
   Ports: WP-01 5201, WP-03 5203, WP-04 5204, WP-05 5205, WP-06 5206, WP-08 5208, WP-09 5209 (PWA preview 5219),
   WP-10 5210, WP-12 5212, FIX packages 5230–5299 (assigned per FIX).
-- Content: `npm run validate:content` (uses a result cache in `.cache/validate/`).
+- Content: `npm run validate:content -- --only <your validator>` while other validators are being written
+  (uses a result cache in `.cache/validate/`); the full run is the integration gate.
+- Component/page tests: render with `<ServicesProvider services={createFakeAppServices(…)}>` (`@/core/testing`, D-45) –
+  never `createAppServices(readAppConfig({}))`, which builds the real workers and database once wave 1 lands.
+
+**Wave-1 persistence rule (D-50).** Until WP-08 is integrated the app runs on the in-memory placeholder data layer,
+so a page reload loses all data. Acceptance criteria that say "after reload" are proven in wave 1 by a component or
+hook test that unmounts and remounts with the **same** `createMemoryDataServices()` instance. Write the reload e2e
+test anyway and mark it `test.fixme(true, 'needs WP-08 persistence – enabled in the integration round')`; the
+manager enables it in the integration round.
 
 **Chess correctness.** Rules only via chess.js and `src/lib/chess` (FIDE Laws 2023, see CONSTRAINTS §3 and
 `docs/team/RULES.md` once written by the rules auditor). Every FEN, move and claim in content must be validated by script.
@@ -72,6 +82,10 @@ open problems, `needs`.
 ---
 
 ## 2. WP-00 Foundation (wave 0, one coder)
+
+**State: integrated** (commit c3bb5b6 + "WP-00 manager fixes"; acceptance criteria 1–12 verified by the manager). The
+actual interfaces are documented in `docs/team/CONVENTIONS.md`; where they extend this section (board helpers D-44,
+`createFakeAppServices` D-45, e2e dev-server isolation D-46), CONVENTIONS and the wave-1 sections below are authoritative.
 
 **PRD refs:** Tech-Stack, UX und Informationsarchitektur, Datenmodell, P0-03 (minimal board), P0-16 (shell), P2-01/02/04/05/06 (contracts).
 **Depends on:** `docs/team/DESIGN.md` (designer). Read `docs/team/RULES.md` too if it exists.
@@ -537,9 +551,16 @@ the GPL note from the PRD risk table).
 ### WP-01 Board & Analysebrett
 **PRD:** P0-03, P0-16 (board), Funktionsumfang §6 Analysebrett, §3 "Variante erkunden" target, Gestaltungsregeln (sounds,
 animation ≤ 200 ms, colour codes, arrow keys), NFR Barrierefreiheit. **Depends:** WP-00. **Port:** 5201.
-**Consumes:** `lib/chess`, `useSettings()`, `useServices().engines.analysis`, `ClassificationBadge`, `BoardLayout`, `paths`.
-**Exposes:** `@/ui/board` (`Board`, `BoardProps`), `@/ui/chess` (`MoveList`, `EvalBar`, `usePlyNavigation`,
-`NavigationControls`), `@/ui/sound` (`playSound(kind)`), page `/analysis/board`.
+**Consumes:** `lib/chess` (incl. `parseFen`/`buildFen`/`boardPieces` for the position editor, D-44), `useSettings()`,
+`useServices().engines.analysis`, `ClassificationBadge`, `BoardLayout`, `paths`.
+**Exposes:** `@/ui/board` (`Board`, `BoardProps`, `PromotionPicker`), `@/ui/chess` (`MoveList`, `EvalBar`, `usePlyNavigation`,
+`NavigationControls`), `@/ui/sound` (`playSound(kind)`, `soundForMove(move)`), page `/analysis/board`.
+**Starting point (as delivered by WP-00):** `BoardProps` already has every final prop name listed below (the minimal
+version ignores `annotations` and `allowUserArrows`); the placeholder signatures of `MoveList` (`moves: MoveRecord[]`,
+`currentPly`, `onSelectPly`, `notation?`, `classifications?`), `EvalBar` (`score: Score | null`, `orientation`,
+`direction?`), `NavigationControls` (`ply`, `maxPly`, `onNavigate`) and `usePlyNavigation({ maxPly, initialPly?,
+keyboard? })` are final – extend, do not rename. `MoveRecord.ply` reported by `onMove` is relative to the shown position
+(CONVENTIONS §15). `playSound` is not a hook: read `useSettingsStore.getState().settings.sound` from `@/app/services`.
 
 Instructions:
 - Complete `Board`: props `fen`, `orientation`, `interactive`, `onMove(move: MoveRecord)`, `onMoveAttempt?(input) => boolean|Promise<boolean>`
@@ -595,7 +616,10 @@ assessment for coach), Analyse-Pipeline 1–4, Gewinnwahrscheinlichkeit/Genauigk
 Instructions:
 - Browser engine (`src/engine/`): Worker transport
   (`new Worker(import.meta.env.BASE_URL + 'engine/stockfish-19-lite-single.js')`, the matching `.wasm` sits next to it),
-  `createEngineService(role)` = `createUciEngineService(workerTransport)`; separate worker per role (D-27); status and
+  `createEngineService(role)` = `createUciEngineService(workerTransport)`; separate worker per role (D-27).
+  **Lazy (D-51):** `createAppServices` calls the factory at app start, so the factory must not create the Worker – create
+  it on `init()` or the first `analyse`/`bestMove` call. Where `Worker` does not exist (jsdom, Node) construction must
+  still succeed; `init()` then rejects and `status()` is `{ state: 'error', error: 'Engine nicht verfügbar' }`. Status and
   loading progress for "Engine lädt" UI; on init measure speed (`go depth 10`) and derive a budget (default depth 16–18,
   per-position movetime cap) so weak devices use less depth instead of freezing; abort ≤ 100 ms.
 - Optional Lichess cloud-eval provider (`config.cloudEvalEnabled`): GET cloud-eval with 1.5 s timeout; 404/429/network →
@@ -622,18 +646,23 @@ Instructions:
   per side → counts → eval graph → key moments (3–5 largest EP losses ≥ 0.10; fewer only if the game has fewer) →
   phase per ply (lila Divider logic, documented) → `facts` for every mistake, miss and blunder → progress after every
   position; abortable; `engineVersion` stored.
-- Motif detectors (pure, chess.js only): hanging piece (attacked, SEE < 0), fork, pin (absolute/relative), skewer,
+- Motif detectors (pure, on `@/lib/chess` only – chess.js imports are a lint error outside `src/lib/chess`): use
+  `attackersOf`/`isSquareAttacked` (attacks incl. pinned pieces), `boardPieces`, `kingSquare`, `parseFen`/`buildFen`
+  (remove pieces for SEE and x-ray/pin tests), `ChessGame`, `PIECE_VALUES` (D-44). Detectors: hanging piece (attacked, SEE < 0), fork, pin (absolute/relative), skewer,
   discovered attack/check, double check, mate threat (from engine mate score), back-rank weakness, trapped piece,
   material swing along a PV. `buildFacts(kind, …)` creates `ExplanationFacts` containing only engine-confirmed lines
   (SAN generated by chess.js from engine PVs).
 - `prepare(fen)` (analyse the position in the background and cache it, LRU by FEN; superseded by the next `prepare`),
   `assessMove(fenBefore, move)` (reuses the cached analysis; only the position after the move is searched, shallow;
-  coach, D-41), `findThreats(fen)` (pass-move analysis: if the side to
-  move is not in check, give the move to the opponent and report the opponent's best move when it wins ≥ 2 pawns or mates).
+  coach, D-41), `findThreats(fen)` (pass-move analysis with `nullMoveFen(fen)` from `@/lib/chess` – `null` when the side
+  to move is in check: then no threat report; otherwise analyse the null-move position and report the opponent's best move when it wins ≥ 2 pawns or mates).
+- `@/analysis` must also run in Node with `createNodeEngineService()` from `@/lib/uci/node` (bench, WP-10 generator,
+  validators): no browser-only APIs at module top level; the opening book is loaded with a dynamic `import()` of the JSON.
 - Bench `npm run bench:analysis`: Node engine (lib/uci/node) analyses the 40-move fixture (core testing) and prints total time.
 
 Acceptance criteria:
-1. Browser EngineService implements the contract; two roles run independently; abort works; status/progress emitted.
+1. Browser EngineService implements the contract; two roles run independently; abort works; status/progress emitted;
+   no Worker is created before first use, and construction in jsdom succeeds (unit test).
 2. `winPercent`, `moveAccuracy`, `gameAccuracy` match lila (constants and test values documented in SOURCES.md with URL + commit).
 3. Classification thresholds exactly as D-07; one unit test per category and per boundary (0.005, 0.02, 0.05, 0.10, 0.20).
 4. Book moves detected from the lichess openings data; data file committed with source and licence note.
@@ -678,8 +707,10 @@ Instructions:
   difficulty filter Leicht/Mittel/Schwer/Alle (rating −300…−100 / ±100 / +100…+300 around the user's rating); opening
   filter via `openingTags` when data exists; unrated (D-11); attempts recorded with mode `theme` so theme stats update.
 - Demo `/puzzles/demo`: 5 fixed easy puzzles, nothing persisted, call to action "Anmelden, um Fortschritt zu speichern".
-- Bank loading (D-25): `public/data/puzzles/manifest.json` + chunk files → `repos.puzzles.bulkUpsert` on first start and when
-  the manifest version changes (offline afterwards). Write the wave-1 seed `public/data/puzzles/seed.json`: ≥ 40
+- Bank loading (D-25): `public/data/puzzles/manifest.json` + chunk files (fetch `import.meta.env.BASE_URL + 'data/puzzles/…'`,
+  validate with `puzzleBankManifestSchema`/`puzzleChunkSchema`) → `repos.puzzles.bulkUpsert` on first start and when
+  the manifest version changes (offline afterwards). Loading must be idempotent: the wave-1 placeholder data layer is
+  in memory and reloads the bank on every page load. Write the wave-1 seed `public/data/puzzles/seed.json`: ≥ 40
   hand-checked puzzles in Lichess format (≥ 20 rated ≤ 600: mate in 1, win a hanging piece; the rest up to ~1400), each
   with themes and a German explanation (1–3 sentences).
 - Validator `scripts/validate/puzzles.ts` (all chunks of the manifest): zod schema; legal FEN (`validateFen`); all moves
@@ -689,7 +720,7 @@ Instructions:
   (depth ≥ 18, MultiPV 2); `mateInN` themes match the engine mate distance; other immediately mating moves are allowed
   (accepted at runtime, D-12);
   rating 100–3000; every puzzle has an explanation or is from source `lichess`; theme ids exist in `PUZZLE_THEMES`.
-  Uses the validation cache; `--quick` skips engine checks.
+  Uses the validation cache; `--quick` skips engine checks. Run it with `npm run validate:content -- --only puzzles`.
 - Lichess importer `npm run puzzles:import-lichess -- --input <file.csv|file.csv.zst> --out <dir> [--min-popularity 80]
   [--min-plays 300] [--max 500000] [--rating-min 0] [--rating-max 3500]`: streaming parse (`csv-parse`, `fzstd` for .zst),
   exact columns `PuzzleId,FEN,Moves,Rating,RatingDeviation,Popularity,NbPlays,Themes,GameUrl,OpeningTags`, chess.js
@@ -707,7 +738,8 @@ Acceptance criteria:
 7. Learning mode: hints, playable solution, motif tags + 1–3 sentence explanation after every puzzle.
 8. Theme training lists ≥ 20 motifs, difficulty filter works, success rate per motif is stored and shown.
 9. Demo shows exactly 5 puzzles and persists nothing.
-10. After the bank is loaded, rated and learning mode work offline (`context.setOffline(true)`).
+10. After the bank is loaded, rated and learning mode work offline (`context.setOffline(true)` within the same page
+    session in wave 1; offline after a reload needs WP-08 + the WP-09 service worker and is re-checked then).
 11. Seed bank and fixture pass `validate:content` (full engine mode); importer test passes.
 
 Checks: typecheck; eslint and vitest on `src/puzzles src/features/puzzles scripts/puzzles scripts/validate/puzzles.ts`;
@@ -753,10 +785,18 @@ Instructions:
   `shouldClaimDraw` (its eval ≤ 0 for itself); "Aufgeben" with confirmation. Result dialog with German reason (DSB
   terms) and actions "Analyse ansehen" (`paths.analysisGame(id)`), "Revanche", "Neue Partie".
 - Persistence/resume: `progress.createGame` (source `bot`, startFen, origin) and `appendGameEvent` after every move or
-  takeback; `/play/game/:id` rebuilds the position with `ChessGame.fromMoves(startFen, moves)` (repetition history kept);
-  active games listed on `/play`. Respect `settings.moveConfirmation` (confirm before commit).
+  takeback; `/play/game/:id` rebuilds the position with `ChessGame.fromMoves(startFen, movesFromEvents(events))`
+  (`movesFromEvents` from `@/core` applies takebacks; repetition history kept); active games listed on `/play`.
+  Respect `settings.moveConfirmation` (confirm before commit).
+- Game headers (required by `progress.finishGame` for the bot rating, CONVENTIONS §15): `Event`, `Date`, `White`,
+  `Black` (bot name / "Du"), and the bot's Elo as `WhiteElo` or `BlackElo` on the bot's side; PGN via
+  `ChessGame.pgn(headers)` (English SAN).
 - Two devices: heartbeat every 10 s (`games.heartbeat`); if another device's heartbeat is < 30 s old, ask "Partie läuft
   auf einem anderen Gerät – hier übernehmen?"; after `takeOver` the other device shows a notice and becomes read-only.
+  Wave-1 proof: a hook/component test with two instances (different `deviceId`) on one shared
+  `createMemoryDataServices()`; the e2e uses two pages in **one** browser context (they share IndexedDB) and is
+  `test.fixme` until WP-08 is integrated (D-50).
+- The rule-based gross errors of bots < 800 may use `attackersOf`/`isSquareAttacked` from `@/lib/chess` (D-44).
 - `/play/position?fen=`: validate with `validateFen` (German error), choose bot/colour/level, game with `origin`.
 
 Acceptance criteria:
@@ -766,12 +806,13 @@ Acceptance criteria:
 4. Wettkampf/Training/Coach behave as specified; takeback unlimited in Training and Coach; Wettkampf games update the bot rating, others do not.
 5. Coach warning appears before a move losing ≥ 0.20 expected points with a German reason (e2e with a fixture position where the queen can be hung).
 6. Game end per FIDE: tests for mate, stalemate, insufficient material, fivefold, 75-move, threefold/50-move claim (not automatic), resignation.
-7. Reload or a new browser context resumes the game at the same move (e2e); takeover dialog works with two contexts on the same data (memory/Dexie per WP-08 after integration).
+7. Reload or a second page resumes the game at the same move; takeover dialog works with two pages on the same data
+   (wave 1: remount/two-instance tests on shared memory data; e2e enabled after WP-08 integration, D-50).
 8. Play from any valid FEN; invalid FEN shows a German error.
 9. Usable at 360 px; all moves via keyboard possible (inherits board).
 
 Checks: typecheck; eslint/vitest on `src/bots src/features/play scripts/bots scripts/validate/bots.ts`; `npm run bots:calibrate`;
-`npm run validate:content`; build to `.build/WP-04`; `E2E_SERVER=dev E2E_PORT=5204 npx playwright test e2e/play --output test-results/WP-04`.
+`npm run validate:content -- --only bots`; build to `.build/WP-04`; `E2E_SERVER=dev E2E_PORT=5204 npx playwright test e2e/play --output test-results/WP-04`.
 
 ### WP-05 Review, explanations & PGN import
 **PRD:** P0-10 (UI), P0-11, P0-15, Partieanalyse §3 (summary, colours, explanations, "Nochmal versuchen", "Variante
@@ -784,7 +825,8 @@ erkunden"), Analyse-Pipeline step 5, P2-01/P2-02/P2-06, Erfolgsmetriken (thumbs 
 Instructions:
 - `/analysis` hub: own games (bot + pgn) with date, opponent, result, accuracy if analysed; actions "PGN importieren",
   "Analysebrett"; empty state suggests a fitting bot (`paths.play`).
-- `/analysis/:gameId` (deep link): start `analyseGame` automatically when no stored analysis exists or `engineVersion`
+- `/analysis/:gameId` (deep link): load the game (`repos.games.get`, moves via `movesFromEvents(repos.gameMoves.list(id))`
+  for bot games, `ChessGame.fromPgn(game.pgn)` for imported games); start `analyseGame` automatically when no stored analysis exists or `engineVersion`
   differs; progress bar "Analysiere Zug x von y", cancel; UI stays responsive; save via `progress.saveAnalysis`; reuse on reopen.
 - Summary: accuracy both sides (0–100 %, one decimal), counts per category both sides, eval graph (own SVG, win% White
   per ply, click/keyboard to jump, table alternative for screen readers), 3–5 key moments.
@@ -818,7 +860,8 @@ Acceptance criteria:
 6. "Nochmal versuchen" works for a fixture blunder (success and reveal paths).
 7. PGN import: ≥ 15 fixture PGNs (comments, variations, NAGs, FEN start, promotions, all results, multi-game, CRLF) parse correctly; invalid PGNs show a German error with the correct line number.
 8. Imported games are stored with source `pgn` and an external id, analysed and listed; duplicates are not stored twice.
-9. Deep link `/analysis/:gameId` works after reload; explanations are stored as plain text (+ segments) in the analysis.
+9. Deep link `/analysis/:gameId` works after reload (wave 1: remount test on shared memory data, e2e after WP-08
+   integration, D-50); explanations are stored as plain text (+ segments) in the analysis.
 
 Checks: typecheck; eslint/vitest on `src/explain src/pgn src/features/review src/features/pgn-import`; build to `.build/WP-05`;
 `E2E_SERVER=dev E2E_PORT=5205 npx playwright test e2e/review --output test-results/WP-05`.
@@ -831,8 +874,12 @@ Checks: typecheck; eslint/vitest on `src/explain src/pgn src/features/review src
 
 Instructions:
 - Content loader (D-26): `import.meta.glob('/content/lessons/**/*.json')` (lazy per lesson), validated with core zod schemas
-  (invalid content → visible dev error, never a crash in production); catalog includes planned courses. Use
-  `src/lessons/__fixtures__/` for tests (until WP-07 content is integrated the UI must work with the fixture course).
+  (`lessonCatalogSchema` for `content/lessons/catalog.json`, `lessonSchema`, `courseMetaSchema`; invalid content →
+  visible dev error, never a crash in production); catalog includes planned courses. Use `src/lessons/__fixtures__/`
+  for tests. **Fixture course in e2e builds only (D-52):** when `useServices().config.e2e` is true the loader adds the
+  fixture course (dynamic `import()` from `src/lessons/__fixtures__/`, course id `fixture-course`) to the catalog;
+  production builds never show it. Your e2e tests use only the fixture course, so they stay stable while WP-07
+  writes `content/lessons/` in parallel (a half-written file must show the dev error, not break the fixture course).
 - `/learn` Lernpfad: stages 0–4 with courses, progress (lessons done/total, stars), next lesson highlighted; planned
   courses/stages shown as "in Vorbereitung". Unlock rules (D-38): Stufe 0 always open; Stufe 1 open if
   `selfAssessment ∈ {beginner, club, advanced}` or skip test passed or Stufe 0 completed; lessons unlock sequentially
@@ -854,7 +901,8 @@ Instructions:
 
 Acceptance criteria:
 1. All five step types work with the fixture course (e2e walks through every type).
-2. Progress is saved per step; leaving and reopening (reload) resumes at the same step.
+2. Progress is saved per step; leaving and reopening resumes at the same step (wave 1: remount test on shared memory
+   data; reload e2e after WP-08 integration, D-50).
 3. Stars follow D-13; unlock rules work (unit tests for every rule).
 4. Course test/skip test scoring and pass threshold work.
 5. Lesson end offers next lesson, matching puzzles and a practice game.
@@ -891,7 +939,9 @@ Instructions:
   Läufer, Springer, Bauer; German notation in texts (K D T L S, 0-0).
 - Mark ≥ 30 very easy find_move exercises (mate in 1, win a hanging piece) with `puzzle: { rating 150–500, themes }`.
 - Set `practiceThemes` for every Stufe-1 lesson (valid `PUZZLE_THEMES` ids).
-- Validator `scripts/validate/lessons.ts`: schema; legal FENs (`validateFen`) and move sequences; find_move:
+- Validator `scripts/validate/lessons.ts` (run with `npm run validate:content -- --only lessons`): schema
+  (`lessonCatalogSchema`, `lessonSchema`); legal FENs (`validateFen`) and move sequences (`ChessGame`; quiz asserts via
+  `ChessGame.fromFen(fen).status()` – `reason`/`inCheck` – and `legalMoves()`, never chess.js directly); find_move:
   `claim: best` → accepted moves include the engine best move and every non-accepted legal move is worse by ≥ 0.10
   expected points (depth ≥ 18, MultiPV ≥ 2, re-check all legal moves for short positions); `claim: mate` → mate in N
   confirmed and, if `acceptAnyMate`, all mating first moves accepted; `claim: rule` → legality only; replies in move
@@ -917,8 +967,16 @@ Sicherheit/Datenschutz, DoD (Konto-Export/-Löschung). CONSTRAINTS §2 Backend. 
 `createDataServices` and pages `/login`, `/auth/callback`, `AuthGate`, `SyncStatusIndicator`.
 
 Instructions:
+- `createDataServices(config): DataServices` stays **synchronous** (the shell calls it at start; Dexie opens lazily).
+  Where `indexedDB` is missing it must not throw: fall back to `createMemoryDataServices()` and log one
+  `console.warn`. `createMemoryDataServices` (`@/core/testing`) is the reference behaviour: run the same contract test
+  suite against both implementations (node tests import `fake-indexeddb/auto`; the dom test setup already loads it).
 - Dexie database `zugzwang` with tables for every entity plus `outbox` and `meta`; versioned schema; repositories
-  implementing the core interfaces with `liveQuery`-based `observe` (UI updates without reload).
+  implementing the core interfaces with `liveQuery`-based `observe` (UI updates without reload; adapt with
+  `fromObservable()` from `@/lib/observable`).
+- DB contract details fixed by WP-00 (CONVENTIONS §15): `profiles` owner column is `id` (`USER_ID_COLUMN`),
+  `puzzle_attempts.puzzle_rd` exists, `Settings.updatedAt` defaults to the epoch (any stored change wins LWW), bot
+  rating opponent = bot Elo from the game headers with RD 50.
 - ProgressService in Dexie transactions (each ≤ 50 ms): `recordPuzzleAttempt` (append attempt with client UUID; rated
   mode: provisional Glicko-2 via `lib/rating` vs puzzle rating/RD; theme_stats only for first-try results of rated,
   learning and theme modes (D-11); daily_activity), `recordLessonProgress` (furthest wins: max step, completed OR, max
@@ -986,7 +1044,8 @@ Instructions:
 - `/profile/stats`: rating curves (puzzle, bot), success rate per theme, accuracy per phase, most frequent mistake
   types; own accessible SVG charts (table fallback), lazy-loaded.
 - `/profile`: name, ratings, streak, daily goal edit, mode and sync status, export and delete account (confirmation).
-- `/settings` (DESIGN §3.6 list without "Einfache Ansicht", D-39): Design (Dunkel/Hell/System, dark default),
+- `/settings` (DESIGN §3.6 list without "Einfache Ansicht", D-39): Design (Dunkel/Hell, dark default; no "System"
+  option – PRD and DESIGN §2, D-43),
   Brettdesign (Moos default, Holz), Figuren (react-chessboard default set only, DESIGN §4.1), Koordinaten anzeigen,
   Mögliche Züge anzeigen, Töne, Animationen, Zugbestätigung, Notation (Deutsch K D T L S / Englisch K Q R B N),
   Sprache (Deutsch; Englisch shown as "in Vorbereitung", disabled), Tagesziel (Minuten); applied immediately, persisted.

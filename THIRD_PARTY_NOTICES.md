@@ -23,12 +23,14 @@ below are GPL-compatible.
 |---|---|---|---|
 | chess.js 1.4 | BSD-2-Clause | Rules, legality, FEN/PGN (only via `src/lib/chess`) | https://github.com/jhlywa/chess.js |
 | react-chessboard 5 | MIT | Board component | https://github.com/Clariity/react-chessboard |
-| Piece artwork bundled with react-chessboard | see note | Board pieces (DESIGN §4.1) | — |
+| Piece artwork bundled with react-chessboard ("Cburnett" set) | GPL-2.0-or-later (also CC BY-SA 3.0) | Board pieces (DESIGN §4.1) | https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces |
 
-Note on the piece artwork: react-chessboard (MIT, © Ryan Gregory) bundles its default piece SVGs without naming their
-origin. They match the widely used "Cburnett" set by Colin M. L. Burnett (Wikimedia Commons), which is offered under
-CC BY-SA 3.0 / GFDL / BSD / GPL. Attribution is given here as a precaution; the exact origin is **not confirmed**
-(open point for the manager). Every option is compatible with the app's GPL-3.0 situation.
+Note on the piece artwork (confirmed by the manager, D-47): the default piece SVGs of react-chessboard are the
+"Cburnett" set by Colin M. L. Burnett. The react-chessboard source file `src/pieces.tsx` (commit d2dc982, 2026-02-10)
+states: "https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces – By en:User:Cburnett – Own work – CC BY-SA 3.0".
+Lichess distributes the same set as `public/piece/cburnett` under **GPLv2+** with author Colin M. L. Burnett
+(lichess-org/lila `COPYING.md`). Zugzwang uses the set under GPL-2.0-or-later, which is compatible with the app's
+GPL-3.0 situation (Stockfish). Attribution: chess pieces © Colin M. L. Burnett, GPLv2+ / CC BY-SA 3.0.
 
 ## Data
 

@@ -5,7 +5,6 @@ export const STRINGS_DE = {
   theme: 'Design',
   themeDark: 'Dunkel',
   themeLight: 'Hell',
-  themeSystem: 'System',
   board: 'Brettdesign',
   boardMoos: 'Moos',
   boardHolz: 'Holz',
