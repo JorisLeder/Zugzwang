@@ -1,5 +1,23 @@
 # Zugzwang
 
+**Zugzwang** ist ein persönliches Schach-Lerntool als Web-App, angelehnt an chess.com. Es begleitet dich vom ersten
+Zug bis zum fortgeschrittenen Spieler:
+
+- **Puzzles** mit eigenem Rating, Lernmodus mit Hinweisen und Training nach Motiven (Gabel, Fesselung, Grundreihenmatt …)
+- **Spielen gegen Bots** von ca. 100 bis 2500 Elo, auf Wunsch mit Coach, der vor groben Fehlern warnt
+- **Partieanalyse** mit Genauigkeit, Zugbewertung (Brillant bis Patzer) und Erklärungen, *warum* ein Zug schlecht war
+- **Lektionen** in einem Lernpfad mit fünf Stufen, vom kompletten Neuling bis ca. 2000 Elo
+- **Fortschritt**, der sofort gespeichert und – mit Cloud-Anbindung – zwischen Laptop und Handy synchronisiert wird
+
+Schachregeln laufen ausschließlich über [chess.js](https://github.com/jhlywa/chess.js) und werden gegen die
+FIDE-Regeln geprüft; Analyse und Bots nutzen [Stockfish](https://stockfishchess.org). Die vollständige Produktbeschreibung
+steht in [`docs/PRD.md`](docs/PRD.md).
+
+**Status:** in Entwicklung (V1). Gebaut von einem Agenten-Team (Manager, Coder, Reviewer, Regel-Prüfer, Designer,
+Tester) – Rollen in [`.claude/agents/`](.claude/agents/), Arbeitsstand in [`docs/team/STATUS.md`](docs/team/STATUS.md).
+
+---
+
 Chess learning web app (PWA) in German: rated puzzles, lessons from the rules to tactics, bots with a coach, and game
 analysis with explanations. Product spec: `docs/PRD.md`. Team documents: `docs/team/` (start with `CONVENTIONS.md`).
 
