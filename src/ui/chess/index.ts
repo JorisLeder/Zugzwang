@@ -1,7 +1,7 @@
-/**
- * `@/ui/chess` – chess widgets. PLACEHOLDERS (WP-00) with the final signatures; owned by WP-01 from wave 1.
- */
+/** `@/ui/chess` – chess widgets (WP-01): move list, evaluation bar, move navigation. */
 export { EvalBar, type EvalBarProps } from './EvalBar';
+export { evalWords, leadingSide, whiteShare } from './evalBar';
 export { MoveList, type MoveListProps } from './MoveList';
+export { movePairs, type MovePair } from './moveList';
 export { NavigationControls, type NavigationControlsProps } from './NavigationControls';
-export { usePlyNavigation, type PlyNavigation, type PlyNavigationOptions } from './usePlyNavigation';
+export { isOwnKeyTarget, usePlyNavigation, type PlyNavigation, type PlyNavigationOptions } from './usePlyNavigation';

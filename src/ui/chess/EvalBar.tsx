@@ -1,6 +1,7 @@
 import type { Score } from '@/core/engine';
 import { formatEval } from '@/i18n/format';
 import { cn } from '@/lib/cn';
+import { evalWords, leadingSide, whiteShare } from './evalBar';
 import { CHESS_UI_DE } from './strings.de';
 
 /** Props of `EvalBar`. */
@@ -11,31 +12,33 @@ export interface EvalBarProps {
   orientation: 'white' | 'black';
   /** Vertical 24 px bar (≥ 768 px) or horizontal 8 px bar (phone). */
   direction?: 'vertical' | 'horizontal';
+  /** Show the number inside the bar (vertical only; default true). */
+  showLabel?: boolean;
   className?: string;
 }
 
-/** White's share 3–97 % (forced mate 100/0) – lichess win% (DESIGN §5.4). */
-function whiteShare(score: Score | null): number {
-  if (!score) return 50;
-  if (score.type === 'mate') return score.value > 0 ? 100 : score.value < 0 ? 0 : 50;
-  const cp = Math.max(-1000, Math.min(1000, score.value));
-  const w = 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
-  return Math.max(3, Math.min(97, w));
-}
-
-/** Evaluation bar. PLACEHOLDER (WP-00) with the final signature – WP-01 owns it from wave 1. */
-export function EvalBar({ score, orientation, direction = 'vertical', className }: EvalBarProps) {
+/**
+ * Evaluation bar (DESIGN §5.4): White's share = win percentage (3–97 %, mate 100/0), White's side follows the board
+ * orientation, 200 ms transition. The vertical bar shows "+1,3" / "M3" at the leading side's end; the phone bar has no
+ * number (the panel shows it). `role="img"` with a German label, e.g. "Bewertung: Weiß steht etwas besser (+1,3)".
+ */
+export function EvalBar({ score, orientation, direction = 'vertical', showLabel = true, className }: EvalBarProps) {
   const share = whiteShare(score);
   const text = score ? formatEval(score) : '0,0';
-  const side = share > 55 ? CHESS_UI_DE.whiteBetter : share < 45 ? CHESS_UI_DE.blackBetter : CHESS_UI_DE.equal;
   const whiteAtStart = orientation === 'white';
   const vertical = direction === 'vertical';
+  const leader = leadingSide(score);
+  // White's end of the bar: bottom (vertical) / left (horizontal) when White is at the bottom of the board.
+  const labelAtWhiteEnd = leader === 'w';
+  const labelAtBottom = labelAtWhiteEnd === whiteAtStart;
   return (
     <div
       role="img"
-      aria-label={CHESS_UI_DE.evalLabel(text, side)}
+      aria-label={CHESS_UI_DE.evalLabel(text, evalWords(score))}
+      data-testid="eval-bar"
+      data-share={Math.round(share)}
       className={cn(
-        'relative overflow-hidden rounded-[4px] bg-eval-black outline outline-1 outline-white/10 light:outline-black/15',
+        'relative shrink-0 overflow-hidden rounded-[4px] bg-eval-black outline outline-1 outline-white/10 light:outline-black/15',
         vertical ? 'h-full w-6' : 'h-2 w-full',
         className,
       )}
@@ -48,6 +51,18 @@ export function EvalBar({ score, orientation, direction = 'vertical', className 
             : { top: 0, bottom: 0, width: `${share}%`, ...(whiteAtStart ? { left: 0 } : { right: 0 }) }
         }
       />
+      {vertical && showLabel && score && (
+        <span
+          aria-hidden="true"
+          className={cn(
+            'absolute inset-x-0 text-center text-[11px] leading-4 font-bold tracking-tighter tabular-nums',
+            labelAtWhiteEnd ? 'text-eval-black' : 'text-eval-white',
+            labelAtBottom ? 'bottom-1' : 'top-1',
+          )}
+        >
+          {text}
+        </span>
+      )}
     </div>
   );
 }

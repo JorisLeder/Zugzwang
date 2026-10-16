@@ -1,23 +1,40 @@
 /**
- * Minimal board (WP-00, BACKLOG 2.5) – owned by WP-01 from wave 1, which completes it (keyboard, marks, annotations,
- * right-click arrows, sounds, board themes). Built on react-chessboard v5 (`options` prop, @dnd-kit) and
- * `@/lib/chess` for legality.
+ * The chessboard of every board screen (P0-03, DESIGN §2.2/§4/§7). Built on react-chessboard v5 (`options` prop,
+ * dnd-kit) with `@/lib/chess` for legality – the board never decides chess rules itself.
  *
  * Selector contract (e2e helpers depend on it, keep it): root `data-testid="board"` with `data-orientation` and
  * `data-fen`; every square `data-square="e4"`; every piece `data-piece="wP"`; promotion buttons
- * `data-testid="promotion-q|r|b|n"`.
+ * `data-testid="promotion-q|r|b|n"`. Extra test hooks: `data-highlights` on the inner square element,
+ * `data-arrow`/`data-arrow-source`/`data-arrow-kind` on arrows, `data-annotation`, `data-feedback`, `board-cursor`.
+ * API documentation: `src/ui/board/README.md`.
  */
-import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { Chessboard, type ChessboardOptions, type PieceDropHandlerArgs, type SquareHandlerArgs } from 'react-chessboard';
 import type { MoveClassification } from '@/core/analysis';
-import type { Arrow, Fen, MoveInput, MoveRecord, PromotionPiece, Square, SquareMark } from '@/core/chess';
-import { ChessGame } from '@/lib/chess';
+import { type Arrow, type Color, type Fen, type MoveInput, type MoveRecord, type PieceSymbol, type PromotionPiece, type Square, type SquareMark } from '@/core/chess';
+import { boardPieces, ChessGame, kingSquare } from '@/lib/chess';
 import { cn } from '@/lib/cn';
 import { useSettings } from '@/app/services';
+import { playSound, soundForMove } from '@/ui/sound';
+import { AnnotationBadge, BoardArrows, FeedbackBadge, KeyboardCursor, type OverlayArrow } from './BoardOverlays';
+import {
+  castlingByRook,
+  describeMoveDe,
+  findMoveBetween,
+  moveCursor,
+  squareLabelDe,
+  squareLayers,
+  USER_ARROW_VARS,
+  type BoardFeedback,
+  type CursorKey,
+} from './boardLogic';
+import { boardThemeOptions } from './boardTheme';
 import { PromotionPicker } from './PromotionPicker';
 import { BOARD_DE } from './strings.de';
+import { useDndAccessibilityFix, useElementWidth } from './useBoardDom';
+import { useUserShapes } from './useUserShapes';
 
-/** Props of `Board` (final names per WP-01; the minimal version ignores `annotations` and `allowUserArrows`). */
+/** Props of `Board`. */
 export interface BoardProps {
   /** Position to show. Invalid FENs render without interaction. */
   fen: Fen;
@@ -29,22 +46,35 @@ export interface BoardProps {
   onMove?: (move: MoveRecord) => void;
   /** Veto/confirm before commit (coach warning, move confirmation). Return false to reject. */
   onMoveAttempt?: (input: MoveInput) => boolean | Promise<boolean>;
-  /** Programmatic arrows. */
+  /** Programmatic arrows (colour by `kind`, DESIGN §2.2). */
   arrows?: Arrow[];
-  /** Square highlights. */
+  /** Square highlights (hints, danger, …). */
   marks?: SquareMark[];
-  /** Classification symbols at pieces (WP-01). */
+  /** Classification symbols at the destination square (DESIGN §4.5; pass only the current move's). */
   annotations?: Array<{ square: Square; classification: MoveClassification }>;
   /** Last move highlight. */
   lastMove?: { from: Square; to: Square } | null;
   /** Highlight a king in check (default true). */
   highlightCheck?: boolean;
-  /** Right-drag arrows and right-click marks (WP-01). */
+  /** Right-drag arrows and right-click marks on desktop (default true). */
   allowUserArrows?: boolean;
   /** Default: settings.showCoordinates. */
   showCoordinates?: boolean;
   /** Default: settings.showLegalMoves. */
   showLegalMoves?: boolean;
+  /** Correct/wrong feedback on a square (puzzles, lessons; DESIGN §4.4). */
+  feedback?: BoardFeedback | null;
+  /** Called by the `F` key while the board has focus (DESIGN §7.4). The parent flips `orientation`. */
+  onFlip?: () => void;
+  /**
+   * Called for every click/tap or keyboard activation (Enter/Space) of a square – also when not `interactive`
+   * (position editor, "click the square" tasks).
+   */
+  onSquareClick?: (square: Square) => void;
+  /** Play the move/capture/check sound for moves made on the board (default true; respects settings.sound). */
+  sound?: boolean;
+  /** Accessible name (default "Schachbrett, du spielst Weiß/Schwarz"). */
+  label?: string;
   className?: string;
 }
 
@@ -53,42 +83,24 @@ const ARROW_VARS: Record<Arrow['kind'], string> = {
   best: '--zz-arrow-best',
   threat: '--zz-arrow-threat',
   hint: '--zz-arrow-hint',
-  played: '--zz-arrow-best',
-};
-const ARROW_FALLBACK: Record<Arrow['kind'], string> = {
-  user: 'rgb(242 163 58 / 0.85)',
-  best: 'rgb(124 191 74 / 0.90)',
-  threat: 'rgb(232 85 58 / 0.85)',
-  hint: 'rgb(47 107 255 / 0.85)',
-  played: 'rgb(124 191 74 / 0.90)',
+  played: '--zz-mark-yellow',
 };
 
-/** Resolves a board token to a concrete colour (SVG presentation attributes do not resolve `var()` reliably). */
-function tokenColor(kind: Arrow['kind']): string {
-  if (typeof window === 'undefined') return ARROW_FALLBACK[kind];
-  const v = getComputedStyle(document.documentElement).getPropertyValue(ARROW_VARS[kind]).trim();
-  return v || ARROW_FALLBACK[kind];
-}
-
-const layer = (color: string) => `linear-gradient(${color}, ${color})`;
-const DOT = 'radial-gradient(circle closest-side, var(--zz-dot-core) 0 26%, var(--zz-dot-ring) 26% 32%, transparent 32%)';
-const CAPTURE =
-  'radial-gradient(circle closest-side, transparent 0 79%, var(--zz-dot-ring) 79% 82%, var(--zz-dot-core) 82% 100%, transparent 100%)';
-const MARK_LAYERS: Record<SquareMark['kind'], string> = {
-  user: layer('var(--zz-mark-red)'),
-  'hint-piece': layer('var(--zz-hl-hint-fill)'),
-  'hint-target': layer('var(--zz-hl-hint-fill)'),
-  danger: layer('var(--zz-hl-wrong)'),
-  selected: layer('var(--zz-hl-selected)'),
-  'last-move': layer('var(--zz-hl-lastmove)'),
-  check: 'var(--zz-hl-check)',
-};
+const CURSOR_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
 
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 }
 
-/** Interactive chessboard (drag-and-drop and click-click; only legal moves; promotion picker). */
+function isFocusVisible(el: Element): boolean {
+  try {
+    return el.matches(':focus-visible');
+  } catch {
+    return true;
+  }
+}
+
+/** Interactive chessboard: drag-and-drop, click-click, touch and keyboard; only legal moves; promotion picker. */
 export function Board({
   fen,
   orientation = 'white',
@@ -97,23 +109,49 @@ export function Board({
   onMoveAttempt,
   arrows,
   marks,
+  annotations,
   lastMove,
   highlightCheck = true,
+  allowUserArrows = true,
   showCoordinates,
   showLegalMoves,
+  feedback,
+  onFlip,
+  onSquareClick,
+  sound = true,
+  label,
   className,
 }: BoardProps) {
   const id = useId().replace(/:/g, '');
   const settings = useSettings();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const fenRef = useRef(fen);
+  useLayoutEffect(() => {
+    fenRef.current = fen;
+  }, [fen]);
+  const committing = useRef(false);
+
   const [selected, setSelected] = useState<Square | null>(null);
-  const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
+  const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square; viaKeyboard: boolean } | null>(null);
+  const [cursor, setCursor] = useState<Square | null>(null);
+  const [focused, setFocused] = useState(false);
+  const [cursorVisible, setCursorVisible] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
   const [lastFen, setLastFen] = useState(fen);
+  const shapes = useUserShapes(rootRef, allowUserArrows);
   if (fen !== lastFen) {
-    // A new position clears selection and an open promotion picker.
+    // A new position clears selection, an open promotion picker and the user's arrows/marks, and announces the move
+    // that led to it (user, opponent or a single step forward).
+    const move = findMoveBetween(lastFen, fen);
     setLastFen(fen);
     setSelected(null);
     setPendingPromotion(null);
+    setAnnouncement(move ? describeMoveDe(move) : '');
+    shapes.clear();
   }
+
+  const width = useElementWidth(rootRef);
+  useDndAccessibilityFix(rootRef);
 
   const game = useMemo(() => {
     try {
@@ -122,37 +160,85 @@ export function Board({
       return null;
     }
   }, [fen]);
-  const turn = game?.turn() ?? 'w';
-  const canMove = interactive && game !== null && !game.status().isOver;
+  const pieces = useMemo(() => {
+    const map = new Map<Square, { type: PieceSymbol; color: Color }>();
+    for (const p of boardPieces(fen)) map.set(p.square, { type: p.type, color: p.color });
+    return map;
+  }, [fen]);
+  const turn: Color = game?.turn() ?? 'w';
+  const status = useMemo(() => game?.status() ?? null, [game]);
+  const canMove = interactive && game !== null && status !== null && !status.isOver;
   const coords = showCoordinates ?? settings.showCoordinates;
   const dots = showLegalMoves ?? settings.showLegalMoves;
+  const activeSelection = canMove ? selected : null;
 
   const movesFrom = useCallback((sq: Square) => (game && canMove ? game.legalMoves(sq) : []), [game, canMove]);
+  const targets = useMemo(() => (activeSelection ? movesFrom(activeSelection) : []), [activeSelection, movesFrom]);
 
   const commit = useCallback(
     async (input: MoveInput) => {
-      if (!game) return;
-      if (onMoveAttempt && !(await onMoveAttempt(input))) return;
-      const probe = ChessGame.fromFen(fen);
-      const record = probe.move(input);
-      if (record) onMove?.(record);
+      if (committing.current) return;
+      const fenAtStart = fen;
+      committing.current = true;
+      try {
+        if (onMoveAttempt && !(await onMoveAttempt(input))) return;
+        if (fenRef.current !== fenAtStart) return; // the position changed meanwhile (opponent, navigation)
+        const record = ChessGame.fromFen(fenAtStart).move(input);
+        if (!record) return;
+        if (sound) playSound(soundForMove(record));
+        onMove?.(record);
+      } catch (e) {
+        // A failing veto counts as "not allowed"; report it so the bug is visible.
+        console.error('Board: move handler failed', e);
+      } finally {
+        committing.current = false;
+      }
     },
-    [fen, game, onMove, onMoveAttempt],
+    [fen, onMove, onMoveAttempt, sound],
   );
 
+  /** Tries `from → to`; returns true when the move was committed (false: illegal, or the promotion picker opened). */
   const tryMove = useCallback(
-    (from: Square, to: Square): boolean => {
-      const candidates = movesFrom(from).filter((m) => m.to === to);
+    (from: Square, to: Square, viaKeyboard = false): boolean => {
+      const legal = movesFrom(from);
+      let candidates = legal.filter((m) => m.to === to);
+      if (candidates.length === 0) {
+        const castle = castlingByRook(legal, from, to, pieces.get(from), pieces.get(to));
+        if (castle) candidates = [castle];
+      }
       if (candidates.length === 0) return false;
       setSelected(null);
+      const first = candidates[0]!;
       if (candidates.some((m) => m.isPromotion)) {
-        setPendingPromotion({ from, to });
+        setPendingPromotion({ from, to: first.to, viaKeyboard });
         return false;
       }
-      void commit({ from, to });
+      void commit({ from, to: first.to });
       return true;
     },
-    [commit, movesFrom],
+    [commit, movesFrom, pieces],
+  );
+
+  const activateSquare = useCallback(
+    (sq: Square, viaKeyboard: boolean) => {
+      onSquareClick?.(sq);
+      setCursor(sq);
+      if (!canMove) return;
+      if (activeSelection && activeSelection !== sq && tryMove(activeSelection, sq, viaKeyboard)) return;
+      if (activeSelection === sq) {
+        setSelected(null);
+        return;
+      }
+      const piece = pieces.get(sq);
+      const own = piece !== undefined && piece.color === turn;
+      if (activeSelection && !own) {
+        // A click on an unreachable square while a piece is selected only clears the selection.
+        setSelected(null);
+        return;
+      }
+      setSelected(own && movesFrom(sq).length > 0 ? sq : null);
+    },
+    [activeSelection, canMove, movesFrom, onSquareClick, pieces, tryMove, turn],
   );
 
   const onPieceDrop = useCallback(
@@ -163,117 +249,187 @@ export function Board({
     [canMove, tryMove],
   );
 
-  const onSquareClick = useCallback(
-    ({ square, piece }: SquareHandlerArgs) => {
-      if (!canMove) return;
-      const sq = square as Square;
-      const ownPiece = piece !== null && piece.pieceType[0] === turn;
-      if (selected && selected !== sq && tryMove(selected, sq)) return;
-      if (selected === sq) {
-        setSelected(null);
-        return;
-      }
-      setSelected(ownPiece && movesFrom(sq).length > 0 ? sq : null);
-    },
-    [canMove, movesFrom, selected, tryMove, turn],
-  );
+  const initialCursor = useCallback((): Square => {
+    if (activeSelection) return activeSelection;
+    if (lastMove) return lastMove.to;
+    return kingSquare(fen, orientation === 'white' ? 'w' : 'b') ?? (orientation === 'white' ? 'e1' : 'e8');
+  }, [activeSelection, fen, lastMove, orientation]);
 
-  const squareStyles = useMemo(() => {
-    const layers = new Map<string, string[]>();
-    const add = (sq: string, value: string) => layers.set(sq, [...(layers.get(sq) ?? []), value]);
-    if (lastMove) {
-      add(lastMove.from, layer('var(--zz-hl-lastmove)'));
-      add(lastMove.to, layer('var(--zz-hl-lastmove)'));
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (CURSOR_KEYS.has(e.key)) {
+      e.preventDefault();
+      e.stopPropagation();
+      setCursorVisible(true);
+      setCursor(moveCursor(cursor ?? initialCursor(), e.key as CursorKey, orientation));
+      return;
     }
-    if (highlightCheck && game?.status().inCheck) {
-      const king = (['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const)
-        .flatMap((f) => [1, 2, 3, 4, 5, 6, 7, 8].map((r) => `${f}${r}` as Square))
-        .find((s) => {
-          const p = game.pieceAt(s);
-          return p?.type === 'k' && p.color === turn;
-        });
-      if (king) add(king, 'var(--zz-hl-check)');
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      setCursorVisible(true);
+      activateSquare(cursor ?? initialCursor(), true);
+      return;
     }
-    for (const m of marks ?? []) add(m.square, MARK_LAYERS[m.kind]);
-    if (selected) {
-      add(selected, layer('var(--zz-hl-selected)'));
-      if (dots) for (const m of movesFrom(selected)) add(m.to, m.isCapture ? CAPTURE : DOT);
+    if (e.key === 'Escape' && activeSelection) {
+      e.preventDefault();
+      e.stopPropagation();
+      setSelected(null);
+      return;
     }
-    const styles: Record<string, CSSProperties> = {};
-    // Later layers are painted on top: CSS lists the top layer first.
-    for (const [sq, l] of layers) styles[sq] = { backgroundImage: [...l].reverse().join(', ') };
-    return styles;
-  }, [dots, game, highlightCheck, lastMove, marks, movesFrom, selected, turn]);
+    if ((e.key === 'f' || e.key === 'F') && onFlip) {
+      e.preventDefault();
+      e.stopPropagation();
+      onFlip();
+    }
+  };
 
-  const chessboardArrows = useMemo(
-    () => (arrows ?? []).map((a) => ({ startSquare: a.from, endSquare: a.to, color: tokenColor(a.kind) })),
-    [arrows],
+  const onFocus = (e: FocusEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return;
+    setFocused(true);
+    setCursorVisible(isFocusVisible(e.currentTarget));
+    if (!cursor) setCursor(initialCursor());
+  };
+
+  const onBlur = (e: FocusEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return;
+    setFocused(false);
+  };
+
+  const checkSquare = highlightCheck && status?.inCheck ? kingSquare(fen, turn) : null;
+  const visuals = useMemo(
+    () =>
+      squareLayers({
+        lastMove,
+        checkSquare,
+        marks,
+        userMarks: shapes.marks,
+        feedback,
+        selected: activeSelection,
+        targets,
+        showDots: dots,
+      }),
+    [lastMove, checkSquare, marks, shapes.marks, feedback, activeSelection, targets, dots],
   );
+  const targetSet = useMemo(() => new Set(targets.map((t) => t.to)), [targets]);
+
+  const squareRenderer = ({ square, children }: SquareHandlerArgs & { children?: ReactNode }) => {
+    const sq = square as Square;
+    const visual = visuals.get(sq);
+    return (
+      <div
+        id={`${id}-sq-${sq}`}
+        role="button"
+        aria-label={squareLabelDe(sq, pieces.get(sq), { selected: activeSelection === sq, target: targetSet.has(sq) })}
+        data-highlights={visual?.tokens.join(' ') || undefined}
+        style={{ width: '100%', height: '100%', backgroundImage: visual?.backgroundImage, boxShadow: visual?.boxShadow }}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  const overlayArrows: OverlayArrow[] = [
+    ...(arrows ?? []).map((a) => ({ from: a.from, to: a.to, colorVar: ARROW_VARS[a.kind], source: 'program' as const, kind: a.kind })),
+    ...shapes.arrows.map((a) => ({ from: a.from, to: a.to, colorVar: USER_ARROW_VARS[a.color], source: 'user' as const, kind: a.color })),
+    ...(shapes.preview
+      ? [{ from: shapes.preview.from, to: shapes.preview.to, colorVar: USER_ARROW_VARS[shapes.preview.color], source: 'preview' as const, kind: shapes.preview.color }]
+      : []),
+  ];
 
   // react-chessboard measures squares to animate; a board without layout (hidden, jsdom) must not animate.
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [hasLayout, setHasLayout] = useState(false);
-  useLayoutEffect(() => {
-    const el = rootRef.current;
-    if (!el) return undefined;
-    const check = () => setHasLayout(el.getBoundingClientRect().width > 0);
-    check();
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(check) : null;
-    ro?.observe(el);
-    return () => ro?.disconnect();
-  }, []);
-  const animate = hasLayout && settings.animations && !prefersReducedMotion() && import.meta.env.VITE_E2E !== '1';
+  const animate = width > 0 && settings.animations && !prefersReducedMotion() && import.meta.env.VITE_E2E !== '1';
+  const boardPx = width > 0 ? width : 320;
 
   const options: ChessboardOptions = {
+    ...boardThemeOptions({ showCoordinates: coords, animate }),
     id: `board-${id}`,
     position: fen,
     boardOrientation: orientation,
     allowDragging: canMove,
     canDragPiece: ({ piece }) => canMove && piece.pieceType[0] === turn,
     onPieceDrop,
-    onSquareClick,
+    onSquareClick: ({ square }) => activateSquare(square as Square, false),
     onPieceDrag: ({ square }) => {
-      if (square) setSelected(square as Square);
+      if (square && canMove) setSelected(square as Square);
     },
-    squareStyles,
-    arrows: chessboardArrows,
-    allowDrawingArrows: false,
-    clearArrowsOnPositionChange: false,
-    showNotation: coords,
-    showAnimations: animate,
-    animationDurationInMs: 150,
-    boardStyle: { borderRadius: 'var(--zz-radius-board)', overflow: 'hidden', boxShadow: 'var(--zz-shadow-board)' },
-    lightSquareStyle: { backgroundColor: 'var(--zz-sq-light)' },
-    darkSquareStyle: { backgroundColor: 'var(--zz-sq-dark)' },
-    lightSquareNotationStyle: { color: 'var(--zz-coord-on-light)', fontSize: 12, fontWeight: 600 },
-    darkSquareNotationStyle: { color: 'var(--zz-coord-on-dark)', fontSize: 12, fontWeight: 600 },
-    dropSquareStyle: { boxShadow: 'inset 0 0 0 3px var(--zz-board-focus-light)' },
+    squareRenderer,
   };
 
+  const cursorSquare = focused && cursor ? cursor : null;
+  const instructionsId = `${id}-instructions`;
+
+  // The board is one keyboard widget (DESIGN §7.4, WAI-ARIA "application" with aria-activedescendant): one tab stop,
+  // arrow keys move the cursor, Enter/Space select and move. jsx-a11y does not count `application` as interactive.
+  /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex -- see above */
   return (
     <div
       ref={rootRef}
       data-testid="board"
       data-orientation={orientation}
       data-fen={fen}
-      role="region"
-      aria-label={BOARD_DE.boardLabel(orientation)}
-      className={cn('relative aspect-square w-full select-none', className)}
+      role="application"
+      aria-roledescription={BOARD_DE.boardRoleDescription}
+      aria-label={label ?? BOARD_DE.boardLabel(orientation)}
+      aria-describedby={instructionsId}
+      aria-activedescendant={cursorSquare ? `${id}-sq-${cursorSquare}` : undefined}
+      tabIndex={0}
+      onKeyDown={onKeyDown}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      {...shapes.handlers}
+      className={cn('relative isolate aspect-square w-full select-none outline-none', className)}
     >
       <Chessboard options={options} />
+      <BoardArrows arrows={overlayArrows} orientation={orientation} />
+      {(annotations ?? []).map((a) => (
+        <AnnotationBadge
+          key={`${a.square}-${a.classification}`}
+          square={a.square}
+          classification={a.classification}
+          orientation={orientation}
+          boardPx={boardPx}
+          animate={animate}
+        />
+      ))}
+      {feedback && (
+        <FeedbackBadge
+          key={`${feedback.square}-${feedback.result}`}
+          square={feedback.square}
+          result={feedback.result}
+          label={feedback.result === 'correct' ? BOARD_DE.feedbackCorrect : BOARD_DE.feedbackWrong}
+          orientation={orientation}
+          boardPx={boardPx}
+          animate={animate}
+        />
+      )}
+      {cursorSquare && cursorVisible && <KeyboardCursor square={cursorSquare} orientation={orientation} />}
       {pendingPromotion && (
         <PromotionPicker
           square={pendingPromotion.to}
           color={turn}
           orientation={orientation}
-          onCancel={() => setPendingPromotion(null)}
-          onSelect={(piece: PromotionPiece) => {
-            const move = { ...pendingPromotion, promotion: piece };
+          onCancel={() => {
+            const viaKeyboard = pendingPromotion.viaKeyboard;
             setPendingPromotion(null);
-            void commit(move);
+            if (viaKeyboard) rootRef.current?.focus({ preventScroll: true });
+          }}
+          onSelect={(piece: PromotionPiece) => {
+            const { from, to, viaKeyboard } = pendingPromotion;
+            setPendingPromotion(null);
+            if (viaKeyboard) rootRef.current?.focus({ preventScroll: true });
+            void commit({ from, to, promotion: piece });
           }}
         />
       )}
+      <p id={instructionsId} className="sr-only">
+        {BOARD_DE.instructions}
+        {onFlip ? ` ${BOARD_DE.instructionsFlip}` : ''}
+      </p>
+      <p role="status" aria-live="polite" data-testid="board-announcer" className="sr-only">
+        {announcement}
+      </p>
     </div>
   );
+  /* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
 }

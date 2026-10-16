@@ -1,5 +1,5 @@
 /**
- * Routes of the Analysebrett (D-03). PLACEHOLDER written by WP-00 – owned by WP-01 from wave 1.
+ * Routes of the Analysebrett (D-03, WP-01).
  */
 import type { RouteObject } from 'react-router';
 import { ROUTE_PATTERNS } from '@/app/paths';
