@@ -1,0 +1,928 @@
+{
+ "source": "docs/team/RULES.md §6.2 (verified against chess.js 1.4.0 by the rules auditor, 2026-10-16)",
+ "fixtures": [
+  {
+   "id": "C1",
+   "art": "3.8.2",
+   "fen": "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+   "moves": [],
+   "legal": [
+    "O-O",
+    "O-O-O"
+   ]
+  },
+  {
+   "id": "C2",
+   "art": "3.8.2.2",
+   "fen": "4k3/8/8/4r3/8/8/8/R3K2R w KQ - 0 1",
+   "moves": [],
+   "illegal": [
+    "O-O",
+    "O-O-O"
+   ],
+   "note": "king in check"
+  },
+  {
+   "id": "C3",
+   "art": "3.8.2.2",
+   "fen": "1k3r2/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+   "moves": [],
+   "illegal": [
+    "O-O"
+   ],
+   "legal": [
+    "O-O-O"
+   ],
+   "note": "f1 (square the king crosses) attacked"
+  },
+  {
+   "id": "C4",
+   "art": "3.8.2.2",
+   "fen": "1k4r1/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+   "moves": [],
+   "illegal": [
+    "O-O"
+   ],
+   "legal": [
+    "O-O-O"
+   ],
+   "note": "g1 (king destination) attacked"
+  },
+  {
+   "id": "C5",
+   "art": "3.8.2.2",
+   "fen": "1r4k1/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+   "moves": [],
+   "legal": [
+    "O-O-O"
+   ],
+   "note": "b1 attacked, only the ROOK crosses it -> castling legal"
+  },
+  {
+   "id": "C6",
+   "art": "3.8.2.2",
+   "fen": "r5k1/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+   "moves": [],
+   "legal": [
+    "O-O-O"
+   ],
+   "note": "rook a1 itself attacked -> castling legal"
+  },
+  {
+   "id": "C7",
+   "art": "3.8.2.2",
+   "fen": "r3k2r/8/8/8/8/8/8/RN2K2R w KQkq - 0 1",
+   "moves": [],
+   "illegal": [
+    "O-O-O"
+   ],
+   "legal": [
+    "O-O"
+   ],
+   "note": "knight on b1 between king and rook"
+  },
+  {
+   "id": "C8",
+   "art": "3.8.2.1",
+   "fen": "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+   "moves": [
+    "Kf1",
+    "Kf8",
+    "Ke1",
+    "Ke8"
+   ],
+   "illegal": [
+    "O-O",
+    "O-O-O"
+   ],
+   "fenAfter": "r3k2r/8/8/8/8/8/8/R3K2R w - - 4 3",
+   "note": "king moved and returned"
+  },
+  {
+   "id": "C9",
+   "art": "3.8.2.1",
+   "fen": "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+   "moves": [
+    "Rh2",
+    "Rh7",
+    "Rh1",
+    "Rh8"
+   ],
+   "illegal": [
+    "O-O"
+   ],
+   "legal": [
+    "O-O-O"
+   ],
+   "fenAfter": "r3k2r/8/8/8/8/8/8/R3K2R w Qq - 4 3",
+   "note": "h-rook moved and returned"
+  },
+  {
+   "id": "C10",
+   "art": "3.8.2.2",
+   "fen": "r3k2r/8/8/B7/8/8/8/R3K2R b KQkq - 0 1",
+   "moves": [],
+   "illegal": [
+    "O-O-O"
+   ],
+   "legal": [
+    "O-O"
+   ],
+   "note": "black: d8 attacked by Ba5"
+  },
+  {
+   "id": "C11",
+   "art": "3.8.2.1",
+   "fen": "r3k2r/8/8/8/8/8/8/R4K1R w KQkq - 0 1",
+   "moves": [],
+   "fideIllegal": [
+    "O-O-O",
+    "O-O"
+   ],
+   "chessjsBug": "chess.js 1.4.0 trusts the FEN flags and generates O-O-O (Kf1-d1); app must strip KQ on load (king not on e1)",
+   "chessjsGenerates": [
+    "O-O-O"
+   ]
+  },
+  {
+   "id": "C12",
+   "art": "3.8.2.1",
+   "fen": "r3k2r/8/8/8/8/8/8/R3K3 w KQkq - 0 1",
+   "moves": [],
+   "fideIllegal": [
+    "O-O"
+   ],
+   "chessjsBug": "chess.js 1.4.0 generates O-O although h1 is empty; app must strip K on load",
+   "chessjsGenerates": [
+    "O-O"
+   ]
+  },
+  {
+   "id": "E1",
+   "art": "3.7.4",
+   "fen": "startpos",
+   "moves": [
+    "e4",
+    "a6",
+    "e5",
+    "d5"
+   ],
+   "legal": [
+    "exd6"
+   ],
+   "fenAfter": "rnbqkbnr/1pp1pppp/p7/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
+  },
+  {
+   "id": "E2",
+   "art": "3.7.4.2",
+   "fen": "startpos",
+   "moves": [
+    "e4",
+    "a6",
+    "e5",
+    "d5",
+    "Nf3",
+    "h6"
+   ],
+   "illegal": [
+    "exd6"
+   ],
+   "note": "right expired"
+  },
+  {
+   "id": "E3",
+   "art": "3.7.4 + 3.9.2",
+   "fen": "7k/2p5/8/KP5r/8/8/8/8 b - - 0 1",
+   "moves": [
+    "c5"
+   ],
+   "illegal": [
+    "bxc6"
+   ],
+   "fenAfter": "7k/8/8/KPp4r/8/8/8/8 w - - 0 2",
+   "note": "e.p. would expose Ka5 to Rh5; fen() omits the e.p. square"
+  },
+  {
+   "id": "E4",
+   "art": "3.7.4 + 3.9",
+   "fen": "8/8/8/4k3/2p5/8/3P4/4K3 w - - 0 1",
+   "moves": [
+    "d4+"
+   ],
+   "legal": [
+    "cxd3"
+   ],
+   "note": "e.p. capture removes the checking pawn"
+  },
+  {
+   "id": "E5",
+   "art": "3.7.4.1",
+   "fen": "4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1",
+   "moves": [],
+   "fideIllegal": [
+    "exd6"
+   ],
+   "chessjsBug": "chess.js 1.4.0 accepts the bogus e.p. square and generates exd6 capturing a non-existent pawn; app must strip it on load",
+   "chessjsGenerates": [
+    "exd6"
+   ]
+  },
+  {
+   "id": "P1",
+   "art": "3.7.5.1",
+   "fen": "8/P6k/8/8/8/8/8/K7 w - - 0 1",
+   "moves": [],
+   "pieceMoves": {
+    "a7": [
+     "a8=N",
+     "a8=B",
+     "a8=R",
+     "a8=Q"
+    ]
+   },
+   "rejected": [
+    "a8",
+    {
+     "from": "a7",
+     "to": "a8"
+    },
+    {
+     "from": "a7",
+     "to": "a8",
+     "promotion": "k"
+    },
+    {
+     "from": "a7",
+     "to": "a8",
+     "promotion": "p"
+    }
+   ]
+  },
+  {
+   "id": "P2",
+   "art": "3.7.5.3",
+   "fen": "8/4P1k1/8/8/8/8/8/K7 w - - 0 1",
+   "moves": [],
+   "sanOf": {
+    "e8=N": "e8=N+",
+    "e8=Q": "e8=Q"
+   },
+   "note": "new piece acts immediately: knight gives check"
+  },
+  {
+   "id": "P3",
+   "art": "3.7.5.1",
+   "fen": "1r5k/P7/8/8/8/8/8/K7 w - - 0 1",
+   "moves": [],
+   "pieceMoves": {
+    "a7": [
+     "a8=N",
+     "a8=B",
+     "a8=R",
+     "a8=Q",
+     "axb8=N",
+     "axb8=B",
+     "axb8=R+",
+     "axb8=Q+"
+    ]
+   }
+  },
+  {
+   "id": "P4a",
+   "art": "3.7.5 + 5.2.1",
+   "fen": "8/k1P5/2K5/8/8/8/8/8 w - - 0 1",
+   "moves": [
+    "c8=Q"
+   ],
+   "status": {
+    "over": true,
+    "result": "1/2-1/2",
+    "reason": "stalemate"
+   }
+  },
+  {
+   "id": "P4b",
+   "art": "3.7.5",
+   "fen": "8/k1P5/2K5/8/8/8/8/8 w - - 0 1",
+   "moves": [
+    "c8=R"
+   ],
+   "status": {
+    "over": false,
+    "claims": []
+   },
+   "note": "under-promotion avoids stalemate (K+R v K wins)"
+  },
+  {
+   "id": "P4c",
+   "art": "3.7.5 + 5.2.2",
+   "fen": "8/k1P5/2K5/8/8/8/8/8 w - - 0 1",
+   "moves": [
+    "c8=N+"
+   ],
+   "status": {
+    "over": true,
+    "result": "1/2-1/2",
+    "reason": "dead_position"
+   }
+  },
+  {
+   "id": "I1",
+   "art": "3.9.2",
+   "fen": "4k3/4r3/8/8/8/8/4N3/4K3 w - - 0 1",
+   "moves": [],
+   "pieceMoves": {
+    "e2": []
+   },
+   "note": "pinned knight"
+  },
+  {
+   "id": "I2",
+   "art": "3.9.2",
+   "fen": "4k3/8/8/8/8/8/3r4/4K3 w - - 0 1",
+   "moves": [],
+   "pieceMoves": {
+    "e1": [
+     "Kxd2",
+     "Kf1"
+    ]
+   }
+  },
+  {
+   "id": "I3",
+   "art": "3.9",
+   "fen": "4k3/8/8/8/8/8/8/r3K2N w - - 0 1",
+   "moves": [],
+   "allMoves": [
+    "Kd2",
+    "Ke2",
+    "Kf2"
+   ],
+   "note": "in check: only moves that end the check"
+  },
+  {
+   "id": "I4",
+   "art": "3.10.2",
+   "fen": "4k3/8/8/8/8/8/4N3/4K3 w - - 0 1",
+   "moves": [],
+   "rejected": [
+    {
+     "from": "e2",
+     "to": "e4"
+    },
+    "Ke3"
+   ]
+  },
+  {
+   "id": "K1",
+   "art": "5.1.1",
+   "fen": "startpos",
+   "moves": [
+    "f3",
+    "e5",
+    "g4",
+    "Qh4#"
+   ],
+   "status": {
+    "over": true,
+    "result": "0-1",
+    "reason": "checkmate"
+   }
+  },
+  {
+   "id": "K2",
+   "art": "5.1.1",
+   "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1",
+   "moves": [
+    "Ra8#"
+   ],
+   "status": {
+    "over": true,
+    "result": "1-0",
+    "reason": "checkmate"
+   }
+  },
+  {
+   "id": "K3",
+   "art": "5.1.1",
+   "fen": "4k3/8/8/8/8/8/3r4/3rK3 w - - 0 1",
+   "moves": [],
+   "status": {
+    "over": true,
+    "result": "0-1",
+    "reason": "checkmate"
+   },
+   "note": "king may not capture a protected rook"
+  },
+  {
+   "id": "S1",
+   "art": "5.2.1",
+   "fen": "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",
+   "moves": [],
+   "status": {
+    "over": true,
+    "result": "1/2-1/2",
+    "reason": "stalemate"
+   }
+  },
+  {
+   "id": "S2",
+   "art": "5.2.1",
+   "fen": "k7/8/1QK5/8/8/8/8/8 b - - 0 1",
+   "moves": [],
+   "status": {
+    "over": true,
+    "result": "1/2-1/2",
+    "reason": "stalemate"
+   }
+  },
+  {
+   "id": "D1",
+   "art": "5.2.2",
+   "fen": "8/8/8/4k3/8/8/8/4K3 w - - 0 1",
+   "moves": [],
+   "insufficient": true,
+   "fideDead": true,
+   "note": "K v K"
+  },
+  {
+   "id": "D2",
+   "art": "5.2.2",
+   "fen": "8/8/8/4k3/8/8/8/2B1K3 w - - 0 1",
+   "moves": [],
+   "insufficient": true,
+   "fideDead": true,
+   "note": "K+B v K"
+  },
+  {
+   "id": "D3",
+   "art": "5.2.2",
+   "fen": "8/8/8/4k3/8/8/8/1N2K3 w - - 0 1",
+   "moves": [],
+   "insufficient": true,
+   "fideDead": true,
+   "note": "K+N v K"
+  },
+  {
+   "id": "D4",
+   "art": "5.2.2",
+   "fen": "5b1k/8/8/8/8/8/8/2B1K3 w - - 0 1",
+   "moves": [],
+   "insufficient": true,
+   "fideDead": true,
+   "note": "K+B v K+B, bishops on same colour (c1, f8 dark)"
+  },
+  {
+   "id": "D5",
+   "art": "5.2.2",
+   "fen": "2b4k/8/8/8/8/8/8/2B1K3 w - - 0 1",
+   "moves": [],
+   "insufficient": false,
+   "fideDead": false,
+   "note": "K+B v K+B, opposite colours: mate possible"
+  },
+  {
+   "id": "D6",
+   "art": "5.2.2",
+   "fen": "6nk/8/8/8/8/8/8/1N2K3 w - - 0 1",
+   "moves": [],
+   "insufficient": false,
+   "fideDead": false,
+   "note": "K+N v K+N: mate possible"
+  },
+  {
+   "id": "D7",
+   "art": "5.2.2",
+   "fen": "7k/8/8/8/8/8/8/1N2KN2 w - - 0 1",
+   "moves": [],
+   "insufficient": false,
+   "fideDead": false,
+   "note": "K+N+N v K: mate possible (not forced)"
+  },
+  {
+   "id": "D8",
+   "art": "5.2.2",
+   "fen": "7k/8/8/8/8/8/8/2B1K1B1 w - - 0 1",
+   "moves": [],
+   "insufficient": true,
+   "fideDead": true,
+   "note": "K+B+B same colour (c1, g1) v K"
+  },
+  {
+   "id": "D9",
+   "art": "5.2.2",
+   "fen": "6nk/8/8/8/8/8/8/2B1K3 w - - 0 1",
+   "moves": [],
+   "insufficient": false,
+   "fideDead": false,
+   "note": "K+B v K+N: mate possible"
+  },
+  {
+   "id": "D10",
+   "art": "5.2.2",
+   "fen": "7k/7p/8/8/8/8/8/1N2K3 w - - 0 1",
+   "moves": [],
+   "insufficient": false,
+   "fideDead": false,
+   "note": "K+N v K+P"
+  },
+  {
+   "id": "D11",
+   "art": "5.2.2",
+   "fen": "k7/8/8/p1p1p1p1/P1P1P1P1/8/8/K7 w - - 0 1",
+   "moves": [],
+   "insufficient": false,
+   "fideDead": true,
+   "note": "locked pawns, kings cannot cross: FIDE dead, chess.js does not detect"
+  },
+  {
+   "id": "R1a",
+   "art": "9.2",
+   "fen": "startpos",
+   "moves": [
+    "Nf3",
+    "Nf6",
+    "Ng1",
+    "Ng8"
+   ],
+   "status": {
+    "over": false,
+    "claims": []
+   },
+   "chessjsThreefold": false,
+   "note": "2nd occurrence"
+  },
+  {
+   "id": "R1b",
+   "art": "9.2.1.2",
+   "fen": "startpos",
+   "moves": [
+    "Nf3",
+    "Nf6",
+    "Ng1",
+    "Ng8",
+    "Nf3",
+    "Nf6",
+    "Ng1",
+    "Ng8"
+   ],
+   "status": {
+    "over": false,
+    "claims": [
+     "threefold"
+    ]
+   },
+   "chessjsThreefold": true,
+   "chessjsIsGameOver": true,
+   "note": "3rd occurrence: claim only; chess.js isDraw()/isGameOver() = true"
+  },
+  {
+   "id": "R2",
+   "art": "9.6.1",
+   "fen": "startpos",
+   "moves": [
+    "Nf3",
+    "Nf6",
+    "Ng1",
+    "Ng8",
+    "Nf3",
+    "Nf6",
+    "Ng1",
+    "Ng8",
+    "Nf3",
+    "Nf6",
+    "Ng1",
+    "Ng8",
+    "Nf3",
+    "Nf6",
+    "Ng1",
+    "Ng8"
+   ],
+   "status": {
+    "over": true,
+    "result": "1/2-1/2",
+    "reason": "fivefold"
+   },
+   "note": "5th occurrence: automatic; chess.js has no fivefold API"
+  },
+  {
+   "id": "R3a",
+   "art": "9.2.2.2",
+   "fen": "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+   "moves": [
+    "Kf1",
+    "Kf8",
+    "Ke1",
+    "Ke8",
+    "Kf1",
+    "Kf8",
+    "Ke1",
+    "Ke8"
+   ],
+   "status": {
+    "over": false,
+    "claims": []
+   },
+   "chessjsThreefold": false,
+   "note": "start position had castling rights -> different position"
+  },
+  {
+   "id": "R3b",
+   "art": "9.2.2.2",
+   "fen": "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+   "moves": [
+    "Kf1",
+    "Kf8",
+    "Ke1",
+    "Ke8",
+    "Kf1",
+    "Kf8",
+    "Ke1",
+    "Ke8",
+    "Kf1",
+    "Kf8",
+    "Ke1",
+    "Ke8"
+   ],
+   "status": {
+    "over": false,
+    "claims": [
+     "threefold"
+    ]
+   },
+   "chessjsThreefold": true
+  },
+  {
+   "id": "R4a",
+   "art": "9.2.2.1",
+   "fen": "4k3/8/8/8/3p4/8/4P3/4K3 w - - 0 1",
+   "moves": [
+    "e4",
+    "Kf8",
+    "Kf1",
+    "Ke8",
+    "Ke1",
+    "Kf8",
+    "Kf1",
+    "Ke8",
+    "Ke1"
+   ],
+   "status": {
+    "over": false,
+    "claims": []
+   },
+   "chessjsThreefold": false,
+   "note": "first occurrence had e.p. possible -> different position"
+  },
+  {
+   "id": "R4b",
+   "art": "9.2.2.1",
+   "fen": "4k3/8/8/8/3p4/8/4P3/4K3 w - - 0 1",
+   "moves": [
+    "e4",
+    "Kf8",
+    "Kf1",
+    "Ke8",
+    "Ke1",
+    "Kf8",
+    "Kf1",
+    "Ke8",
+    "Ke1",
+    "Kf8",
+    "Kf1",
+    "Ke8",
+    "Ke1"
+   ],
+   "status": {
+    "over": false,
+    "claims": [
+     "threefold"
+    ]
+   },
+   "chessjsThreefold": true
+  },
+  {
+   "id": "R5",
+   "art": "9.2.2",
+   "fen": "7k/2p5/8/KP5r/8/8/8/8 b - - 0 1",
+   "moves": [
+    "c5",
+    "Ka6",
+    "Kg8",
+    "Ka5",
+    "Kh8",
+    "Ka6",
+    "Kg8",
+    "Ka5",
+    "Kh8"
+   ],
+   "status": {
+    "over": false,
+    "claims": [
+     "threefold"
+    ]
+   },
+   "chessjsThreefold": false,
+   "note": "e.p. after c5 was illegal (pin) -> same position per 9.2.2; chess.js internal hash differs and under-counts; FEN key is correct"
+  },
+  {
+   "id": "M1",
+   "art": "9.3.2",
+   "fen": "8/8/8/4k3/8/8/8/R3K3 w - - 99 80",
+   "moves": [
+    "Ra2"
+   ],
+   "status": {
+    "over": false,
+    "claims": [
+     "fifty"
+    ]
+   },
+   "chessjsFifty": true,
+   "chessjsIsGameOver": true
+  },
+  {
+   "id": "M2",
+   "art": "9.3",
+   "fen": "8/8/8/4k3/8/8/r7/R3K3 w - - 99 80",
+   "moves": [
+    "Rxa2"
+   ],
+   "status": {
+    "over": false,
+    "claims": []
+   },
+   "chessjsFifty": false,
+   "note": "capture resets the count"
+  },
+  {
+   "id": "M3",
+   "art": "9.3",
+   "fen": "8/8/8/4k3/8/8/P7/4K3 w - - 99 80",
+   "moves": [
+    "a3"
+   ],
+   "status": {
+    "over": false,
+    "claims": []
+   },
+   "chessjsFifty": false,
+   "note": "pawn move resets the count"
+  },
+  {
+   "id": "M4",
+   "art": "5.1.1 over 9.3",
+   "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 99 80",
+   "moves": [
+    "Ra8#"
+   ],
+   "status": {
+    "over": true,
+    "result": "1-0",
+    "reason": "checkmate"
+   },
+   "chessjsFifty": true,
+   "note": "chess.js reports isCheckmate AND isDrawByFiftyMoves/isDraw: check mate first"
+  },
+  {
+   "id": "M5",
+   "art": "9.6.2",
+   "fen": "8/8/8/4k3/8/8/8/R3K3 w - - 149 120",
+   "moves": [
+    "Ra2"
+   ],
+   "status": {
+    "over": true,
+    "result": "1/2-1/2",
+    "reason": "seventyfive"
+   },
+   "note": "chess.js has no 75-move API"
+  },
+  {
+   "id": "M6",
+   "art": "9.6.2",
+   "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 149 120",
+   "moves": [
+    "Ra8#"
+   ],
+   "status": {
+    "over": true,
+    "result": "1-0",
+    "reason": "checkmate"
+   },
+   "note": "mate on the 75th move takes precedence"
+  },
+  {
+   "id": "F1",
+   "art": "6.9",
+   "fen": "8/8/8/4k3/8/8/8/3QK3 w - - 0 1",
+   "moves": [],
+   "cannotMate": {
+    "w": false,
+    "b": true
+   },
+   "onFlag": {
+    "w": "1/2-1/2",
+    "b": "1-0"
+   }
+  },
+  {
+   "id": "F2",
+   "art": "6.9",
+   "fen": "n3k3/8/8/8/8/8/8/4K2R w - - 0 1",
+   "moves": [],
+   "cannotMate": {
+    "w": false,
+    "b": false
+   },
+   "onFlag": {
+    "w": "0-1",
+    "b": "1-0"
+   },
+   "mateDemo": "8/8/8/8/8/6n1/7R/5k1K w - - 0 1"
+  },
+  {
+   "id": "F3",
+   "art": "5.2.2 before 6.9",
+   "fen": "8/8/8/4k3/8/8/8/1N2K3 w - - 0 1",
+   "moves": [],
+   "status": {
+    "over": true,
+    "result": "1/2-1/2",
+    "reason": "dead_position"
+   },
+   "note": "K+N v K: game already over, a flag cannot fall"
+  },
+  {
+   "id": "F4",
+   "art": "6.9",
+   "fen": "7k/7p/8/8/8/8/8/1N2K3 w - - 0 1",
+   "moves": [],
+   "cannotMate": {
+    "w": false,
+    "b": false
+   },
+   "onFlag": {
+    "w": "0-1",
+    "b": "1-0"
+   },
+   "mateDemo": "k1K5/p1N5/8/8/8/8/8/8 b - - 0 1"
+  },
+  {
+   "id": "F5",
+   "art": "6.9",
+   "fen": "3qk3/8/8/8/8/8/8/1N2K3 w - - 0 1",
+   "moves": [],
+   "cannotMate": {
+    "w": true,
+    "b": false
+   },
+   "onFlag": {
+    "w": "0-1",
+    "b": "1/2-1/2"
+   },
+   "note": "K+N cannot mate K+Q (brute force: no mate position exists)"
+  },
+  {
+   "id": "F6",
+   "art": "6.9",
+   "fen": "4k2r/8/8/8/8/8/8/2B1K3 w - - 0 1",
+   "moves": [],
+   "cannotMate": {
+    "w": true,
+    "b": false
+   },
+   "onFlag": {
+    "w": "0-1",
+    "b": "1/2-1/2"
+   },
+   "note": "K+B cannot mate K+R (brute force)"
+  },
+  {
+   "id": "F7",
+   "art": "6.9",
+   "fen": "7k/7p/8/8/8/8/8/2B1K3 w - - 0 1",
+   "moves": [],
+   "cannotMate": {
+    "w": false,
+    "b": false
+   },
+   "onFlag": {
+    "w": "0-1",
+    "b": "1-0"
+   },
+   "mateDemo": "k7/p1K5/8/3B4/8/8/8/8 b - - 0 1"
+  },
+  {
+   "id": "F8",
+   "art": "5.1.2",
+   "fen": "8/8/8/4k3/8/8/8/3QK3 w - - 0 1",
+   "moves": [],
+   "onResign": {
+    "w": "1/2-1/2",
+    "b": "1-0"
+   },
+   "note": "resigning against a side that cannot mate is a draw (2023 text)"
+  }
+ ]
+}

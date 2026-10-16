@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Zugzwang – Schach lernen mit Puzzles, Lektionen, Bots und Partieanalyse." />
+    <meta name="theme-color" content="#171614" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Zugzwang</title>
+    <script>
+      // Apply the stored light theme before first paint (dark is the default). Convenience only.
+      try {
+        if (localStorage.getItem('zz-theme') === 'light') document.documentElement.dataset.theme = 'light';
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,242 @@
+/*
+ * Zugzwang design tokens – copied verbatim from docs/team/DESIGN.md §2.1–§2.3 (v1.0), followed by the tokens of
+ * §2.6–§2.9 (sizes, radii, shadows, motion, z-index). Owned by WP-00 (frozen); changes go through the designer.
+ * Dark is the default (:root); light via <html data-theme="light">; board theme via <html data-board="holz">.
+ * tokens.contrast.test.ts parses this file and recomputes DESIGN §2.4.
+ */
+
+/* ---- §2.1 Colour tokens – app UI ---- */
+:root {                                   /* DARK – default */
+  color-scheme: dark;
+  --zz-bg:             #171614;  /* page background */
+  --zz-surface:        #22201D;  /* cards, panel, sidebar */
+  --zz-surface-2:      #2C2A26;  /* raised: coach bubble, inputs, hover on surface */
+  --zz-surface-3:      #383531;  /* selected row, current move, pressed, toast */
+  --zz-border:         #3B3833;  /* decorative dividers and card borders */
+  --zz-border-strong:  #7A7468;  /* input borders, segmented control outline (≥ 3:1) */
+
+  --zz-text:           #F3F1EC;  /* primary text */
+  --zz-text-muted:     #ABA59A;  /* secondary text, meta, move numbers */
+  --zz-text-disabled:  #7A756C;  /* disabled controls only (WCAG-exempt) */
+
+  --zz-accent:         #7CBF4A;  /* primary button fill, progress fill, active nav */
+  --zz-accent-hover:   #8CCB5B;
+  --zz-accent-active:  #6CAD3C;
+  --zz-on-accent:      #0F1A07;  /* text/icons on accent fill */
+  --zz-accent-text:    #8FCB5C;  /* green text and links on surfaces */
+  --zz-accent-subtle:  #22321A;  /* success message background */
+
+  --zz-danger:         #D7373D;  /* destructive button fill */
+  --zz-on-danger:      #FFFFFF;
+  --zz-danger-text:    #FF7A7A;
+  --zz-danger-subtle:  #3A1E1F;  /* error message background */
+
+  --zz-warning:        #F2B84B;  /* warning fill, streak flame */
+  --zz-on-warning:     #1F1600;
+  --zz-warning-text:   #F2B84B;
+  --zz-warning-subtle: #3A2E14;  /* warning/offline banner background */
+
+  --zz-info-text:      #7DB6F0;
+  --zz-info-subtle:    #1A2A3B;  /* info / local-mode banner background */
+
+  --zz-focus:          #8AB8FF;  /* focus ring */
+  --zz-scrim:          rgb(0 0 0 / 0.60);  /* behind dialogs and sheets */
+}
+
+:root[data-theme="light"] {               /* LIGHT */
+  color-scheme: light;
+  --zz-bg:             #F5F3EF;
+  --zz-surface:        #FFFFFF;
+  --zz-surface-2:      #F0EDE7;
+  --zz-surface-3:      #E5E1D9;
+  --zz-border:         #DCD7CD;
+  --zz-border-strong:  #8A8377;
+
+  --zz-text:           #1D1B18;
+  --zz-text-muted:     #5A554C;
+  --zz-text-disabled:  #A09A90;
+
+  --zz-accent:         #2E7D32;
+  --zz-accent-hover:   #276C2B;
+  --zz-accent-active:  #1F5A23;
+  --zz-on-accent:      #FFFFFF;
+  --zz-accent-text:    #2B6E2E;
+  --zz-accent-subtle:  #E3F1DF;
+
+  --zz-danger:         #C62828;
+  --zz-on-danger:      #FFFFFF;
+  --zz-danger-text:    #B3261E;
+  --zz-danger-subtle:  #FBE4E2;
+
+  --zz-warning:        #F2B84B;
+  --zz-on-warning:     #1F1600;
+  --zz-warning-text:   #8A5A00;
+  --zz-warning-subtle: #FCEFD2;
+
+  --zz-info-text:      #1F5FA8;
+  --zz-info-subtle:    #E1ECF8;
+
+  --zz-focus:          #1A5FD6;
+  --zz-scrim:          rgb(20 18 15 / 0.45);
+}
+
+/* ---- §2.2 Board tokens (theme-independent) ---- */
+:root {
+  /* Moos (default) */
+  --zz-sq-light:          #EEF0D6;
+  --zz-sq-dark:           #5B7E43;
+  --zz-coord-on-light:    #46633A;  /* coordinate text drawn on light squares */
+  --zz-coord-on-dark:     #FFFFFF;  /* coordinate text drawn on dark squares */
+}
+:root[data-board="holz"] {
+  --zz-sq-light:          #EDD6B0;
+  --zz-sq-dark:           #946844;
+  --zz-coord-on-light:    #6E4826;
+  --zz-coord-on-dark:     #FFFFFF;
+}
+:root {
+  /* square overlays (painted over the square colour) */
+  --zz-hl-lastmove:       rgb(244 210 60 / 0.50);  /* from- and to-square of the last move */
+  --zz-hl-selected:       rgb(244 210 60 / 0.70);  /* selected piece (click-to-move) */
+  --zz-hl-correct:        rgb(124 191 74 / 0.55);  /* correct move in puzzle/lesson */
+  --zz-hl-wrong:          rgb(215 50 43 / 0.50);   /* wrong move in puzzle/lesson */
+  --zz-hl-hint-fill:      rgb(37 99 235 / 0.22);   /* hint stage 1 and 2 square fill */
+  --zz-hl-check:          radial-gradient(circle, #FF3B30 0%, rgb(255 59 48 / 0.75) 30%, rgb(255 59 48 / 0) 72%);
+
+  /* markers – each has a dark and a light component, so one of them reaches ≥ 3:1 on every square */
+  --zz-dot-core:          rgb(14 18 11 / 0.55);    /* legal-move dot */
+  --zz-dot-ring:          rgb(255 255 255 / 0.90); /* 2 px ring around the dot */
+  --zz-hint-ring-dark:    #0A3D9C;                 /* 4 px inset ring */
+  --zz-hint-ring-light:   #FFFFFF;                 /* next 2 px inset ring */
+  --zz-board-focus-dark:  #111111;                 /* 3 px inset keyboard cursor */
+  --zz-board-focus-light: #FFFFFF;                 /* next 2 px inset */
+
+  /* user marks (right click) and arrows */
+  --zz-mark-red:          rgb(235 64 52 / 0.75);   /* right click */
+  --zz-mark-green:        rgb(96 168 56 / 0.75);   /* Shift + right click */
+  --zz-mark-blue:         rgb(52 120 220 / 0.75);  /* Alt + right click */
+  --zz-mark-yellow:       rgb(240 190 40 / 0.75);  /* Ctrl/Strg + right click */
+  --zz-arrow-user:        rgb(242 163 58 / 0.85);  /* right-drag arrow, default orange */
+  --zz-arrow-best:        rgb(124 191 74 / 0.90);  /* "besserer Zug" in analysis, engine line */
+  --zz-arrow-hint:        rgb(47 107 255 / 0.85);  /* lesson/demo arrows, hint stage 2 (Einfache Ansicht) */
+  --zz-arrow-threat:      rgb(232 85 58 / 0.85);   /* Coach: opponent threat, checking piece */
+
+  /* evaluation bar and graph */
+  --zz-eval-white:        #F0EEE9;
+  --zz-eval-black:        #3A3733;
+}
+
+/* ---- §2.3 Move classification ---- */
+:root {
+  --zz-cls-brilliant:  #1FB5A9;  --zz-cls-brilliant-ink:  #141414;
+  --zz-cls-great:      #4F86D9;  --zz-cls-great-ink:      #141414;
+  --zz-cls-best:       #6FAE45;  --zz-cls-best-ink:       #141414;
+  --zz-cls-excellent:  #93C15A;  --zz-cls-excellent-ink:  #141414;
+  --zz-cls-good:       #93A88A;  --zz-cls-good-ink:       #141414;
+  --zz-cls-book:       #B38C61;  --zz-cls-book-ink:       #141414;
+  --zz-cls-inaccuracy: #F2C232;  --zz-cls-inaccuracy-ink: #141414;
+  --zz-cls-mistake:    #F5933B;  --zz-cls-mistake-ink:    #141414;
+  --zz-cls-miss:       #EE6B5B;  --zz-cls-miss-ink:       #141414;
+  --zz-cls-blunder:    #D7322B;  --zz-cls-blunder-ink:    #FFFFFF;
+}
+
+/* ---- §2.6 Sizes and breakpoint-dependent layout tokens ---- */
+:root {
+  --zz-gutter: 16px;
+  --zz-card-pad: 16px;
+  --zz-card-gap: 12px;
+  --zz-sidebar-w: 0px;
+  --zz-rail-w: 72px;
+  --zz-sidebar-wide-w: 224px;
+  --zz-panel-w: 360px;
+  --zz-topbar-h: 56px;
+  --zz-topbar-board-h: 44px;
+  --zz-tabbar-h: calc(56px + env(safe-area-inset-bottom, 0px));
+  --zz-actionbar-h: calc(64px + env(safe-area-inset-bottom, 0px));
+  --zz-player-bar-h: 36px;
+  --zz-eval-w: 8px;
+  --zz-content-max: 1120px;
+  --zz-board-max: 960px;
+  --zz-touch-min: 44px;
+}
+@media (min-width: 768px) {
+  :root {
+    --zz-gutter: 24px;
+    --zz-card-pad: 20px;
+    --zz-card-gap: 16px;
+    --zz-sidebar-w: 72px;
+    --zz-eval-w: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --zz-player-bar-h: 44px;
+  }
+}
+@media (min-width: 1280px) {
+  :root {
+    --zz-gutter: 32px;
+    --zz-sidebar-w: 224px;
+    --zz-panel-w: 400px;
+  }
+}
+@media (min-width: 1536px) {
+  :root {
+    --zz-panel-w: 440px;
+  }
+}
+
+/* ---- §2.7 Radii ---- */
+:root {
+  --zz-radius-sm: 6px;
+  --zz-radius-md: 10px;
+  --zz-radius-lg: 14px;
+  --zz-radius-xl: 20px;
+  --zz-radius-board: 4px;
+  --zz-radius-full: 9999px;
+}
+
+/* ---- §2.8 Shadows (elevation) ---- */
+:root {
+  --zz-shadow-1: 0 1px 2px rgb(0 0 0 / 0.40);
+  --zz-shadow-2: 0 6px 16px rgb(0 0 0 / 0.45);
+  --zz-shadow-3: 0 16px 40px rgb(0 0 0 / 0.55);
+  --zz-shadow-board: 0 8px 24px rgb(0 0 0 / 0.45);
+  --zz-shadow-button: inset 0 -3px 0 rgb(0 0 0 / 0.22);
+}
+:root[data-theme="light"] {
+  --zz-shadow-1: 0 1px 2px rgb(30 25 15 / 0.08);
+  --zz-shadow-2: 0 6px 16px rgb(30 25 15 / 0.12);
+  --zz-shadow-3: 0 16px 40px rgb(30 25 15 / 0.18);
+  --zz-shadow-board: 0 6px 18px rgb(30 25 15 / 0.18);
+}
+
+/* ---- §2.9 Motion tokens and z-index ---- */
+:root {
+  --zz-dur-fast: 100ms;
+  --zz-dur-base: 150ms;
+  --zz-dur-slow: 200ms;
+  --zz-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --zz-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --zz-z-board-overlay: 10;
+  --zz-z-sticky: 20;
+  --zz-z-nav: 30;
+  --zz-z-banner: 40;
+  --zz-z-popover: 50;
+  --zz-z-dialog: 60;
+  --zz-z-toast: 70;
+}
+/* Setting "Animationen" off (data-motion="off") and prefers-reduced-motion: all durations 0 ms (DESIGN §6.1). */
+:root[data-motion="off"] {
+  --zz-dur-fast: 0ms;
+  --zz-dur-base: 0ms;
+  --zz-dur-slow: 0ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --zz-dur-fast: 0ms;
+    --zz-dur-base: 0ms;
+    --zz-dur-slow: 0ms;
+  }
+}

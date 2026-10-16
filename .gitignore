@@ -8,3 +8,7 @@ test-results/
 .env.local
 *.log
 .DS_Store
+.build/
+.cache/
+public/engine/
+*.tsbuildinfo

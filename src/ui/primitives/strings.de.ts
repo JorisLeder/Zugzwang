@@ -1,0 +1,22 @@
+/** German strings of the generic UI primitives (D-35). */
+export const PRIMITIVES_DE = {
+  close: 'Schließen',
+  moreInfo: 'Mehr erfahren',
+  lessInfo: 'Weniger anzeigen',
+  helpfulQuestion: 'War das hilfreich?',
+  helpfulYes: 'Ja, hilfreich',
+  helpfulNo: 'Nein, nicht hilfreich',
+  thanks: 'Danke!',
+  retry: 'Erneut versuchen',
+  genericError: 'Das hat nicht geklappt. Versuch es nochmal.',
+  loading: 'Wird geladen …',
+  stars: (n: number, max: number) => `${n} von ${max} Sternen`,
+  streakDays: (n: number) => (n === 1 ? 'Tag' : 'Tage'),
+  streakDayOne: 'Tag 1',
+  streakOpenToday: 'Heute noch offen',
+  streakStart: 'Starte heute deinen Streak',
+  streakLabel: (n: number) => `Streak: ${n} ${n === 1 ? 'Tag' : 'Tage'}`,
+  ratingDelta: (text: string) => `Veränderung ${text}`,
+  coach: 'Coach',
+  selectPlaceholder: 'Bitte wählen',
+} as const;

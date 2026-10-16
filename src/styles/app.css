@@ -1,0 +1,219 @@
+/*
+ * Main stylesheet: Tailwind CSS v4 + design tokens (DESIGN.md §2.10). Owned by WP-00 (frozen).
+ * Components use only these token utilities (bg-surface, text-muted, bg-accent text-on-accent, rounded-lg, shadow-2 …):
+ * the default Tailwind palette is disabled, raw hex values are not allowed in components.
+ */
+@import "tailwindcss";
+@import "./tokens.css";
+
+@custom-variant light (&:where([data-theme=light], [data-theme=light] *));
+/* `dark:` means the app's dark theme (the default), not the OS preference. */
+@custom-variant dark (&:where(:root:not([data-theme=light]), :root:not([data-theme=light]) *));
+@custom-variant motion-off (&:where([data-motion=off], [data-motion=off] *));
+
+/* Responsive typography tokens (DESIGN §2.5): phone sizes first, desktop sizes from 768 px. */
+:root {
+  --zz-fs-display: 32px;
+  --zz-lh-display: 36px;
+  --zz-fs-h1: 24px;
+  --zz-lh-h1: 30px;
+  --zz-fs-h2: 20px;
+  --zz-lh-h2: 26px;
+}
+@media (min-width: 768px) {
+  :root {
+    --zz-fs-display: 36px;
+    --zz-lh-display: 40px;
+    --zz-fs-h1: 28px;
+    --zz-lh-h1: 34px;
+    --zz-fs-h2: 22px;
+    --zz-lh-h2: 28px;
+  }
+}
+
+@theme inline {
+  --color-*: initial; /* disable the default palette: tokens only */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-bg: var(--zz-bg);
+  --color-surface: var(--zz-surface);
+  --color-surface-2: var(--zz-surface-2);
+  --color-surface-3: var(--zz-surface-3);
+  --color-border: var(--zz-border);
+  --color-border-strong: var(--zz-border-strong);
+  --color-text: var(--zz-text);
+  --color-muted: var(--zz-text-muted);
+  --color-disabled: var(--zz-text-disabled);
+  --color-accent: var(--zz-accent);
+  --color-accent-hover: var(--zz-accent-hover);
+  --color-accent-active: var(--zz-accent-active);
+  --color-on-accent: var(--zz-on-accent);
+  --color-accent-text: var(--zz-accent-text);
+  --color-accent-subtle: var(--zz-accent-subtle);
+  --color-danger: var(--zz-danger);
+  --color-on-danger: var(--zz-on-danger);
+  --color-danger-text: var(--zz-danger-text);
+  --color-danger-subtle: var(--zz-danger-subtle);
+  --color-warning: var(--zz-warning);
+  --color-on-warning: var(--zz-on-warning);
+  --color-warning-text: var(--zz-warning-text);
+  --color-warning-subtle: var(--zz-warning-subtle);
+  --color-info-text: var(--zz-info-text);
+  --color-info-subtle: var(--zz-info-subtle);
+  --color-focus: var(--zz-focus);
+  --color-scrim: var(--zz-scrim);
+  /* Move classification (DESIGN §2.3) */
+  --color-cls-brilliant: var(--zz-cls-brilliant);
+  --color-cls-brilliant-ink: var(--zz-cls-brilliant-ink);
+  --color-cls-great: var(--zz-cls-great);
+  --color-cls-great-ink: var(--zz-cls-great-ink);
+  --color-cls-best: var(--zz-cls-best);
+  --color-cls-best-ink: var(--zz-cls-best-ink);
+  --color-cls-excellent: var(--zz-cls-excellent);
+  --color-cls-excellent-ink: var(--zz-cls-excellent-ink);
+  --color-cls-good: var(--zz-cls-good);
+  --color-cls-good-ink: var(--zz-cls-good-ink);
+  --color-cls-book: var(--zz-cls-book);
+  --color-cls-book-ink: var(--zz-cls-book-ink);
+  --color-cls-inaccuracy: var(--zz-cls-inaccuracy);
+  --color-cls-inaccuracy-ink: var(--zz-cls-inaccuracy-ink);
+  --color-cls-mistake: var(--zz-cls-mistake);
+  --color-cls-mistake-ink: var(--zz-cls-mistake-ink);
+  --color-cls-miss: var(--zz-cls-miss);
+  --color-cls-miss-ink: var(--zz-cls-miss-ink);
+  --color-cls-blunder: var(--zz-cls-blunder);
+  --color-cls-blunder-ink: var(--zz-cls-blunder-ink);
+  /* Evaluation bar */
+  --color-eval-white: var(--zz-eval-white);
+  --color-eval-black: var(--zz-eval-black);
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Typography (DESIGN §2.5): text-display, text-h1 … text-caption */
+  --text-display: var(--zz-fs-display);
+  --text-display--line-height: var(--zz-lh-display);
+  --text-display--font-weight: 700;
+  --text-h1: var(--zz-fs-h1);
+  --text-h1--line-height: var(--zz-lh-h1);
+  --text-h1--font-weight: 600;
+  --text-h2: var(--zz-fs-h2);
+  --text-h2--line-height: var(--zz-lh-h2);
+  --text-h2--font-weight: 600;
+  --text-h3: 18px;
+  --text-h3--line-height: 24px;
+  --text-h3--font-weight: 600;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-move: 15px;
+  --text-move--line-height: 22px;
+  --text-move--font-weight: 500;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 500;
+
+  --radius-sm: var(--zz-radius-sm);
+  --radius-md: var(--zz-radius-md);
+  --radius-lg: var(--zz-radius-lg);
+  --radius-xl: var(--zz-radius-xl);
+  --radius-board: var(--zz-radius-board);
+
+  --shadow-1: var(--zz-shadow-1);
+  --shadow-2: var(--zz-shadow-2);
+  --shadow-3: var(--zz-shadow-3);
+  --shadow-board: var(--zz-shadow-board);
+  --shadow-button: var(--zz-shadow-button);
+
+  --ease-out: var(--zz-ease-out);
+  --ease-in-out: var(--zz-ease-in-out);
+  --default-transition-duration: var(--zz-dur-fast);
+  --default-transition-timing-function: var(--zz-ease-out);
+}
+
+@layer base {
+  html {
+    background: var(--zz-bg);
+    color: var(--zz-text);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--zz-bg);
+    color: var(--zz-text);
+    font-size: 16px;
+    line-height: 24px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+
+  /* DESIGN §7.2: visible focus ring on every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--zz-focus);
+    outline-offset: 2px;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+@layer utilities {
+  /* Focus ring drawn inside the element (move list, segmented controls; DESIGN §7.2). */
+  .focus-inset:focus-visible {
+    outline-offset: -2px;
+  }
+
+  /* Minimum touch target on coarse pointers (DESIGN §7.3). */
+  .touch-target {
+    min-width: var(--zz-touch-min);
+    min-height: var(--zz-touch-min);
+  }
+
+  .text-measure {
+    max-width: 68ch;
+  }
+}
+
+/* Reduced motion and "Animationen aus": no transitions/animations (DESIGN §6.1). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-motion="off"] *,
+:root[data-motion="off"] *::before,
+:root[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+}
