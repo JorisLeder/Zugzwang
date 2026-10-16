@@ -811,35 +811,35 @@
  },
  {
   "id": "seed-0021",
-  "fen": "r1bq1rk1/ppp2ppp/2nb4/3p4/3P4/2N5/PPPNBPPP/R1BQ1RK1 b - - 0 1",
+  "fen": "r1bqk1nr/pppn1ppp/3b4/3p4/3P4/P1N1PN2/1PP2PPP/R1BQKB1R b KQkq - 0 1",
   "moves": [
-   "d6h2",
-   "g1h2"
+   "d6b4",
+   "a3b4"
   ],
   "rating": 300,
   "ratingDeviation": 80,
   "themes": [
    "hangingPiece",
    "oneMove",
-   "middlegame",
+   "opening",
    "crushing"
   ],
   "openingTags": [],
   "source": "seed",
   "explanation": {
-   "plain": "Der Läufer auf h2 gibt zwar Schach, ist aber ungedeckt. Schlag ihn mit Kxh2 – dein König darf ungedeckte Figuren schlagen.",
+   "plain": "Der schwarze Läufer auf b4 steht schräg vor deinem Bauern und ist ungedeckt. Schlag ihn mit axb4 – Bauern schlagen schräg nach vorn.",
    "segments": [
     {
      "type": "text",
-     "text": "Der Läufer auf h2 gibt zwar Schach, ist aber ungedeckt. Schlag ihn mit "
+     "text": "Der schwarze Läufer auf b4 steht schräg vor deinem Bauern und ist ungedeckt. Schlag ihn mit "
     },
     {
      "type": "move",
-     "san": "Kxh2"
+     "san": "axb4"
     },
     {
      "type": "text",
-     "text": " – dein König darf ungedeckte Figuren schlagen."
+     "text": " – Bauern schlagen schräg nach vorn."
     }
    ],
    "source": "rule",

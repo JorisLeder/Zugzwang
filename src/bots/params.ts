@@ -36,14 +36,14 @@ export interface SkillParams {
   plausibilityTemperature: number;
 }
 
-/** Skill parameters by Elo (100 → very weak … 790 → weak). Gross errors fall geometrically from 65 % to 18 %. */
+/** Skill parameters by Elo (100 → very weak … 790 → weak). Gross errors fall geometrically from 70 % to 26 %. */
 export function skillParams(elo: number): SkillParams {
   const t = clamp((elo - 100) / 600, 0, 1);
   return {
     skillLevel: clamp(Math.round(lerp(0, 3, t)), 0, 3),
     depth: clamp(Math.round(lerp(1, 6, t)), 1, 6),
     movetimeMs: 300,
-    grossErrorRate: Number((0.65 * Math.pow(0.18 / 0.65, t)).toFixed(3)),
+    grossErrorRate: Number((0.7 * Math.pow(0.26 / 0.7, t)).toFixed(3)),
     plausibilityTemperature: Number(lerp(1.6, 1.0, t).toFixed(3)),
   };
 }
@@ -56,13 +56,15 @@ export interface HumanParams {
   multiPv: number;
   /** Search time cap of the main search in ms (keeps the answer ≤ 1 s on slow devices). */
   movetimeMs: number;
-  /** Softmax temperature over expected-points loss (EP units, 0–1). Lower = closer to the best move. */
+  /** Loss scale of the selection kernel (EP units, 0–1): a move losing this much has weight e⁻¹. Lower = stronger. */
   temperature: number;
+  /** Exponent of the kernel `exp(−(loss / temperature)^sharpness)`; 2 = bell-shaped (big losses become rare fast). */
+  sharpness: number;
   /** Probability that the bot judges the position "blind" to the opponent's replies (shallow search only). */
   blindness: number;
   /** Depth of the shallow ("blind") search. */
   shallowDepth: number;
-  /** Bonus for natural moves, in units of `temperature` (recapture, check, capture, development, castling). */
+  /** Bonus for natural moves in log-weight units (recapture, check, capture, development, castling). */
   natural: { recapture: number; check: number; capture: number; development: number; castle: number };
 }
 
@@ -75,15 +77,16 @@ export function humanParams(elo: number, style?: BotProfile['style']): HumanPara
     depth: clamp(Math.round(lerp(7, 12, t)), 3, 14),
     multiPv: clamp(Math.round(lerp(12, 8, t)), 8, 12),
     movetimeMs: 700,
-    temperature: Number((0.06 * Math.pow(0.016 / 0.06, t)).toFixed(4)),
+    temperature: Number((0.16 * Math.pow(0.06 / 0.16, t)).toFixed(4)),
+    sharpness: 2,
     blindness: Number(lerp(0.2, 0.03, t).toFixed(3)),
     shallowDepth: clamp(Math.round(lerp(2, 5, t)), 1, 6),
     natural: {
-      recapture: 1.2,
-      check: aggressive ? 0.8 : 0.4,
-      capture: aggressive ? 0.5 : 0.3,
-      development: quiet ? 0.6 : 0.4,
-      castle: quiet ? 0.8 : 0.5,
+      recapture: 1,
+      check: aggressive ? 0.5 : 0.25,
+      capture: aggressive ? 0.3 : 0.15,
+      development: quiet ? 0.4 : 0.25,
+      castle: quiet ? 0.5 : 0.3,
     },
   };
 }

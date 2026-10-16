@@ -3,7 +3,7 @@ import type { BotProfile } from '@/core/bots';
 import { START_FEN } from '@/core/chess';
 import { FakeEngineService } from '@/core/testing';
 import { ChessGame } from '@/lib/chess';
-import { BOT_ROSTER, botById, createBotEngine, createBotEngineWithOptions, createSeededRandom, MaiaBotEngine, StockfishBotEngine } from './index';
+import { BOT_ROSTER, botById, createBotEngine, createBotEngineWithOptions, createSeededRandom, eloParams, MaiaBotEngine, StockfishBotEngine } from './index';
 
 const MIDDLEGAME = ChessGame.fromMoves(START_FEN, ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'g8f6']).uciMoves();
 const bot = (id: string): BotProfile => botById(id)!;
@@ -51,7 +51,7 @@ describe('StockfishBotEngine – routing per strength (D-16)', () => {
     const engine = new FakeEngineService();
     const sb = new StockfishBotEngine(engine, { e2e: true, useRepertoire: false });
     await sb.chooseMove({ bot: bot('zora'), startFen: START_FEN, moves: MIDDLEGAME });
-    expect(engine.calls[0]).toMatchObject({ method: 'bestMove', opts: { limitStrengthElo: 2500 } });
+    expect(engine.calls[0]).toMatchObject({ method: 'bestMove', opts: { limitStrengthElo: eloParams(2500).uciElo } });
   });
 
   it('maia bots fall back to the human model (stub, D-16)', async () => {

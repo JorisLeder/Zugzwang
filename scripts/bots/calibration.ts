@@ -25,6 +25,14 @@ export const TARGETS = {
   thinkMs: { min: 1000, max: 8000 },
 } as const;
 
+/** Evenly spaced subset of `n` items (deterministic; all items when `n` is missing or too large). */
+export function spread<T>(items: T[], n: number | undefined): T[] {
+  if (!n || n >= items.length) return items;
+  const out: T[] = [];
+  for (let i = 0; i < n; i++) out.push(items[Math.floor((i * items.length) / n)]!);
+  return out;
+}
+
 /** Loss class of one move. */
 export type LossClass = 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder';
 

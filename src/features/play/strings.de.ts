@@ -83,7 +83,7 @@ export const STRINGS_DE = {
   hintFailed: 'Gerade gibt es keinen Hinweis. Versuch es gleich nochmal.',
   resign: 'Aufgeben',
   claimDraw: 'Remis beantragen',
-  moreActions: 'Weitere Aktionen',
+  moreActions: 'Partie-Aktionen',
   analyse: 'Analyse ansehen',
   rematch: 'Revanche',
   newGame: 'Neue Partie',

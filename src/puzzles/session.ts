@@ -227,11 +227,17 @@ export function hintSquares(state: PuzzleSessionState): { piece: Square | null; 
   return { piece: from, target: state.hintStage >= 2 ? to : null };
 }
 
-/** Outcome for `recordPuzzleAttempt`: solved = finished with own moves; first try = no wrong move, hint or solution. */
+/**
+ * Outcome for `recordPuzzleAttempt`. Solved = finished with the learner's own moves (no solution playback); in rated
+ * mode additionally without a wrong move or hint (D-11 – the attempt is recorded as failed at the first one).
+ * First try = solved without any wrong move (contract `PuzzleAttempt.firstTry`); hints are reported in `hintsUsed`.
+ */
 export function sessionOutcome(state: PuzzleSessionState): PuzzleOutcome {
+  const finished = state.phase === 'done' && state.solvedByUser && !state.solutionShown;
+  const solved = finished && (state.mode !== 'rated' || !isFailedForRating(state));
   return {
-    solved: state.phase === 'done' && state.solvedByUser && !state.solutionShown,
-    firstTry: state.wrongMoves === 0 && state.hintsUsed === 0 && !state.solutionShown,
+    solved,
+    firstTry: solved && state.wrongMoves === 0,
     hintsUsed: state.hintsUsed,
     solutionShown: state.solutionShown,
   };

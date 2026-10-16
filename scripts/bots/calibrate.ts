@@ -24,7 +24,7 @@ import type { BotProfile } from '@/core/bots';
 import type { Fen } from '@/core/chess';
 import { ChessGame } from '@/lib/chess';
 import { createNodeEngineService, NODE_ENGINE_ID } from '@/lib/uci/node';
-import { aggregate, checkCriteria, moveLoss, renderReport, type BotStats, type MoveSample, type ReferenceEval } from './calibration';
+import { aggregate, checkCriteria, moveLoss, renderReport, spread, type BotStats, type MoveSample, type ReferenceEval } from './calibration';
 import { calibrationPositions, CLASSICAL_GAMES, type CalibrationPosition } from './fixtureGames';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -34,14 +34,6 @@ const CACHE_DIR = join(ROOT, '.cache', 'bots-calibration');
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(name);
   return i >= 0 ? process.argv[i + 1] : undefined;
-}
-
-/** Evenly spaced subset of `n` positions (deterministic). */
-export function spread<T>(items: T[], n: number | undefined): T[] {
-  if (!n || n >= items.length) return items;
-  const out: T[] = [];
-  for (let i = 0; i < n; i++) out.push(items[Math.floor((i * items.length) / n)]!);
-  return out;
 }
 
 /** Model parameters of a bot, as one report line. */

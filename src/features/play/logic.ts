@@ -6,7 +6,8 @@
 import type { BotProfile } from '@/core/bots';
 import type { Color, DrawClaim, Fen, GameEndReason, GameResult, MoveRecord, PieceSymbol } from '@/core/chess';
 import type { AssistanceLevel, Game, GameOrigin } from '@/core/games';
-import { pieceNameDe, PIECE_VALUES } from '@/lib/chess';
+import { isStandardStart } from '@/bots';
+import { ChessGame, pieceNameDe, PIECE_VALUES, validateFen } from '@/lib/chess';
 import { STRINGS_DE } from './strings.de';
 
 /** Colour choice in the setup (DESIGN §3.6: Weiß · Zufall · Schwarz). */
@@ -186,4 +187,24 @@ export function normalizeFenInput(input: string): string {
   if (fields.length === 4) return [...fields, '0', '1'].join(' ');
   if (fields.length === 5) return [...fields, '1'].join(' ');
   return fields.join(' ');
+}
+
+/** Result of checking a FEN from the URL or the input field. */
+export type PositionCheck = { ok: true; fen: string; turn: 'w' | 'b'; standard: boolean } | { ok: false; error: string } | null;
+
+/** Validates a FEN for play (German errors, RULES §5.4 via `validateFen`; finished positions are rejected). */
+export function checkPosition(raw: string | null): PositionCheck {
+  if (raw === null) return null;
+  const fen = normalizeFenInput(raw);
+  if (!fen) return { ok: false, error: STRINGS_DE.fenEmpty };
+  const v = validateFen(fen);
+  if (!v.ok) return { ok: false, error: STRINGS_DE.fenInvalid(v.errorDe) };
+  try {
+    const game = ChessGame.fromFen(fen);
+    if (game.status().isOver) return { ok: false, error: STRINGS_DE.fenGameOver };
+    return { ok: true, fen: game.fen(), turn: game.turn(), standard: isStandardStart(game.fen()) };
+  } catch (e) {
+    const message = e instanceof Error && 'messageDe' in e ? String((e as { messageDe: string }).messageDe) : STRINGS_DE.fenGameOver;
+    return { ok: false, error: STRINGS_DE.fenInvalid(message) };
+  }
 }

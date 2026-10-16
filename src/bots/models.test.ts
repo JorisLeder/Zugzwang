@@ -84,7 +84,7 @@ describe('human model selection (800–2000, D-16)', () => {
   const natural = { recapture: 0, check: 0, capture: 0, development: 0, castle: 0 };
 
   it('computes the expected-points loss of each candidate vs the best', () => {
-    const s = selectHumanMove(START_FEN, lines, { temperature: 0.01, natural }, () => 0)!;
+    const s = selectHumanMove(START_FEN, lines, { temperature: 0.01, sharpness: 1, natural }, () => 0)!;
     const best = s.candidates.find((c) => c.uci === 'e2e4')!;
     const bad = s.candidates.find((c) => c.uci === 'f2f3')!;
     expect(best.loss).toBe(0);
@@ -94,11 +94,11 @@ describe('human model selection (800–2000, D-16)', () => {
 
   it('a cold temperature plays the best move, a warm one varies – small losses far more often than big ones', () => {
     const cold = createSeededRandom(1);
-    for (let i = 0; i < 50; i++) expect(selectHumanMove(START_FEN, lines, { temperature: 0.0005, natural }, cold)!.uci).toBe('e2e4');
+    for (let i = 0; i < 50; i++) expect(selectHumanMove(START_FEN, lines, { temperature: 0.0005, sharpness: 2, natural }, cold)!.uci).toBe('e2e4');
     const warm = createSeededRandom(2);
     const counts = new Map<string, number>();
     for (let i = 0; i < 700; i++) {
-      const uci = selectHumanMove(START_FEN, lines, { temperature: 0.03, natural }, warm)!.uci;
+      const uci = selectHumanMove(START_FEN, lines, { temperature: 0.03, sharpness: 1, natural }, warm)!.uci;
       counts.set(uci, (counts.get(uci) ?? 0) + 1);
     }
     expect(counts.size).toBeGreaterThan(2);
@@ -107,22 +107,35 @@ describe('human model selection (800–2000, D-16)', () => {
     expect(counts.get('a2a4') ?? 0).toBeGreaterThan(counts.get('f2f3') ?? 0);
   });
 
+  it('a bell-shaped kernel (sharpness 2) makes big losses much rarer than small ones', () => {
+    const random = createSeededRandom(8);
+    const counts = { small: 0, big: 0 };
+    const mixed = [line(1, 'e2e4', 30), line(2, 'd2d4', 10), line(3, 'f2f3', -150)];
+    for (let i = 0; i < 400; i++) {
+      const uci = selectHumanMove(START_FEN, mixed, { temperature: 0.12, sharpness: 2, natural }, random)!.uci;
+      if (uci === 'd2d4') counts.small++;
+      if (uci === 'f2f3') counts.big++;
+    }
+    expect(counts.small).toBeGreaterThan(80);
+    expect(counts.big).toBeLessThan(counts.small / 4);
+  });
+
   it('natural moves get a bonus (development preferred among equals)', () => {
     const equal = [line(1, 'h2h3', 20), line(2, 'g1f3', 20)];
     const random = createSeededRandom(7);
     let dev = 0;
     for (let i = 0; i < 300; i++) {
-      const s = selectHumanMove(START_FEN, equal, { temperature: 0.02, natural: { ...natural, development: 1 } }, random)!;
+      const s = selectHumanMove(START_FEN, equal, { temperature: 0.02, sharpness: 2, natural: { ...natural, development: 1 } }, random)!;
       if (s.uci === 'g1f3') dev++;
     }
     expect(dev).toBeGreaterThan(180);
   });
 
   it('skips illegal or duplicate lines and returns null without candidates', () => {
-    const s = selectHumanMove(START_FEN, [line(1, 'e2e5', 50), line(2, 'e2e4', 10), line(3, 'e2e4', 10)], { temperature: 0.02, natural }, () => 0.5);
+    const s = selectHumanMove(START_FEN, [line(1, 'e2e5', 50), line(2, 'e2e4', 10), line(3, 'e2e4', 10)], { temperature: 0.02, sharpness: 2, natural }, () => 0.5);
     expect(s!.candidates.map((c) => c.uci)).toEqual(['e2e4']);
     expect(s!.spread).toBeNull();
-    expect(selectHumanMove(START_FEN, [], { temperature: 0.02, natural }, () => 0.5)).toBeNull();
+    expect(selectHumanMove(START_FEN, [], { temperature: 0.02, sharpness: 2, natural }, () => 0.5)).toBeNull();
   });
 
   it('handles mate scores (mating move is clearly preferred)', () => {
@@ -133,7 +146,7 @@ describe('human model selection (800–2000, D-16)', () => {
     ];
     const random = createSeededRandom(3);
     let mates = 0;
-    for (let i = 0; i < 200; i++) if (selectHumanMove(fen, mateLines, { temperature: 0.012, natural }, random)!.uci === 'a1a8') mates++;
+    for (let i = 0; i < 200; i++) if (selectHumanMove(fen, mateLines, { temperature: 0.012, sharpness: 1, natural }, random)!.uci === 'a1a8') mates++;
     expect(mates).toBeGreaterThan(150);
   });
 });

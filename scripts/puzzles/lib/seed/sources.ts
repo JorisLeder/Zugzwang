@@ -184,11 +184,11 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
   },
   {
     id: 'seed-0021',
-    fen: 'r1bq1rk1/ppp2ppp/2nb4/3p4/3P4/2N5/PPPNBPPP/R1BQ1RK1 b - - 0 1',
-    line: ['Bxh2+', 'Kxh2'],
+    fen: 'r1bqk1nr/pppn1ppp/3b4/3p4/3P4/P1N1PN2/1PP2PPP/R1BQKB1R b KQkq - 0 1',
+    line: ['Bb4', 'axb4'],
     rating: 300,
-    themes: ['hangingPiece', 'oneMove', 'middlegame', 'crushing'],
-    explanation: 'Der Läufer auf h2 gibt zwar Schach, ist aber ungedeckt. Schlag ihn mit [[Kxh2]] – dein König darf ungedeckte Figuren schlagen.',
+    themes: ['hangingPiece', 'oneMove', 'opening', 'crushing'],
+    explanation: 'Der schwarze Läufer auf b4 steht schräg vor deinem Bauern und ist ungedeckt. Schlag ihn mit [[axb4]] – Bauern schlagen schräg nach vorn.',
   },
   {
     id: 'seed-0022',

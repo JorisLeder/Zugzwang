@@ -5,10 +5,14 @@
  * 1. The engine reports 8–12 candidate moves (MultiPV) at an Elo-dependent depth.
  * 2. With an Elo-dependent probability the bot is "blind" to the opponent's replies: it judges the candidates with a
  *    very shallow search only (depth 1–2), so it misses quiet threats (forks, pins, mating nets) beyond that horizon.
- * 3. Each candidate's expected-points loss (mover's win% vs. the best candidate, D-07 scale) is reduced by a small
- *    bonus for natural moves (recapture, check, capture, development, castling – style dependent).
- * 4. The move is drawn from a softmax over the (perceived) loss with an Elo-dependent temperature: near-best moves are
- *    common, small inaccuracies frequent, big losses rare – errors grow smoothly with the position's difficulty.
+ * 3. Each candidate gets a log-weight `−(loss / temperature)^sharpness + natural bonus`: `loss` is its expected-points
+ *    loss vs. the best candidate (mover's win%, D-07 scale), the Elo-dependent temperature is the loss a player of
+ *    this strength still "accepts" easily, and `sharpness` > 1 makes the kernel bell-shaped (small inaccuracies are
+ *    common, big losses fall off much faster than in a plain softmax). Natural moves (recapture, check, capture,
+ *    development, castling – style dependent) get a small bonus in log units.
+ * 4. The move is drawn proportionally to `exp(log-weight)`: near-best moves are common, inaccuracies frequent,
+ *    mistakes rarer and blunders rarest – errors grow smoothly with the position's difficulty, they are not random
+ *    blunders sprinkled over perfect play.
  */
 import type { Color, Fen, PieceSymbol, Square, Uci } from '@/core/chess';
 import type { EngineLine, EngineService } from '@/core/engine';
@@ -25,8 +29,10 @@ export interface HumanCandidate {
   winPct: number;
   /** Expected-points loss vs. the best candidate (0–1). */
   loss: number;
-  /** Loss minus the natural-move bonus (what the "human" perceives; may be negative for natural best moves). */
-  perceived: number;
+  /** Natural-move bonus (log units). */
+  bonus: number;
+  /** Log-weight of the candidate in the selection (`−(loss / temperature)^sharpness + bonus`). */
+  score: number;
 }
 
 /** Result of `selectHumanMove`. */
@@ -47,7 +53,7 @@ export type PreviousMove = { to: Square; captured?: PieceSymbol } | null;
 export function selectHumanMove(
   fen: Fen,
   lines: readonly EngineLine[],
-  params: Pick<HumanParams, 'temperature' | 'natural'>,
+  params: Pick<HumanParams, 'temperature' | 'sharpness' | 'natural'>,
   random: RandomSource,
   previous: PreviousMove = null,
 ): HumanSelection | null {
@@ -65,23 +71,22 @@ export function selectHumanMove(
   }
   if (raw.length === 0) return null;
   const bestWin = Math.max(...raw.map((c) => c.winPct));
-  const t = params.temperature;
+  const t = Math.max(params.temperature, 1e-6);
   const candidates: HumanCandidate[] = raw.map((c) => {
     const loss = Math.max(0, (bestWin - c.winPct) / 100);
     const traits = naturalTraits(fen, c.move, previous);
     const n = params.natural;
     const bonus =
-      t *
-      ((traits.recapture ? n.recapture : 0) +
-        (traits.check ? n.check : 0) +
-        (traits.capture && !traits.recapture ? n.capture : 0) +
-        (traits.development ? n.development : 0) +
-        (traits.castle ? n.castle : 0));
-    return { uci: c.uci, winPct: c.winPct, loss, perceived: loss - bonus };
+      (traits.recapture ? n.recapture : 0) +
+      (traits.check ? n.check : 0) +
+      (traits.capture && !traits.recapture ? n.capture : 0) +
+      (traits.development ? n.development : 0) +
+      (traits.castle ? n.castle : 0);
+    return { uci: c.uci, winPct: c.winPct, loss, bonus, score: -Math.pow(loss / t, params.sharpness) + bonus };
   });
   const weights = softmaxWeights(
-    candidates.map((c) => -c.perceived),
-    t,
+    candidates.map((c) => c.score),
+    1,
   );
   const pick = weightedPick(candidates, weights, random) ?? candidates[0]!;
   const losses = candidates.map((c) => c.loss).sort((a, b) => a - b);
