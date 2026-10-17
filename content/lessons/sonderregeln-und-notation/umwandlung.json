@@ -1,0 +1,103 @@
+{
+  "id": "umwandlung",
+  "courseId": "sonderregeln-und-notation",
+  "order": 3,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Umwandlung",
+  "summaryDe": "Erreicht ein Bauer die letzte Reihe, muss er umgewandelt werden. Du wählst die neue Figur selbst.",
+  "practiceThemes": ["promotion"],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.7.5.1 (Umwandlung ist Pflicht)",
+    "FIDE-Schachregeln 2023, Art. 3.7.5.2 (Freie Wahl der Figur)",
+    "FIDE-Schachregeln 2023, Art. 3.7.5.3 (Die neue Figur wirkt sofort)"
+  ],
+  "steps": [
+    {
+      "id": "umwandlung",
+      "type": "explanation",
+      "textDe": "Erreicht ein Bauer die letzte Reihe, muss er umgewandelt werden. Er wird zur Dame, zum Turm, zum Läufer oder zum Springer der eigenen Farbe. Die Umwandlung gehört zum selben Zug.",
+      "fen": "4k3/1P6/8/8/8/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "b7", "to": "b8", "kind": "hint" }]
+    },
+    {
+      "id": "freie-wahl",
+      "type": "explanation",
+      "textDe": "Du darfst frei wählen – auch eine Figur, die noch auf dem Brett steht. So kann man zwei oder mehr Damen haben. Die neue Figur wirkt sofort. Meist wählst du die Dame, denn sie ist am stärksten."
+    },
+    {
+      "id": "umwandlung-demo",
+      "type": "demo",
+      "introDe": "Der Bauer zieht auf die letzte Reihe.",
+      "startFen": "4k3/1P6/8/8/8/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "b7b8q", "commentDe": "b8=D+: Der Bauer wird zur Dame und gibt sofort Schach." },
+        { "uci": "e8e7", "commentDe": "Schwarz zieht den König weg." }
+      ]
+    },
+    {
+      "id": "umwandeln-matt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Wandle um und setze matt.",
+      "fen": "k7/2P5/1K6/8/8/8/8/8 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c7c8q", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die neue Figur gibt auf der 8. Reihe Schach."],
+      "explanationDe": "c8=D#: Die neue Dame gibt sofort Schach, dein König deckt a7 und b7. Auch c8=T wäre Matt.",
+      "puzzle": { "rating": 250, "themes": ["promotion", "mateIn1"] }
+    },
+    {
+      "id": "quiz-wahl",
+      "type": "quiz",
+      "questionDe": "In welche Figuren darf ein Bauer umgewandelt werden?",
+      "options": [
+        { "id": "vier", "textDe": "Dame, Turm, Läufer oder Springer der eigenen Farbe", "correct": true, "feedbackDe": "Richtig. Einen König oder einen zweiten Bauern gibt es nicht." },
+        { "id": "dame", "textDe": "Nur in eine Dame", "correct": false, "feedbackDe": "Du darfst auch Turm, Läufer oder Springer wählen." },
+        { "id": "koenig", "textDe": "In jede Figur, auch einen König", "correct": false, "feedbackDe": "Ein König ist nicht erlaubt." }
+      ]
+    },
+    {
+      "id": "zur-dame",
+      "type": "play_out",
+      "promptDe": "Bring deinen Bauern zur Umwandlung. Der schwarze König kommt zu spät.",
+      "fen": "8/8/8/2P4k/8/8/8/K7 w - - 0 1",
+      "userColor": "w",
+      "goal": "promote",
+      "maxMoves": 6,
+      "botElo": 600,
+      "successDe": "Umgewandelt! Jetzt hast du eine neue Figur.",
+      "failDe": "Der Bauer hat die letzte Reihe nicht erreicht. Ziehe ihn ohne Umweg nach vorn."
+    },
+    {
+      "id": "springer-matt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Hier ist die Dame nicht die beste Wahl. Setze mit einer Umwandlung matt.",
+      "fen": "6nb/5P1k/6pp/8/3B4/8/8/K7 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f7f8n", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Welche Figur greift von f8 aus das Feld h7 an?", "Der Läufer auf d4 deckt g7."],
+      "explanationDe": "f8=S#: Der neue Springer gibt Schach. Der König ist von eigenen Figuren eingesperrt, g7 deckt der Läufer.",
+      "puzzle": { "rating": 500, "themes": ["underPromotion", "mateIn1"] }
+    },
+    {
+      "id": "quiz-pflicht",
+      "type": "quiz",
+      "questionDe": "Darf ein Bauer auf der letzten Reihe ein Bauer bleiben?",
+      "fen": "4k3/1P6/8/8/8/8/8/4K3 w - - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein, die Umwandlung ist Pflicht.", "correct": true, "feedbackDe": "Richtig. Ohne Umwandlung ist der Zug nicht erlaubt." },
+        { "id": "ja", "textDe": "Ja, wenn der Spieler das möchte.", "correct": false, "feedbackDe": "Der Bauer muss in eine andere Figur umgewandelt werden." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "4k3/1P6/8/8/8/8/8/4K3 w - - 0 1", "move": "b7b8", "expect": false },
+        { "kind": "isLegalMove", "fen": "4k3/1P6/8/8/8/8/8/4K3 w - - 0 1", "move": "b7b8n", "expect": true }
+      ]
+    }
+  ]
+}

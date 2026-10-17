@@ -1,0 +1,117 @@
+{
+  "id": "remis-regeln",
+  "courseId": "schach-matt-patt",
+  "order": 5,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Remis-Regeln",
+  "summaryDe": "Ungenügendes Material, dreimalige Stellungswiederholung und die 50-Züge-Regel: So endet eine Partie Remis.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 5.2.2 (Kein Matt mehr möglich)",
+    "FIDE-Schachregeln 2023, Art. 9.2 (Dreimalige Stellungswiederholung)",
+    "FIDE-Schachregeln 2023, Art. 9.3 (50-Züge-Regel)",
+    "FIDE-Schachregeln 2023, Art. 9.6.1 (Fünfmalige Stellungswiederholung)",
+    "FIDE-Schachregeln 2023, Art. 9.6.2 (75-Züge-Regel)"
+  ],
+  "steps": [
+    {
+      "id": "remis",
+      "type": "explanation",
+      "textDe": "Nicht jede Partie hat einen Sieger. Endet sie Remis, bekommt jeder einen halben Punkt. Das Patt kennst du schon. Hier lernst du drei weitere Remis-Regeln."
+    },
+    {
+      "id": "material",
+      "type": "explanation",
+      "textDe": "Kann keine Seite mehr mattsetzen, ist die Partie sofort Remis. Das gilt zum Beispiel für König gegen König. Auch König und Springer gegen König oder König und Läufer gegen König reichen nicht zum Matt.",
+      "fen": "8/8/3k4/8/8/2KN4/8/8 w - - 0 1",
+      "orientation": "w"
+    },
+    {
+      "id": "quiz-material",
+      "type": "quiz",
+      "questionDe": "Weiß hat König und Läufer, Schwarz nur den König. Wie geht es weiter?",
+      "fen": "8/8/4k3/8/8/3KB3/8/8 w - - 0 1",
+      "options": [
+        { "id": "remis", "textDe": "Remis – mit König und Läufer kann man nicht mattsetzen.", "correct": true, "feedbackDe": "Richtig. Die Partie ist sofort Remis." },
+        { "id": "weiss", "textDe": "Weiß gewinnt.", "correct": false, "feedbackDe": "Mit einem Läufer allein ist kein Matt möglich." },
+        { "id": "weiter", "textDe": "Die Partie läuft weiter.", "correct": false, "feedbackDe": "Kein Matt ist mehr möglich. Darum endet die Partie sofort." }
+      ],
+      "asserts": [{ "kind": "isInsufficientMaterial", "fen": "8/8/4k3/8/8/3KB3/8/8 w - - 0 1", "expect": true }]
+    },
+    {
+      "id": "wiederholung",
+      "type": "explanation",
+      "textDe": "Remis durch dreimalige Stellungswiederholung: Kommt dieselbe Stellung zum dritten Mal vor, darf der Spieler am Zug Remis beanspruchen. Gleich heißt: dieselben Figuren auf denselben Feldern, derselbe Spieler am Zug und dieselben Zugmöglichkeiten. Bei der fünften Wiederholung ist die Partie automatisch Remis."
+    },
+    {
+      "id": "dauerschach",
+      "type": "demo",
+      "introDe": "Schwarz hat zwei Türme mehr. Doch Weiß gibt immer wieder Schach.",
+      "startFen": "4Q1k1/6p1/8/8/8/8/rr6/7K b - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "g8h7", "commentDe": "Der König muss nach h7." },
+        { "uci": "e8h5", "commentDe": "Dh5+: wieder Schach." },
+        { "uci": "h7g8", "commentDe": "Der König kann nur zurück nach g8." },
+        { "uci": "h5e8", "commentDe": "De8+: Die Stellung vom Anfang ist zum zweiten Mal da." },
+        { "uci": "g8h7" },
+        { "uci": "e8h5" },
+        { "uci": "h7g8" },
+        { "uci": "h5e8", "commentDe": "Zum dritten Mal dieselbe Stellung: Jetzt kann Remis beansprucht werden. Dieses Dauerschach rettet Weiß." }
+      ]
+    },
+    {
+      "id": "quiz-wiederholung",
+      "type": "quiz",
+      "questionDe": "Dieselbe Stellung steht zum dritten Mal auf dem Brett. Was gilt?",
+      "options": [
+        { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig. Er muss es beanspruchen – es passiert nicht von selbst." },
+        { "id": "automatisch", "textDe": "Die Partie ist sofort automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst bei der fünften Wiederholung." },
+        { "id": "verliert", "textDe": "Wer die Stellung wiederholt, verliert.", "correct": false, "feedbackDe": "Wiederholen ist erlaubt. Es führt zum Remis." }
+      ]
+    },
+    {
+      "id": "fuenfzig",
+      "type": "explanation",
+      "textDe": "Die 50-Züge-Regel: Haben beide Spieler 50 Züge lang keinen Bauern gezogen und nichts geschlagen, kann der Spieler am Zug Remis beanspruchen. Nach 75 solchen Zügen ist die Partie automatisch Remis."
+    },
+    {
+      "id": "remis-halten",
+      "type": "play_out",
+      "promptDe": "Du spielst Schwarz und hast einen Bauern weniger. Halte das Remis: Bleib mit deinem König vor dem weißen Bauern.",
+      "fen": "8/8/4k3/8/4P3/4K3/8/8 b - - 0 1",
+      "userColor": "b",
+      "goal": "draw",
+      "maxMoves": 15,
+      "botElo": 800,
+      "successDe": "Gehalten! Mit dem König vor dem Bauern kommt Weiß nicht durch.",
+      "failDe": "Diesmal hat es nicht geklappt. Stell deinen König direkt vor den Bauern und weiche nicht zur Seite."
+    },
+    {
+      "id": "quiz-material-2",
+      "type": "quiz",
+      "questionDe": "Welche Stellung ist sofort Remis, weil keiner mehr mattsetzen kann?",
+      "options": [
+        { "id": "springer", "textDe": "König und Springer gegen König", "correct": true, "feedbackDe": "Richtig. Ein Springer allein kann nicht mattsetzen." },
+        { "id": "turm", "textDe": "König und Turm gegen König", "correct": false, "feedbackDe": "Mit einem Turm kannst du mattsetzen. Das lernst du in Stufe 1." },
+        { "id": "bauer", "textDe": "König und Bauer gegen König", "correct": false, "feedbackDe": "Der Bauer kann sich umwandeln. Darum geht die Partie weiter." }
+      ],
+      "asserts": [
+        { "kind": "isInsufficientMaterial", "fen": "8/8/3k4/8/8/2KN4/8/8 w - - 0 1", "expect": true },
+        { "kind": "isInsufficientMaterial", "fen": "8/8/3k4/8/8/2K5/8/7R w - - 0 1", "expect": false },
+        { "kind": "isInsufficientMaterial", "fen": "8/8/3k4/8/8/2K5/4P3/8 w - - 0 1", "expect": false }
+      ]
+    },
+    {
+      "id": "quiz-fuenfzig",
+      "type": "quiz",
+      "questionDe": "Seit 50 Zügen hat niemand einen Bauern gezogen oder etwas geschlagen. Was gilt?",
+      "options": [
+        { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig: die 50-Züge-Regel." },
+        { "id": "automatisch", "textDe": "Die Partie ist automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst nach 75 Zügen." },
+        { "id": "weiter", "textDe": "Die Partie geht weiter, bis einer mattsetzt.", "correct": false, "feedbackDe": "Nach 50 Zügen darf Remis beansprucht werden." }
+      ]
+    }
+  ]
+}

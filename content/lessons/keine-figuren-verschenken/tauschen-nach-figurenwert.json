@@ -1,0 +1,78 @@
+{
+  "id": "tauschen-nach-figurenwert",
+  "courseId": "keine-figuren-verschenken",
+  "order": 4,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Tauschen nach Figurenwert",
+  "summaryDe": "Ein Tausch ist gut, wenn du mehr bekommst, als du gibst. Mit den Figurenwerten entscheidest du schnell.",
+  "practiceThemes": ["hangingPiece", "capturingDefender"],
+  "steps": [
+    {
+      "id": "tausch",
+      "type": "explanation",
+      "textDe": "Beim Tauschen vergleichst du, was du gibst und was du bekommst. Bauer 1, Springer 3, Läufer 3, Turm 5, Dame 9. Gibst du einen Springer für einen Turm, gewinnst du 2 Punkte."
+    },
+    {
+      "id": "tausch-demo",
+      "type": "demo",
+      "introDe": "Der Springer schlägt einen gedeckten Turm.",
+      "startFen": "3r1rk1/2p2pp1/2N4p/8/8/7P/PP3PP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "c6d8", "commentDe": "Sxd8: Der Springer (3) schlägt den Turm (5)." },
+        { "uci": "f8d8", "commentDe": "Txd8: Schwarz schlägt zurück. Weiß hat trotzdem 2 Punkte gewonnen." }
+      ]
+    },
+    {
+      "id": "springer-gegen-turm",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne Material durch einen guten Tausch.",
+      "fen": "2b3k1/ppp2pp1/3p3p/4r3/8/5N1P/PPP2PP1/2B3K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f3e5", "children": [{ "move": "d6e5", "children": [] }] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Turm ist gedeckt – aber er ist mehr wert als dein Springer."],
+      "explanationDe": "Sxe5 dxe5: Du gibst 3 Punkte und bekommst 5."
+    },
+    {
+      "id": "quiz-dame",
+      "type": "quiz",
+      "questionDe": "Der Springer d5 ist vom Bauern e6 gedeckt. Lohnt sich Dxd5?",
+      "fen": "6k1/ppp2pp1/4p2p/3n4/8/7P/PPP2PP1/3Q2K1 w - - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein – nach exd5 hat Weiß die Dame für einen Springer gegeben.", "correct": true, "feedbackDe": "Richtig: 9 Punkte für 3 Punkte ist ein schlechter Tausch." },
+        { "id": "ja", "textDe": "Ja – die Dame gewinnt einen Springer.", "correct": false, "feedbackDe": "Der Bauer e6 schlägt zurück. Dann ist die Dame weg." }
+      ],
+      "asserts": [{ "kind": "isLegalMove", "fen": "6k1/ppp2pp1/4p2p/3Q4/8/7P/PPP2PP1/6K1 b - - 0 1", "move": "e6d5", "expect": true }]
+    },
+    {
+      "id": "gleich",
+      "type": "explanation",
+      "textDe": "Gleiche Tausche, etwa Springer gegen Läufer, sind meistens in Ordnung. Schlecht ist es, eine wertvolle Figur gegen eine billigere zu geben."
+    },
+    {
+      "id": "laeufer-gegen-dame",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Finde den besten Tausch.",
+      "fen": "6k1/ppp2pp1/2n4p/6q1/8/2NB3P/PPP2PP1/2B3K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c1g5", "children": [{ "move": "h6g5", "children": [] }] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Die Dame ist vom Bauern h6 gedeckt. Lohnt es sich trotzdem?"],
+      "explanationDe": "Lxg5 hxg5: Du gibst einen Läufer (3) und bekommst die Dame (9)."
+    },
+    {
+      "id": "quiz-guter-tausch",
+      "type": "quiz",
+      "questionDe": "Welcher Tausch ist gut für dich?",
+      "options": [
+        { "id": "s-t", "textDe": "Du gibst einen Springer und bekommst einen Turm.", "correct": true, "feedbackDe": "Richtig: 3 Punkte für 5 Punkte." },
+        { "id": "t-l", "textDe": "Du gibst einen Turm und bekommst einen Läufer.", "correct": false, "feedbackDe": "Das kostet dich 2 Punkte." },
+        { "id": "d-t", "textDe": "Du gibst die Dame und bekommst einen Turm.", "correct": false, "feedbackDe": "Das kostet dich 4 Punkte." }
+      ]
+    }
+  ]
+}

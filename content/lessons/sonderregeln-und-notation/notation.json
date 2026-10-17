@@ -1,0 +1,107 @@
+{
+  "id": "notation",
+  "courseId": "sonderregeln-und-notation",
+  "order": 4,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Notation",
+  "summaryDe": "Mit der Notation schreibst du Züge auf und kannst Partien nachspielen.",
+  "practiceThemes": ["mateIn1"],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 8.1.1 (Züge aufschreiben)",
+    "FIDE-Schachregeln 2023, Anhang C (Algebraische Notation)"
+  ],
+  "steps": [
+    {
+      "id": "notation",
+      "type": "explanation",
+      "textDe": "Mit der Notation schreibst du Züge auf. Ein Zug besteht aus dem Buchstaben der Figur und dem Zielfeld. Sf3 heißt: Ein Springer zieht nach f3.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 1 1",
+      "orientation": "w",
+      "arrows": [{ "from": "g1", "to": "f3", "kind": "played" }]
+    },
+    {
+      "id": "buchstaben",
+      "type": "explanation",
+      "textDe": "Die Buchstaben der Figuren: K König, D Dame, T Turm, L Läufer, S Springer. Bauernzüge haben keinen Buchstaben. e4 heißt: Ein Bauer zieht nach e4."
+    },
+    {
+      "id": "zeichen",
+      "type": "explanation",
+      "textDe": "Weitere Zeichen: x für Schlagen, + für Schach und # für Matt. 0-0 ist die kurze, 0-0-0 die lange Rochade. Eine Umwandlung schreibst du so: e8=D. Lxf7+ heißt: Der Läufer schlägt auf f7 und gibt Schach."
+    },
+    {
+      "id": "schaefermatt-demo",
+      "type": "demo",
+      "introDe": "Eine sehr kurze Partie in Notation: das Schäfermatt.",
+      "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "e2e4", "commentDe": "1. e4" },
+        { "uci": "e7e5", "commentDe": "1… e5" },
+        { "uci": "f1c4", "commentDe": "2. Lc4: Der Läufer zielt auf f7." },
+        { "uci": "b8c6", "commentDe": "2… Sc6" },
+        { "uci": "d1h5", "commentDe": "3. Dh5: Jetzt greifen Dame und Läufer f7 an." },
+        { "uci": "g8f6", "commentDe": "3… Sf6?? Schwarz übersieht die Drohung." },
+        { "uci": "h5f7", "commentDe": "4. Dxf7# – Schachmatt." }
+      ]
+    },
+    {
+      "id": "quiz-lb5",
+      "type": "quiz",
+      "questionDe": "Was bedeutet der Zug Lb5?",
+      "options": [
+        { "id": "laeufer", "textDe": "Ein Läufer zieht nach b5.", "correct": true, "feedbackDe": "Richtig: L steht für Läufer." },
+        { "id": "bauer", "textDe": "Ein Bauer zieht nach b5.", "correct": false, "feedbackDe": "Ein Bauernzug hätte keinen Buchstaben: b5." },
+        { "id": "springer", "textDe": "Ein Springer zieht nach b5.", "correct": false, "feedbackDe": "Der Springer hat den Buchstaben S." }
+      ]
+    },
+    {
+      "id": "spiele-sf3",
+      "type": "find_move",
+      "promptDe": "Spiele den Zug 1. Sf3.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "g1f3", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["S steht für Springer, f3 ist das Zielfeld."],
+      "explanationDe": "Sf3: Der Springer von g1 zieht nach f3."
+    },
+    {
+      "id": "quiz-zeichen",
+      "type": "quiz",
+      "questionDe": "Was bedeutet Dxf7#?",
+      "options": [
+        { "id": "matt", "textDe": "Die Dame schlägt auf f7 und setzt matt.", "correct": true, "feedbackDe": "Richtig: x heißt schlagen, # heißt Matt." },
+        { "id": "schach", "textDe": "Die Dame schlägt auf f7 und gibt nur Schach.", "correct": false, "feedbackDe": "Nur Schach wäre +. Das Zeichen # steht für Matt." },
+        { "id": "zieht", "textDe": "Die Dame zieht nach f7, ohne zu schlagen.", "correct": false, "feedbackDe": "Das x zeigt, dass geschlagen wird." }
+      ]
+    },
+    {
+      "id": "spiele-dxf7",
+      "type": "find_move",
+      "promptDe": "Spiele 4. Dxf7#.",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+      "orientation": "w",
+      "solution": [{ "move": "h5f7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["D steht für Dame, f7 ist das Zielfeld."],
+      "explanationDe": "Dxf7#: Die Dame schlägt auf f7, gedeckt vom Läufer c4. Das ist Matt.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1", "attackingF2F7"] }
+    },
+    {
+      "id": "spiele-rochade",
+      "type": "find_move",
+      "promptDe": "Spiele den Zug 0-0.",
+      "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+      "orientation": "w",
+      "solution": [{ "move": "e1g1", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["0-0 ist die kurze Rochade."],
+      "explanationDe": "0-0: Der König steht auf g1, der Turm auf f1."
+    }
+  ]
+}

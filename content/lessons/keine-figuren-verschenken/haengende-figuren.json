@@ -1,0 +1,94 @@
+{
+  "id": "haengende-figuren",
+  "courseId": "keine-figuren-verschenken",
+  "order": 1,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Hängende Figuren",
+  "summaryDe": "Eine Figur hängt, wenn sie angegriffen und nicht gedeckt ist. Du lernst, hängende Figuren zu sehen und zu schlagen.",
+  "practiceThemes": ["hangingPiece"],
+  "steps": [
+    {
+      "id": "haengend",
+      "type": "explanation",
+      "textDe": "Eine Figur „hängt“, wenn sie angegriffen und nicht gedeckt ist. Dann kann der Gegner sie einfach schlagen. Die meisten Partien unter Einsteigern werden so entschieden."
+    },
+    {
+      "id": "pruefen",
+      "type": "explanation",
+      "textDe": "So findest du hängende Figuren: Schau dir jede Figur an. Wird sie angegriffen? Wird sie gedeckt? Angegriffen und ungedeckt heißt: Sie hängt. Prüfe das bei deinen und bei den gegnerischen Figuren."
+    },
+    {
+      "id": "demo-haengt",
+      "type": "demo",
+      "introDe": "Schwarz zieht die Dame auf ein Feld, das der Springer angreift.",
+      "startFen": "3q2k1/ppp2pp1/7p/8/8/2N4P/PPP2PP1/6K1 b - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "d8d5", "commentDe": "Dd5?? Die Dame steht direkt vor dem Springer – und keine Figur deckt sie." },
+        { "uci": "c3d5", "commentDe": "Sxd5: Weiß gewinnt die Dame.", "arrows": [{ "from": "c3", "to": "d5", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "springer-schlaegt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Eine schwarze Figur hängt. Schlage sie.",
+      "fen": "6k1/ppp2pp1/1n5p/4b3/8/5N1P/PPP2PP1/2B3K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f3e5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Welche Figur greift dein Springer an?"],
+      "explanationDe": "Sxe5: Der Läufer war angegriffen und von keiner Figur gedeckt.",
+      "puzzle": { "rating": 300, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "bauer-schlaegt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne eine Figur.",
+      "fen": "6k1/ppp2pp1/5n1p/2b5/3P4/2NB3P/PP3PP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d4c5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Auch ein Bauer kann eine Figur schlagen."],
+      "explanationDe": "dxc5: Der Bauer schlägt den ungedeckten Läufer.",
+      "puzzle": { "rating": 300, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "quiz-wann",
+      "type": "quiz",
+      "questionDe": "Wann hängt eine Figur?",
+      "options": [
+        { "id": "ungedeckt", "textDe": "Wenn sie angegriffen und nicht gedeckt ist", "correct": true, "feedbackDe": "Richtig. Dann kann der Gegner sie ohne Gegenleistung schlagen." },
+        { "id": "rand", "textDe": "Wenn sie am Rand steht", "correct": false, "feedbackDe": "Am Rand ist eine Figur oft schwach, aber sie hängt nicht automatisch." },
+        { "id": "gedeckt", "textDe": "Wenn sie gedeckt ist", "correct": false, "feedbackDe": "Eine gedeckte Figur kann zurückgeschlagen werden. Sie hängt nicht." }
+      ]
+    },
+    {
+      "id": "schwarz-schlaegt",
+      "type": "find_move",
+      "promptDe": "Schwarz am Zug. Eine weiße Figur hängt. Schlage sie.",
+      "fen": "2b3k1/ppp2pp1/7p/8/1n6/2NB1N1P/PP3PP1/6K1 b - - 0 1",
+      "orientation": "b",
+      "solution": [{ "move": "b4d3", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Schau, was dein Springer auf b4 angreift."],
+      "explanationDe": "Sxd3: Der weiße Läufer war ungedeckt.",
+      "puzzle": { "rating": 300, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "quiz-welche",
+      "type": "quiz",
+      "questionDe": "Weiß am Zug. Welche schwarze Figur hängt?",
+      "fen": "6k1/ppp2pp1/4p2p/3n4/6b1/2N4P/PPP2PP1/6K1 w - - 0 1",
+      "options": [
+        { "id": "laeufer", "textDe": "Der Läufer g4 – der Bauer h3 kann ihn schlagen.", "correct": true, "feedbackDe": "Richtig. hxg4 gewinnt den Läufer." },
+        { "id": "springer", "textDe": "Der Springer d5", "correct": false, "feedbackDe": "Der Springer ist vom Bauern e6 gedeckt. Nach Sxd5 exd5 ist es nur ein Tausch." },
+        { "id": "nichts", "textDe": "Keine Figur hängt.", "correct": false, "feedbackDe": "Schau dir den Läufer auf g4 an." }
+      ],
+      "asserts": [{ "kind": "bestMove", "fen": "6k1/ppp2pp1/4p2p/3n4/6b1/2N4P/PPP2PP1/6K1 w - - 0 1", "move": "h3g4" }]
+    }
+  ]
+}

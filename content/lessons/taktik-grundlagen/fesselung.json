@@ -1,0 +1,101 @@
+{
+  "id": "fesselung",
+  "courseId": "taktik-grundlagen",
+  "order": 2,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Die Fesselung",
+  "summaryDe": "Eine Figur kann nicht ziehen, ohne eine wertvollere Figur dahinter freizugeben.",
+  "practiceThemes": ["pin"],
+  "steps": [
+    {
+      "id": "fesselung",
+      "type": "explanation",
+      "textDe": "Bei einer Fesselung steht eine Figur vor einer wertvolleren Figur auf derselben Linie. Zieht sie weg, wird die Figur dahinter geschlagen. Steht dahinter der König, darf die gefesselte Figur gar nicht ziehen.",
+      "fen": "4k3/ppp2ppp/2n5/1B6/3P4/8/PPP2PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "b5", "to": "e8", "kind": "threat" }],
+      "marks": [{ "square": "c6", "kind": "danger" }]
+    },
+    {
+      "id": "fesselung-demo",
+      "type": "demo",
+      "introDe": "Der Springer c6 ist an den König gefesselt. Weiß greift ihn mit einem Bauern an.",
+      "startFen": "4k3/ppp2ppp/2n5/1B6/3P4/8/PPP2PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "d4d5", "commentDe": "d5! Der Springer darf nicht wegziehen, sonst stünde der König im Schach." },
+        { "uci": "a7a6", "commentDe": "Schwarz greift den Läufer an …" },
+        { "uci": "d5c6", "commentDe": "dxc6: … aber Weiß gewinnt zuerst den Springer." }
+      ]
+    },
+    {
+      "id": "quiz-gefesselt",
+      "type": "quiz",
+      "questionDe": "Schwarz am Zug. Darf der Springer c6 ziehen?",
+      "fen": "4k3/ppp2ppp/2n5/1B6/8/8/PPP2PPP/6K1 b - - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein – er ist gefesselt, dahinter steht der König.", "correct": true, "feedbackDe": "Richtig. Kein Zug darf den eigenen König ins Schach stellen." },
+        { "id": "ja", "textDe": "Ja, der Springer darf überall hin springen.", "correct": false, "feedbackDe": "Zieht der Springer weg, gibt der Läufer dem König Schach. Das ist verboten." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "4k3/ppp2ppp/2n5/1B6/8/8/PPP2PPP/6K1 b - - 0 1", "move": "c6e5", "expect": false },
+        { "kind": "isLegalMove", "fen": "4k3/ppp2ppp/2n5/1B6/8/8/PPP2PPP/6K1 b - - 0 1", "move": "c6d4", "expect": false }
+      ]
+    },
+    {
+      "id": "dame-fesseln",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Fessle die schwarze Dame und gewinne sie.",
+      "fen": "4k2r/pp1q1pp1/7p/8/8/2N4P/PPP2PP1/R4BK1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "f1b5",
+          "comment": "Die Dame ist an den König gefesselt.",
+          "children": [{ "move": "d7b5", "children": [{ "move": "c3b5", "comment": "Dame gegen Läufer – ein riesiger Gewinn.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Dame und König stehen auf einer Diagonale.", "Der Läufer braucht ein gedecktes Feld."],
+      "explanationDe": "Lb5: Die Dame kann nicht ausweichen. Schlägt sie den Läufer, schlägt der Springer zurück.",
+      "puzzle": { "rating": 450, "themes": ["pin"] }
+    },
+    {
+      "id": "relativ",
+      "type": "explanation",
+      "textDe": "Steht hinter der gefesselten Figur kein König, sondern zum Beispiel eine Dame, darf sie ziehen. Dann geht aber die wertvollere Figur dahinter verloren. Eine gefesselte Figur ist ein gutes Ziel: Greif sie mit einem Bauern an."
+    },
+    {
+      "id": "gefesselten-angreifen",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Der Springer c6 ist gefesselt. Gewinne ihn.",
+      "fen": "4k3/pp3pp1/2n4p/1B3b2/3P4/7P/PPP2PP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d4d5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Greif die gefesselte Figur mit einem Bauern an."],
+      "explanationDe": "d5: Der Springer kann nicht weg. Weiß gewinnt ihn im nächsten Zug."
+    },
+    {
+      "id": "turm-fesselt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Fessle die Dame mit dem Turm.",
+      "fen": "4k2r/ppp2pp1/7p/4q3/8/2NB3P/PPP2KP1/R7 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "a1e1",
+          "comment": "Die Dame ist an den König gefesselt.",
+          "children": [{ "move": "e5e1", "children": [{ "move": "f2e1", "comment": "Dame gegen Turm.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Dame und König stehen auf der e-Linie."],
+      "explanationDe": "Te1: Die Dame ist gefesselt. Sie kann nur noch den Turm schlagen und geht danach verloren."
+    }
+  ]
+}

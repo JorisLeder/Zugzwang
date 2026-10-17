@@ -1,0 +1,108 @@
+{
+  "id": "schach-und-abwehr",
+  "courseId": "schach-matt-patt",
+  "order": 1,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Schach und drei Abwehrmöglichkeiten",
+  "summaryDe": "Wird dein König angegriffen, steht er im Schach. Du lernst die drei Wege, ein Schach abzuwehren.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.9.1 (Der König im Schach)",
+    "FIDE-Schachregeln 2023, Art. 3.9.2 (Kein Zug darf den König im Schach lassen)"
+  ],
+  "steps": [
+    {
+      "id": "was-ist-schach",
+      "type": "explanation",
+      "textDe": "Greift eine gegnerische Figur deinen König an, steht er im Schach. Ein Schach musst du sofort abwehren. Kein Zug darf deinen König im Schach lassen.",
+      "fen": "4r1k1/8/8/8/8/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "e8", "to": "e1", "kind": "threat" }],
+      "marks": [{ "square": "e1", "kind": "check" }]
+    },
+    {
+      "id": "drei-wege",
+      "type": "explanation",
+      "textDe": "Es gibt drei Abwehrmöglichkeiten. Erstens: Der König zieht weg. Zweitens: Eine Figur stellt sich dazwischen. Drittens: Du schlägst die Figur, die Schach gibt."
+    },
+    {
+      "id": "wegziehen-demo",
+      "type": "demo",
+      "introDe": "Der Turm gibt Schach. Weiß wehrt es mit einem Königszug ab.",
+      "startFen": "4r1k1/8/8/8/8/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "e1d2", "commentDe": "Kd2: Der König verlässt die e-Linie. Das Schach ist abgewehrt.", "arrows": [{ "from": "e1", "to": "d2", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "dazwischen",
+      "type": "find_move",
+      "promptDe": "Weiß steht im Schach. Stelle eine Figur dazwischen.",
+      "fen": "4r1k1/8/8/8/8/2N5/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        { "move": "c3e2", "children": [] },
+        { "move": "c3e4", "children": [] }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Ein Feld zwischen dem Turm und deinem König muss besetzt werden.", "Dein Springer kann auf die e-Linie springen."],
+      "explanationDe": "Se2 oder Se4: Der Springer steht jetzt zwischen Turm und König."
+    },
+    {
+      "id": "schlagen",
+      "type": "find_move",
+      "promptDe": "Weiß steht im Schach. Wehre es ab, indem du die angreifende Figur schlägst.",
+      "fen": "6k1/8/8/4r3/8/2B5/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c3e5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Welche deiner Figuren erreicht das Feld e5?"],
+      "explanationDe": "Lxe5: Der Läufer schlägt den Turm. Damit ist auch das Schach weg."
+    },
+    {
+      "id": "quiz-erlaubt",
+      "type": "quiz",
+      "questionDe": "Weiß steht im Schach. Welcher Zug ist erlaubt?",
+      "fen": "4r1k1/8/8/8/8/8/R7/4K3 w - - 0 1",
+      "options": [
+        { "id": "kd2", "textDe": "Kd2", "correct": true, "feedbackDe": "Richtig. Auf d2 ist der König sicher." },
+        { "id": "ta3", "textDe": "Ta3", "correct": false, "feedbackDe": "Nach Ta3 steht der König weiter im Schach. Das ist nicht erlaubt." },
+        { "id": "ke2", "textDe": "Ke2", "correct": false, "feedbackDe": "Auf e2 stünde der König immer noch auf der e-Linie im Schach." }
+      ],
+      "asserts": [
+        { "kind": "isCheck", "fen": "4r1k1/8/8/8/8/8/R7/4K3 w - - 0 1", "expect": true },
+        { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/8/R7/4K3 w - - 0 1", "move": "e1d2", "expect": true },
+        { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/8/R7/4K3 w - - 0 1", "move": "a2a3", "expect": false },
+        { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/8/R7/4K3 w - - 0 1", "move": "e1e2", "expect": false }
+      ]
+    },
+    {
+      "id": "beste-abwehr",
+      "type": "find_move",
+      "promptDe": "Die schwarze Dame gibt Schach. Finde die beste Abwehr.",
+      "fen": "r5k1/pp4pp/8/8/8/8/PP3qPP/R5K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "g1f2", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Ist die Dame gedeckt?"],
+      "explanationDe": "Kxf2: Die Dame war ungedeckt. Der König darf sie schlagen – das wehrt das Schach ab und gewinnt die Dame.",
+      "puzzle": { "rating": 200, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "quiz-erkennen",
+      "type": "quiz",
+      "questionDe": "Steht der weiße König im Schach?",
+      "fen": "4k3/8/8/8/8/3n4/8/4K3 w - - 0 1",
+      "options": [
+        { "id": "ja", "textDe": "Ja, der Springer auf d3 gibt Schach.", "correct": true, "feedbackDe": "Richtig. Der Springer greift e1 mit einem L-Sprung an." },
+        { "id": "nein", "textDe": "Nein, der Springer steht nicht direkt neben dem König.", "correct": false, "feedbackDe": "Der Springer greift aus der Ferne an: d3 nach e1 ist ein Springerzug." }
+      ],
+      "asserts": [{ "kind": "isCheck", "fen": "4k3/8/8/8/8/3n4/8/4K3 w - - 0 1", "expect": true }]
+    }
+  ]
+}

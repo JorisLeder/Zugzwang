@@ -1,0 +1,112 @@
+{
+  "id": "brett-und-feldnamen",
+  "courseId": "brett-und-figuren",
+  "order": 1,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Brett und Feldnamen",
+  "summaryDe": "Du lernst das Schachbrett kennen: Linien, Reihen, Diagonalen und die Namen der Felder.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 1.2 (Weiß beginnt)",
+    "FIDE-Schachregeln 2023, Art. 2.1 (Das Schachbrett)",
+    "FIDE-Schachregeln 2023, Art. 2.3 (Grundstellung)",
+    "FIDE-Schachregeln 2023, Art. 2.4 (Linien, Reihen, Diagonalen)"
+  ],
+  "steps": [
+    {
+      "id": "brett",
+      "type": "explanation",
+      "textDe": "Das Schachbrett hat 64 Felder. Helle und dunkle Felder wechseln sich ab. Das Brett liegt immer so, dass rechts unten ein helles Feld ist.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "marks": [{ "square": "h1", "kind": "hint-target" }]
+    },
+    {
+      "id": "feldnamen",
+      "type": "explanation",
+      "textDe": "Die senkrechten Linien heißen a bis h. Die waagerechten Reihen heißen 1 bis 8. Jedes Feld hat einen Namen aus Buchstabe und Zahl. Das markierte Feld heißt e4.",
+      "fen": "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "marks": [{ "square": "e4", "kind": "hint-target" }],
+      "arrows": [
+        { "from": "e1", "to": "e8", "kind": "hint" },
+        { "from": "a4", "to": "h4", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "diagonale",
+      "type": "explanation",
+      "textDe": "Felder gleicher Farbe, die sich an den Ecken berühren, bilden eine Diagonale. Die lange Diagonale führt von a1 nach h8.",
+      "fen": "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "a1", "to": "h8", "kind": "hint" }]
+    },
+    {
+      "id": "quiz-ecke",
+      "type": "quiz",
+      "questionDe": "Welche Farbe hat das Feld h1, die Ecke rechts unten aus Sicht von Weiß?",
+      "options": [
+        { "id": "hell", "textDe": "Hell", "correct": true, "feedbackDe": "Richtig. Merke dir: Rechts unten liegt immer ein helles Feld." },
+        { "id": "dunkel", "textDe": "Dunkel", "correct": false, "feedbackDe": "Nicht ganz. Das Brett liegt so, dass rechts unten ein helles Feld ist." }
+      ]
+    },
+    {
+      "id": "grundstellung",
+      "type": "explanation",
+      "textDe": "So stehen die Figuren zu Beginn. Weiß steht auf den Reihen 1 und 2, Schwarz auf 7 und 8. Die Dame steht auf ihrer Farbe: die weiße Dame auf d1, die schwarze auf d8.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "marks": [
+        { "square": "d1", "kind": "hint-target" },
+        { "square": "d8", "kind": "hint-target" }
+      ]
+    },
+    {
+      "id": "erste-zuege",
+      "type": "demo",
+      "introDe": "Weiß macht immer den ersten Zug. Danach wird abwechselnd gezogen.",
+      "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "e2e4", "commentDe": "Weiß zieht einen Bauern von e2 nach e4." },
+        { "uci": "e7e5", "commentDe": "Jetzt ist Schwarz dran: Bauer von e7 nach e5." },
+        { "uci": "g1f3", "commentDe": "Weiß zieht den Springer von g1 nach f3." }
+      ]
+    },
+    {
+      "id": "quiz-koenigsfeld",
+      "type": "quiz",
+      "questionDe": "Auf welchem Feld steht der weiße König in der Grundstellung?",
+      "options": [
+        { "id": "e1", "textDe": "e1", "correct": true, "feedbackDe": "Genau. Die weiße Dame steht daneben auf d1." },
+        { "id": "d1", "textDe": "d1", "correct": false, "feedbackDe": "Auf d1 steht die Dame. Der König steht auf e1." },
+        { "id": "e8", "textDe": "e8", "correct": false, "feedbackDe": "Auf e8 steht der schwarze König." }
+      ]
+    },
+    {
+      "id": "zug-e4",
+      "type": "find_move",
+      "promptDe": "Ziehe den weißen Bauern von e2 nach e4.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e2e4", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Suche die Linie e und darauf die Reihe 2."],
+      "explanationDe": "Richtig: Der Bauer zieht von e2 nach e4."
+    },
+    {
+      "id": "zug-sf3",
+      "type": "find_move",
+      "promptDe": "Ziehe den weißen Springer von g1 nach f3.",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "orientation": "w",
+      "solution": [{ "move": "g1f3", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Springer steht rechts neben dem Läufer auf g1."],
+      "explanationDe": "Gut gemacht: Der Springer steht jetzt auf f3."
+    }
+  ]
+}

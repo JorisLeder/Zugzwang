@@ -1,0 +1,88 @@
+{
+  "id": "en-passant",
+  "courseId": "sonderregeln-und-notation",
+  "order": 2,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "En passant",
+  "summaryDe": "Ein Bauer darf einen gegnerischen Bauern im Vorbeigehen schlagen – aber nur sofort.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.7.4.1 (En passant)",
+    "FIDE-Schachregeln 2023, Art. 3.7.4.2 (Nur im nächsten Zug)"
+  ],
+  "steps": [
+    {
+      "id": "ep-idee",
+      "type": "explanation",
+      "textDe": "Zieht ein Bauer mit Doppelschritt an einem gegnerischen Bauern vorbei, darf dieser ihn trotzdem schlagen. Er schlägt so, als wäre der Bauer nur ein Feld gezogen. Das heißt en passant oder „im Vorbeigehen schlagen“.",
+      "fen": "4k3/3p4/8/4P3/8/8/8/4K3 b - - 0 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "d7", "to": "d5", "kind": "hint" },
+        { "from": "e5", "to": "d6", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "ep-demo",
+      "type": "demo",
+      "introDe": "Schwarz zieht mit Doppelschritt am weißen Bauern vorbei.",
+      "startFen": "4k3/3p4/8/4P3/8/8/8/4K3 b - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "d7d5", "commentDe": "d5: Der Bauer landet direkt neben dem Bauern e5." },
+        { "uci": "e5d6", "commentDe": "exd6 e.p.: Der weiße Bauer schlägt im Vorbeigehen. Er landet auf d6, der Bauer d5 verschwindet.", "arrows": [{ "from": "e5", "to": "d6", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "ep-sofort",
+      "type": "explanation",
+      "textDe": "Wichtig: En passant geht nur sofort, im direkt folgenden Zug. Wartest du einen Zug, ist die Chance vorbei. Und nur ein Bauer darf en passant schlagen."
+    },
+    {
+      "id": "ep-schlagen",
+      "type": "find_move",
+      "promptDe": "Schwarz hat gerade c7–c5 gezogen. Schlage en passant.",
+      "fen": "4k3/8/8/2pP4/8/8/8/4K3 w - c6 0 2",
+      "orientation": "w",
+      "solution": [{ "move": "d5c6", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Dein Bauer schlägt schräg auf das Feld, über das der schwarze Bauer gezogen ist."],
+      "explanationDe": "dxc6 e.p.: Der Bauer landet auf c6, der Bauer c5 verschwindet."
+    },
+    {
+      "id": "quiz-ep-spaet",
+      "type": "quiz",
+      "questionDe": "Schwarz hat c7–c5 schon vor einem Zug gespielt. Darf Weiß jetzt noch dxc6 en passant spielen?",
+      "fen": "4k3/8/8/2pP4/8/8/8/4K3 w - - 0 3",
+      "options": [
+        { "id": "nein", "textDe": "Nein – en passant geht nur im direkt folgenden Zug.", "correct": true, "feedbackDe": "Richtig. Die Chance ist vorbei." },
+        { "id": "ja", "textDe": "Ja, en passant geht immer.", "correct": false, "feedbackDe": "Nur sofort nach dem Doppelschritt darf en passant geschlagen werden." }
+      ],
+      "asserts": [{ "kind": "isLegalMove", "fen": "4k3/8/8/2pP4/8/8/8/4K3 w - - 0 3", "move": "d5c6", "expect": false }]
+    },
+    {
+      "id": "quiz-ep-figur",
+      "type": "quiz",
+      "questionDe": "Was darf en passant geschlagen werden?",
+      "options": [
+        { "id": "bauer", "textDe": "Ein Bauer, der gerade einen Doppelschritt gemacht hat", "correct": true, "feedbackDe": "Richtig. Und schlagen darf auch nur ein Bauer." },
+        { "id": "jede", "textDe": "Jede Figur, die neben einem Bauern steht", "correct": false, "feedbackDe": "En passant gibt es nur zwischen Bauern." },
+        { "id": "ein-feld", "textDe": "Ein Bauer, der nur ein Feld gezogen hat", "correct": false, "feedbackDe": "Dann steht er schon schräg vor dem Bauern und wird ganz normal geschlagen." }
+      ]
+    },
+    {
+      "id": "ep-schwarz",
+      "type": "find_move",
+      "promptDe": "Weiß hat gerade e2–e4 gezogen. Schlage mit Schwarz en passant.",
+      "fen": "4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1",
+      "orientation": "b",
+      "solution": [{ "move": "d4e3", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der weiße Bauer ist über e3 gezogen."],
+      "explanationDe": "dxe3 e.p.: Der schwarze Bauer landet auf e3, der Bauer e4 verschwindet."
+    }
+  ]
+}

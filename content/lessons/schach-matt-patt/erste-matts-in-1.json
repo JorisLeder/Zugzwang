@@ -1,0 +1,122 @@
+{
+  "id": "erste-matts-in-1",
+  "courseId": "schach-matt-patt",
+  "order": 4,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Erste Matts in 1",
+  "summaryDe": "Finde Züge, die sofort mattsetzen – mit Dame, Turm, Läufer und Springer.",
+  "practiceThemes": ["mateIn1"],
+  "sources": ["FIDE-Schachregeln 2023, Art. 5.1.1 (Gewinn durch Schachmatt)"],
+  "steps": [
+    {
+      "id": "einleitung",
+      "type": "explanation",
+      "textDe": "Ein Matt in 1 ist ein Zug, der sofort mattsetzt. Suche zuerst alle Schachs. Prüfe dann bei jedem Schach: Kann der König fliehen, kann etwas dazwischen, kann der Angreifer geschlagen werden?"
+    },
+    {
+      "id": "demo-grundreihe",
+      "type": "demo",
+      "introDe": "Schwarz zieht einen Bauern. Weiß findet das Matt.",
+      "startFen": "6k1/p4ppp/8/8/8/8/5PPP/3Q2K1 b - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "a7a6", "commentDe": "a6? Schwarz übersieht die Gefahr auf der Grundreihe." },
+        { "uci": "d1d8", "commentDe": "Dd8# – die eigenen Bauern versperren dem König die Flucht.", "arrows": [{ "from": "d1", "to": "d8", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "matt-dame-rand",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f1f8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Dein König deckt schon g7 und h7."],
+      "explanationDe": "Df8#: Die Dame gibt auf der 8. Reihe Schach, der König auf g6 deckt die Felder g7 und h7.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "matt-turm-grundreihe",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e1e8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die e-Linie ist offen."],
+      "explanationDe": "Te8#: Grundreihenmatt mit dem Turm.",
+      "puzzle": { "rating": 150, "themes": ["mateIn1", "backRankMate"] }
+    },
+    {
+      "id": "quiz-pruefen",
+      "type": "quiz",
+      "questionDe": "Weiß hat Ta8+ gespielt. Ist das Matt?",
+      "fen": "R5k1/5pp1/7p/8/8/8/5PPP/6K1 b - - 1 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein, der König flieht nach h7.", "correct": true, "feedbackDe": "Richtig. Der Bauer h6 hat dem König ein Fluchtfeld geschaffen." },
+        { "id": "ja", "textDe": "Ja, das ist Matt.", "correct": false, "feedbackDe": "Prüfe die Fluchtfelder: h7 ist frei und nicht angegriffen." }
+      ],
+      "asserts": [
+        { "kind": "isCheck", "fen": "R5k1/5pp1/7p/8/8/8/5PPP/6K1 b - - 1 1", "expect": true },
+        { "kind": "isCheckmate", "fen": "R5k1/5pp1/7p/8/8/8/5PPP/6K1 b - - 1 1", "expect": false },
+        { "kind": "isLegalMove", "fen": "R5k1/5pp1/7p/8/8/8/5PPP/6K1 b - - 1 1", "move": "g8h7", "expect": true }
+      ]
+    },
+    {
+      "id": "matt-dame-laeufer",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "5rk1/5pp1/8/7Q/8/3B4/8/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "h5h7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Läufer auf d3 zielt auf h7."],
+      "explanationDe": "Dh7#: Die Dame wird vom Läufer gedeckt. Der eigene Turm versperrt das Feld f8.",
+      "puzzle": { "rating": 250, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "matt-turm-koenig",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "4k3/8/4K3/8/8/8/8/7R w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "h1h8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Könige stehen sich gegenüber. Jetzt fehlt ein Schach am Rand."],
+      "explanationDe": "Th8#: Der Turm gibt Schach, dein König deckt d7, e7 und f7.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "matt-dame-bauer",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "6k1/5p1p/5PpQ/8/8/8/8/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "h6g7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Bauer auf f6 deckt ein wichtiges Feld."],
+      "explanationDe": "Dg7#: Die Dame wird vom Bauern f6 gedeckt.",
+      "puzzle": { "rating": 250, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "matt-springer",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze mit dem Springer matt.",
+      "fen": "6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "g5f7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der schwarze König ist von seinen eigenen Figuren eingesperrt."],
+      "explanationDe": "Sf7#: Der König kann nicht weg – eigene Figuren versperren alle Felder. Das heißt ersticktes Matt.",
+      "puzzle": { "rating": 300, "themes": ["mateIn1", "smotheredMate"] }
+    }
+  ]
+}

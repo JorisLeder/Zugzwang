@@ -1,0 +1,250 @@
+{
+  "courses": [
+    {
+      "id": "brett-und-figuren",
+      "stage": 0,
+      "order": 1,
+      "version": 1,
+      "titleDe": "Brett und Figuren",
+      "descriptionDe": "Das Schachbrett, die Feldnamen und wie jede Figur zieht und schlägt. Dazu die Faustregel für die Figurenwerte.",
+      "status": "available",
+      "lessonIds": ["brett-und-feldnamen", "turm-und-laeufer", "dame-und-koenig", "springer", "bauer", "figurenwerte"],
+      "testLessonId": "brett-und-figuren-test"
+    },
+    {
+      "id": "schach-matt-patt",
+      "stage": 0,
+      "order": 2,
+      "version": 1,
+      "titleDe": "Schach, Matt und Patt",
+      "descriptionDe": "Wie du ein Schach abwehrst, was Schachmatt und Patt bedeuten und wann eine Partie Remis endet.",
+      "status": "available",
+      "lessonIds": ["schach-und-abwehr", "schachmatt", "patt", "erste-matts-in-1", "remis-regeln"],
+      "testLessonId": "schach-matt-patt-test"
+    },
+    {
+      "id": "sonderregeln-und-notation",
+      "stage": 0,
+      "order": 3,
+      "version": 1,
+      "titleDe": "Sonderregeln und Notation",
+      "descriptionDe": "Rochade, en passant und Umwandlung. Dazu lernst du, Züge aufzuschreiben, und wie eine Partie abläuft.",
+      "status": "available",
+      "lessonIds": ["rochade", "en-passant", "umwandlung", "notation", "partieablauf"],
+      "testLessonId": "sonderregeln-test"
+    },
+    {
+      "id": "keine-figuren-verschenken",
+      "stage": 1,
+      "order": 1,
+      "version": 1,
+      "titleDe": "Keine Figuren verschenken",
+      "descriptionDe": "Hängende Figuren erkennen, Angreifer und Verteidiger zählen und vor jedem Zug den Sicherheits-Check machen.",
+      "status": "available",
+      "lessonIds": ["haengende-figuren", "angreifer-und-verteidiger", "sicherheits-check", "tauschen-nach-figurenwert", "drohungen-erkennen"],
+      "testLessonId": "keine-figuren-verschenken-test"
+    },
+    {
+      "id": "taktik-grundlagen",
+      "stage": 1,
+      "order": 2,
+      "version": 1,
+      "titleDe": "Taktik-Grundlagen",
+      "descriptionDe": "Die wichtigsten Taktiken: Gabel, Fesselung, Spieß und Abzug. Damit gewinnst du Material.",
+      "status": "available",
+      "lessonIds": ["gabel", "fesselung", "spiess", "abzug", "taktik-mix"],
+      "testLessonId": "taktik-grundlagen-test"
+    },
+    {
+      "id": "grundmatts",
+      "stage": 1,
+      "order": 3,
+      "version": 1,
+      "titleDe": "Grundmatts und Mattbilder",
+      "descriptionDe": "Grundreihenmatt, Matt mit Dame und mit Turm, typische Mattbilder und erste Matts in zwei Zügen.",
+      "status": "available",
+      "lessonIds": ["grundreihenmatt", "dame-koenig-gegen-koenig", "turm-koenig-gegen-koenig", "mattbilder", "matt-in-2"],
+      "testLessonId": "grundmatts-test"
+    },
+    {
+      "id": "eroeffnungsprinzipien",
+      "stage": 1,
+      "order": 4,
+      "version": 1,
+      "titleDe": "Eröffnungsprinzipien",
+      "descriptionDe": "Zentrum besetzen, Figuren entwickeln, früh rochieren – so startest du gut in die Partie.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "erste-endspiele",
+      "stage": 1,
+      "order": 5,
+      "version": 1,
+      "titleDe": "Erste Endspiele",
+      "descriptionDe": "Umwandlung, Quadratregel und Opposition im Bauernendspiel.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "kombinationen-und-rechnen",
+      "stage": 2,
+      "order": 1,
+      "version": 1,
+      "titleDe": "Kombinationen und Rechnen",
+      "descriptionDe": "Mehrzügige Kombinationen finden und sicher berechnen.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "denkprozess",
+      "stage": 2,
+      "order": 2,
+      "version": 1,
+      "titleDe": "Denkprozess am Brett",
+      "descriptionDe": "Kandidatenzüge suchen und vergleichen.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "mattangriffe",
+      "stage": 2,
+      "order": 3,
+      "version": 1,
+      "titleDe": "Mattangriffe",
+      "descriptionDe": "Den gegnerischen König angreifen und mattsetzen.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "eroeffnungsrepertoire",
+      "stage": 2,
+      "order": 4,
+      "version": 1,
+      "titleDe": "Eröffnungsrepertoire für Weiß und Schwarz",
+      "descriptionDe": "Ein einfaches Repertoire mit beiden Farben.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "mittelspielplaene",
+      "stage": 2,
+      "order": 5,
+      "version": 1,
+      "titleDe": "Mittelspielpläne",
+      "descriptionDe": "Wie du nach der Eröffnung einen Plan findest.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "turmendspiele",
+      "stage": 2,
+      "order": 6,
+      "version": 1,
+      "titleDe": "Turmendspiele",
+      "descriptionDe": "Die wichtigsten Turmendspiele, darunter Lucena und Philidor.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "bauernstrukturen",
+      "stage": 3,
+      "order": 1,
+      "version": 1,
+      "titleDe": "Bauernstrukturen",
+      "descriptionDe": "Typische Bauernstrukturen und ihre Pläne.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "gute-und-schlechte-figuren",
+      "stage": 3,
+      "order": 2,
+      "version": 1,
+      "titleDe": "Gute und schlechte Figuren",
+      "descriptionDe": "Aktive Figuren finden und schlechte Figuren verbessern.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "angriff-und-verteidigung",
+      "stage": 3,
+      "order": 3,
+      "version": 1,
+      "titleDe": "Angriff und Verteidigung",
+      "descriptionDe": "Wann du angreifst und wie du dich verteidigst.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "prophylaxe",
+      "stage": 3,
+      "order": 4,
+      "version": 1,
+      "titleDe": "Prophylaxe",
+      "descriptionDe": "Die Pläne des Gegners erkennen und rechtzeitig verhindern.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "endspieltechnik",
+      "stage": 3,
+      "order": 5,
+      "version": 1,
+      "titleDe": "Endspieltechnik",
+      "descriptionDe": "Vorteile im Endspiel sicher verwerten.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "strategische-opfer",
+      "stage": 4,
+      "order": 1,
+      "version": 1,
+      "titleDe": "Strategische Opfer und Dynamik",
+      "descriptionDe": "Material für Initiative und Stellungsvorteile geben.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "komplexe-endspiele",
+      "stage": 4,
+      "order": 2,
+      "version": 1,
+      "titleDe": "Komplexe Endspiele",
+      "descriptionDe": "Schwierige Endspiele verstehen und richtig behandeln.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "meisterpartien",
+      "stage": 4,
+      "order": 3,
+      "version": 1,
+      "titleDe": "Meisterpartien verstehen",
+      "descriptionDe": "Von großen Partien lernen.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "repertoire-vertiefen",
+      "stage": 4,
+      "order": 4,
+      "version": 1,
+      "titleDe": "Repertoire vertiefen",
+      "descriptionDe": "Das eigene Eröffnungsrepertoire ausbauen.",
+      "status": "planned",
+      "lessonIds": []
+    },
+    {
+      "id": "zeitmanagement",
+      "stage": 4,
+      "order": 5,
+      "version": 1,
+      "titleDe": "Zeitmanagement und Turnierpraxis",
+      "descriptionDe": "Die Bedenkzeit gut einteilen und im Turnier bestehen.",
+      "status": "planned",
+      "lessonIds": []
+    }
+  ]
+}

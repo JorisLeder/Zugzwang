@@ -1,0 +1,107 @@
+{
+  "id": "rochade",
+  "courseId": "sonderregeln-und-notation",
+  "order": 1,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Rochade",
+  "summaryDe": "Die Rochade bringt den König in Sicherheit und den Turm ins Spiel. Du lernst, wann sie erlaubt ist.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.8.2 (Rochade)",
+    "FIDE-Schachregeln 2023, Art. 3.8.2.1 (Rochaderecht verloren)",
+    "FIDE-Schachregeln 2023, Art. 3.8.2.2 (Rochade vorübergehend verhindert)"
+  ],
+  "steps": [
+    {
+      "id": "rochade",
+      "type": "explanation",
+      "textDe": "Die Rochade ist ein Doppelzug von König und Turm. Der König zieht zwei Felder zum Turm. Der Turm springt über ihn auf das Feld daneben. Es gibt die kurze Rochade 0-0 und die lange Rochade 0-0-0.",
+      "fen": "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "e1", "to": "g1", "kind": "hint" },
+        { "from": "h1", "to": "f1", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "rochade-demo",
+      "type": "demo",
+      "introDe": "Weiß rochiert kurz, Schwarz rochiert lang.",
+      "startFen": "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "e1g1", "commentDe": "0-0: Der König zieht nach g1, der Turm von h1 nach f1." },
+        { "uci": "e8c8", "commentDe": "0-0-0: Der König zieht nach c8, der Turm von a8 nach d8." }
+      ]
+    },
+    {
+      "id": "bedingungen",
+      "type": "explanation",
+      "textDe": "Rochieren darfst du nur, wenn König und Turm noch nicht gezogen haben. Alle Felder zwischen ihnen müssen frei sein. Der König darf nicht im Schach stehen. Er darf auch nicht über ein angegriffenes Feld ziehen oder auf einem landen. Für den Turm gilt das nicht: Er darf über ein angegriffenes Feld ziehen."
+    },
+    {
+      "id": "kurz-rochieren",
+      "type": "find_move",
+      "promptDe": "Rochiere kurz: 0-0.",
+      "fen": "r3k3/pp3ppp/8/8/8/8/PPP2PPP/R3K2R w KQq - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e1g1", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Ziehe den König zwei Felder Richtung h1-Turm."],
+      "explanationDe": "0-0: Der König steht auf g1, der Turm auf f1."
+    },
+    {
+      "id": "quiz-schach",
+      "type": "quiz",
+      "questionDe": "Der weiße König steht im Schach. Darf Weiß jetzt rochieren?",
+      "fen": "4r1k1/8/8/8/8/8/5PPP/4K2R w K - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein – aus dem Schach heraus darf man nicht rochieren.", "correct": true, "feedbackDe": "Richtig. Wehre zuerst das Schach ab." },
+        { "id": "ja", "textDe": "Ja, die Rochade wehrt das Schach ab.", "correct": false, "feedbackDe": "Steht der König im Schach, ist die Rochade verboten." }
+      ],
+      "asserts": [
+        { "kind": "isCheck", "fen": "4r1k1/8/8/8/8/8/5PPP/4K2R w K - 0 1", "expect": true },
+        { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/8/5PPP/4K2R w K - 0 1", "move": "e1g1", "expect": false }
+      ]
+    },
+    {
+      "id": "quiz-feld-angegriffen",
+      "type": "quiz",
+      "questionDe": "Der schwarze Läufer greift f1 an. Darf Weiß kurz rochieren?",
+      "fen": "4k3/8/8/8/2b5/8/6PP/4K2R w K - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein – der König müsste über das angegriffene Feld f1 ziehen.", "correct": true, "feedbackDe": "Richtig. Der König darf über kein angegriffenes Feld ziehen." },
+        { "id": "ja", "textDe": "Ja, der König steht ja nicht im Schach.", "correct": false, "feedbackDe": "Kein Schach reicht nicht. Auch f1 und g1 dürfen nicht angegriffen sein." }
+      ],
+      "asserts": [
+        { "kind": "isCheck", "fen": "4k3/8/8/8/2b5/8/6PP/4K2R w K - 0 1", "expect": false },
+        { "kind": "isLegalMove", "fen": "4k3/8/8/8/2b5/8/6PP/4K2R w K - 0 1", "move": "e1g1", "expect": false }
+      ]
+    },
+    {
+      "id": "quiz-turm-angegriffen",
+      "type": "quiz",
+      "questionDe": "Der schwarze Läufer greift b1 an. Darf Weiß lang rochieren (0-0-0)?",
+      "fen": "4k3/8/8/8/4b3/8/8/R3K3 w Q - 0 1",
+      "options": [
+        { "id": "ja", "textDe": "Ja – über b1 zieht nur der Turm, nicht der König.", "correct": true, "feedbackDe": "Richtig. Der König zieht über d1 nach c1. Beide Felder sind sicher." },
+        { "id": "nein", "textDe": "Nein – b1 ist angegriffen.", "correct": false, "feedbackDe": "Der Turm darf über ein angegriffenes Feld ziehen. Nur für den König gilt das Verbot." }
+      ],
+      "asserts": [{ "kind": "isLegalMove", "fen": "4k3/8/8/8/4b3/8/8/R3K3 w Q - 0 1", "move": "e1c1", "expect": true }]
+    },
+    {
+      "id": "lang-rochieren",
+      "type": "find_move",
+      "promptDe": "Eine der beiden Rochaden ist erlaubt. Spiele sie.",
+      "fen": "4k3/8/8/8/2b5/8/8/R3K2R w KQ - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e1c1", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Läufer greift f1 an. Die kurze Rochade geht also nicht."],
+      "explanationDe": "0-0-0: Die lange Rochade ist erlaubt, weil d1 und c1 nicht angegriffen sind."
+    }
+  ]
+}

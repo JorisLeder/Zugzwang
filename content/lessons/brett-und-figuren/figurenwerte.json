@@ -1,0 +1,92 @@
+{
+  "id": "figurenwerte",
+  "courseId": "brett-und-figuren",
+  "order": 6,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Figurenwerte",
+  "summaryDe": "Wie viel ist eine Figur wert? Mit der Faustregel vergleichst du, ob sich ein Schlagzug lohnt.",
+  "practiceThemes": ["hangingPiece"],
+  "sources": ["FIDE-Schachregeln 2023, Art. 3.1.1 (Schlagen)"],
+  "steps": [
+    {
+      "id": "werte",
+      "type": "explanation",
+      "textDe": "Als Faustregel gilt: Bauer 1 Punkt, Springer 3, Läufer 3, Turm 5 und Dame 9 Punkte. Der König ist unbezahlbar, denn ohne ihn geht es nicht.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w"
+    },
+    {
+      "id": "quiz-dame-wert",
+      "type": "quiz",
+      "questionDe": "Wie viele Punkte ist die Dame ungefähr wert?",
+      "options": [
+        { "id": "neun", "textDe": "9", "correct": true, "feedbackDe": "Richtig. Die Dame ist fast so viel wert wie zwei Türme." },
+        { "id": "fuenf", "textDe": "5", "correct": false, "feedbackDe": "5 Punkte ist der Turm wert." },
+        { "id": "drei", "textDe": "3", "correct": false, "feedbackDe": "3 Punkte sind Springer und Läufer wert." }
+      ]
+    },
+    {
+      "id": "schlechter-tausch",
+      "type": "demo",
+      "introDe": "Ein Schlagzug ist nicht immer gut. Schau, was passiert.",
+      "startFen": "4k3/8/4p3/3p4/8/8/8/3Q2K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "d1d5", "commentDe": "Dxd5? Die Dame schlägt einen Bauern …" },
+        { "uci": "e6d5", "commentDe": "… und der Bauer e6 schlägt die Dame. Weiß gab 9 Punkte für 1 Punkt." }
+      ]
+    },
+    {
+      "id": "tausch",
+      "type": "explanation",
+      "textDe": "Vor dem Schlagen vergleichst du: Was bekomme ich, was gebe ich her? Am besten ist eine Figur, die gar nicht gedeckt ist. Dann gewinnst du sie ohne Gegenleistung."
+    },
+    {
+      "id": "gewinne-turm",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Dein Springer kann zwei Figuren schlagen. Nimm die wertvollere.",
+      "fen": "6k1/3r2pp/2p5/4N3/8/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e5d7", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Ein Turm ist 5 Punkte wert, ein Bauer nur 1."],
+      "explanationDe": "Sxd7: Der Springer schlägt den ungedeckten Turm. Den Bauern c6 lässt du stehen.",
+      "puzzle": { "rating": 250, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "quiz-turm-wert",
+      "type": "quiz",
+      "questionDe": "Was ist mehr wert: ein Turm oder ein Läufer und ein Bauer zusammen?",
+      "options": [
+        { "id": "turm", "textDe": "Der Turm (5 gegen 4)", "correct": true, "feedbackDe": "Richtig: Läufer und Bauer sind zusammen 4 Punkte." },
+        { "id": "laeufer", "textDe": "Läufer und Bauer", "correct": false, "feedbackDe": "Rechne nach: 3 + 1 = 4, der Turm ist 5 wert." },
+        { "id": "gleich", "textDe": "Beide gleich viel", "correct": false, "feedbackDe": "Fast – aber der Turm ist einen Punkt mehr wert." }
+      ]
+    },
+    {
+      "id": "gewinne-dame",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Der Läufer kann zwei Figuren schlagen. Welche nimmst du?",
+      "fen": "6k1/5pp1/q6p/5n2/8/3B4/P4PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d3a6", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Die Dame ist die wertvollste Figur."],
+      "explanationDe": "Lxa6: Der Läufer schlägt die ungedeckte Dame – 9 Punkte statt 3 für den Springer.",
+      "puzzle": { "rating": 200, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "quiz-tausch",
+      "type": "quiz",
+      "questionDe": "Weiß kann einen Springer gegen einen Turm tauschen. Lohnt sich das?",
+      "options": [
+        { "id": "ja", "textDe": "Ja, Weiß gewinnt 2 Punkte.", "correct": true, "feedbackDe": "Genau: 5 Punkte für den Turm, 3 Punkte für den Springer." },
+        { "id": "nein", "textDe": "Nein, Weiß verliert 2 Punkte.", "correct": false, "feedbackDe": "Weiß gibt nur 3 Punkte her und bekommt 5." },
+        { "id": "egal", "textDe": "Das ist egal.", "correct": false, "feedbackDe": "Nicht ganz: Ein Turm ist mehr wert als ein Springer." }
+      ]
+    }
+  ]
+}

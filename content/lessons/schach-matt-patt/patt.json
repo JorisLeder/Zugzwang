@@ -1,0 +1,88 @@
+{
+  "id": "patt",
+  "courseId": "schach-matt-patt",
+  "order": 3,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Patt",
+  "summaryDe": "Hat die Seite am Zug keinen Zug und steht nicht im Schach, ist das Patt. Patt bedeutet Remis.",
+  "practiceThemes": ["mateIn1"],
+  "sources": ["FIDE-Schachregeln 2023, Art. 5.2.1 (Patt)"],
+  "steps": [
+    {
+      "id": "patt",
+      "type": "explanation",
+      "textDe": "Hat die Seite am Zug keinen regelgemäßen Zug und steht ihr König nicht im Schach, ist das Patt. Patt ist Remis: Keiner gewinnt, jeder bekommt einen halben Punkt.",
+      "fen": "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",
+      "orientation": "w",
+      "marks": [{ "square": "h8", "kind": "danger" }]
+    },
+    {
+      "id": "patt-gefahr",
+      "type": "explanation",
+      "textDe": "Patt passiert oft, wenn eine Seite viel mehr Material hat. Pass gut auf: Lass dem gegnerischen König ein Feld – oder setze ihn matt."
+    },
+    {
+      "id": "quiz-patt",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug. Was liegt vor?",
+      "fen": "k7/8/1Q6/8/8/8/8/7K b - - 0 1",
+      "options": [
+        { "id": "patt", "textDe": "Patt – Remis", "correct": true, "feedbackDe": "Richtig. Schwarz hat keinen Zug und steht nicht im Schach." },
+        { "id": "matt", "textDe": "Schachmatt – Weiß gewinnt", "correct": false, "feedbackDe": "Die Dame gibt kein Schach. Ohne Schach ist es kein Matt." },
+        { "id": "zug", "textDe": "Schwarz zieht Ka7.", "correct": false, "feedbackDe": "a7 wird von der Dame angegriffen." }
+      ],
+      "asserts": [
+        { "kind": "isStalemate", "fen": "k7/8/1Q6/8/8/8/8/7K b - - 0 1", "expect": true },
+        { "kind": "isCheck", "fen": "k7/8/1Q6/8/8/8/8/7K b - - 0 1", "expect": false }
+      ]
+    },
+    {
+      "id": "patt-demo",
+      "type": "demo",
+      "introDe": "Weiß hat Dame und König gegen den König. Ein unvorsichtiger Zug verschenkt den Sieg.",
+      "startFen": "k7/8/2K5/8/8/8/8/1Q6 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "b1b6", "commentDe": "Db6?? – Patt! Schwarz hat keinen Zug, steht aber nicht im Schach. Die Partie ist Remis." }
+      ]
+    },
+    {
+      "id": "matt-statt-patt",
+      "type": "find_move",
+      "promptDe": "Dieselbe Stellung: Weiß am Zug. Setze matt – aber stelle kein Patt!",
+      "fen": "k7/8/2K5/8/8/8/8/1Q6 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b1b7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Dame braucht den Schutz deines Königs."],
+      "explanationDe": "Db7#: Die Dame gibt Schach und wird vom König auf c6 gedeckt.",
+      "puzzle": { "rating": 220, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "quiz-patt-bauer",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug und hat noch einen Bauern. Ist das Patt?",
+      "fen": "7k/5Q2/6K1/p7/P7/8/8/8 b - - 0 1",
+      "options": [
+        { "id": "ja", "textDe": "Ja – auch der Bauer kann nicht ziehen.", "correct": true, "feedbackDe": "Richtig. Der Bauer a5 ist blockiert. Schwarz hat keinen einzigen Zug." },
+        { "id": "nein", "textDe": "Nein – Schwarz zieht den Bauern.", "correct": false, "feedbackDe": "Vor dem Bauern steht der weiße Bauer a4. Er kann nicht ziehen." }
+      ],
+      "asserts": [{ "kind": "isStalemate", "fen": "7k/5Q2/6K1/p7/P7/8/8/8 b - - 0 1", "expect": true }]
+    },
+    {
+      "id": "matt-statt-patt-2",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt. Achtung: Viele Züge wären Patt!",
+      "fen": "7k/8/5K2/8/8/8/8/6Q1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "g1g7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Dame kann direkt neben den König – wenn sie gedeckt ist."],
+      "explanationDe": "Dg7#: Die Dame wird vom König auf f6 gedeckt.",
+      "puzzle": { "rating": 220, "themes": ["mateIn1"] }
+    }
+  ]
+}

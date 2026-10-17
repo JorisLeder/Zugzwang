@@ -1,0 +1,110 @@
+{
+  "id": "bauer",
+  "courseId": "brett-und-figuren",
+  "order": 5,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Der Bauer",
+  "summaryDe": "Der Bauer zieht gerade nach vorn, schlägt aber schräg. Vom Startfeld darf er zwei Felder ziehen.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.7.1 (Bauer zieht ein Feld vor)",
+    "FIDE-Schachregeln 2023, Art. 3.7.2 (Doppelschritt vom Startfeld)",
+    "FIDE-Schachregeln 2023, Art. 3.7.3 (Bauer schlägt schräg)",
+    "FIDE-Schachregeln 2023, Art. 3.7.5.1 (Umwandlung)"
+  ],
+  "steps": [
+    {
+      "id": "bauer-zieht",
+      "type": "explanation",
+      "textDe": "Der Bauer zieht nur nach vorn, immer ein Feld. Rückwärts geht er nie. Steht etwas direkt vor ihm, ist er blockiert.",
+      "fen": "4k3/8/8/8/8/4P3/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "e3", "to": "e4", "kind": "hint" }]
+    },
+    {
+      "id": "doppelschritt",
+      "type": "explanation",
+      "textDe": "Steht der Bauer noch auf seinem Startfeld, darf er auch zwei Felder auf einmal ziehen. Beide Felder müssen frei sein.",
+      "fen": "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "e2", "to": "e4", "kind": "hint" }]
+    },
+    {
+      "id": "bauer-schlaegt",
+      "type": "explanation",
+      "textDe": "Der Bauer schlägt anders, als er zieht: schräg nach vorn, ein Feld weit. Den Bauern direkt vor sich kann er nicht schlagen.",
+      "fen": "4k3/8/8/3pp3/4P3/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "e4", "to": "d5", "kind": "hint" }],
+      "marks": [{ "square": "e5", "kind": "danger" }]
+    },
+    {
+      "id": "bauer-demo",
+      "type": "demo",
+      "introDe": "Zwei Doppelschritte und ein Schlagzug.",
+      "startFen": "4k3/4p3/8/8/8/8/3P4/4K3 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "d2d4", "commentDe": "d4: Der Bauer macht vom Startfeld einen Doppelschritt." },
+        { "uci": "e7e5", "commentDe": "e5: Auch der schwarze Bauer zieht zwei Felder." },
+        { "uci": "d4e5", "commentDe": "dxe5: Der weiße Bauer schlägt schräg nach vorn.", "arrows": [{ "from": "d4", "to": "e5", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "bauer-schlagen",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Bauern den schwarzen Springer.",
+      "fen": "4k3/8/8/3np3/4P3/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e4d5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Bauer schlägt schräg nach vorn."],
+      "explanationDe": "exd5: Der Bauer schlägt schräg. Den Bauern auf e5 direkt vor sich kann er nicht schlagen."
+    },
+    {
+      "id": "umwandlung-kurz",
+      "type": "explanation",
+      "textDe": "Erreicht ein Bauer die letzte Reihe, wird er umgewandelt – meist in eine Dame. Mehr dazu lernst du im Kurs „Sonderregeln und Notation“.",
+      "fen": "7k/P7/8/8/8/8/8/1K6 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "a7", "to": "a8", "kind": "hint" }]
+    },
+    {
+      "id": "bauer-laufen",
+      "type": "play_out",
+      "promptDe": "Bring deinen Bauern auf die letzte Reihe. Der schwarze König ist zu weit weg, um ihn aufzuhalten.",
+      "fen": "7k/8/8/P7/8/8/8/1K6 w - - 0 1",
+      "userColor": "w",
+      "goal": "promote",
+      "maxMoves": 6,
+      "botElo": 400,
+      "successDe": "Geschafft! Dein Bauer hat die letzte Reihe erreicht.",
+      "failDe": "Der Bauer ist nicht angekommen. Zieh ihn einfach jedes Mal ein Feld vor."
+    },
+    {
+      "id": "quiz-rueckwaerts",
+      "type": "quiz",
+      "questionDe": "Darf ein Bauer rückwärts ziehen?",
+      "options": [
+        { "id": "nie", "textDe": "Nein, nie.", "correct": true, "feedbackDe": "Richtig. Der Bauer ist die einzige Figur, die nur nach vorn zieht." },
+        { "id": "schlagen", "textDe": "Ja, wenn er schlägt.", "correct": false, "feedbackDe": "Auch beim Schlagen zieht der Bauer nach vorn – schräg." }
+      ]
+    },
+    {
+      "id": "quiz-doppelschritt",
+      "type": "quiz",
+      "questionDe": "Der weiße Bauer steht auf e3. Darf er nach e5 ziehen?",
+      "fen": "4k3/8/8/8/8/4P3/8/4K3 w - - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein, den Doppelschritt gibt es nur vom Startfeld.", "correct": true, "feedbackDe": "Genau. Von e3 darf der Bauer nur nach e4." },
+        { "id": "ja", "textDe": "Ja, zwei Felder gehen immer.", "correct": false, "feedbackDe": "Zwei Felder darf der Bauer nur von seinem Startfeld aus ziehen." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "4k3/8/8/8/8/4P3/8/4K3 w - - 0 1", "move": "e3e5", "expect": false },
+        { "kind": "isLegalMove", "fen": "4k3/8/8/8/8/4P3/8/4K3 w - - 0 1", "move": "e3e4", "expect": true }
+      ]
+    }
+  ]
+}

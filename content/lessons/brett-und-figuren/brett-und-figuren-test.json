@@ -1,0 +1,106 @@
+{
+  "id": "brett-und-figuren-test",
+  "courseId": "brett-und-figuren",
+  "order": 7,
+  "version": 1,
+  "kind": "course_test",
+  "titleDe": "Kurstest: Brett und Figuren",
+  "summaryDe": "Zeig, was du über das Brett und die Figuren weißt.",
+  "practiceThemes": ["hangingPiece"],
+  "passThreshold": 0.8,
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 2.1 (Das Schachbrett)",
+    "FIDE-Schachregeln 2023, Art. 3.2 (Läufer)",
+    "FIDE-Schachregeln 2023, Art. 3.4 (Dame)",
+    "FIDE-Schachregeln 2023, Art. 3.6 (Springer)",
+    "FIDE-Schachregeln 2023, Art. 3.7.3 (Bauer schlägt schräg)"
+  ],
+  "steps": [
+    {
+      "id": "start",
+      "type": "explanation",
+      "textDe": "Sieben Aufgaben zu Brett und Figuren. Löst du mindestens vier von fünf Aufgaben im ersten Versuch, hast du den Kurs geschafft.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w"
+    },
+    {
+      "id": "quiz-feld",
+      "type": "quiz",
+      "questionDe": "Wie heißt das Feld links unten aus Sicht von Weiß?",
+      "options": [
+        { "id": "a1", "textDe": "a1", "correct": true, "feedbackDe": "Richtig: Linie a, Reihe 1." },
+        { "id": "h1", "textDe": "h1", "correct": false, "feedbackDe": "h1 ist rechts unten." },
+        { "id": "a8", "textDe": "a8", "correct": false, "feedbackDe": "a8 ist links oben." }
+      ]
+    },
+    {
+      "id": "laeufer",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Läufer den schwarzen Springer.",
+      "fen": "k7/8/8/6n1/8/8/8/2B4K w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c1g5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Folge der Diagonale von c1 nach oben rechts."],
+      "explanationDe": "Lxg5: Der Läufer zieht schräg über d2, e3 und f4."
+    },
+    {
+      "id": "springer",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Springer den schwarzen Turm.",
+      "fen": "7k/8/8/1r6/8/2N5/7K/8 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c3b5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Zwei Felder nach oben, eins nach links."],
+      "explanationDe": "Sxb5: Ein L-Sprung von c3 nach b5."
+    },
+    {
+      "id": "quiz-bauer",
+      "type": "quiz",
+      "questionDe": "Wie schlägt ein Bauer?",
+      "options": [
+        { "id": "schraeg", "textDe": "Schräg nach vorn, ein Feld weit", "correct": true, "feedbackDe": "Richtig. Geradeaus kann der Bauer nicht schlagen." },
+        { "id": "gerade", "textDe": "Gerade nach vorn", "correct": false, "feedbackDe": "Gerade nach vorn zieht er nur, er schlägt schräg." },
+        { "id": "rueck", "textDe": "Schräg nach hinten", "correct": false, "feedbackDe": "Ein Bauer zieht und schlägt nie nach hinten." }
+      ]
+    },
+    {
+      "id": "haengender-laeufer",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne eine Figur.",
+      "fen": "3r2k1/5pp1/7p/2b5/8/7P/5PP1/2R3K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c1c5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Welche schwarze Figur ist angegriffen und nicht gedeckt?"],
+      "explanationDe": "Txc5: Der Läufer auf c5 war ungedeckt. Jetzt hast du wieder gleich viel Material.",
+      "puzzle": { "rating": 250, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "quiz-wert",
+      "type": "quiz",
+      "questionDe": "Welche Figur ist am meisten wert?",
+      "options": [
+        { "id": "dame", "textDe": "Die Dame", "correct": true, "feedbackDe": "Richtig: etwa 9 Punkte." },
+        { "id": "turm", "textDe": "Der Turm", "correct": false, "feedbackDe": "Der Turm ist 5 Punkte wert, die Dame 9." },
+        { "id": "springer", "textDe": "Der Springer", "correct": false, "feedbackDe": "Der Springer ist nur 3 Punkte wert." }
+      ]
+    },
+    {
+      "id": "dame",
+      "type": "find_move",
+      "promptDe": "Schlage mit der Dame den schwarzen Läufer.",
+      "fen": "4k3/8/7b/8/8/8/3Q4/K7 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d2h6", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Läufer steht schräg von deiner Dame aus."],
+      "explanationDe": "Dxh6: Die Dame zieht schräg über e3, f4 und g5."
+    }
+  ]
+}

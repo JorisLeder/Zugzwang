@@ -1,0 +1,126 @@
+{
+  "id": "gabel",
+  "courseId": "taktik-grundlagen",
+  "order": 1,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Die Gabel",
+  "summaryDe": "Eine Figur greift zwei gegnerische Figuren gleichzeitig an. Der Gegner kann nur eine retten.",
+  "practiceThemes": ["fork"],
+  "steps": [
+    {
+      "id": "gabel",
+      "type": "explanation",
+      "textDe": "Eine Gabel ist ein Doppelangriff: Eine Figur greift zwei gegnerische Figuren gleichzeitig an. Der Gegner kann nur eine davon retten. Besonders stark ist eine Gabel mit Schach.",
+      "fen": "r3k3/ppN2ppp/8/8/8/8/5PPP/6K1 b - - 1 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "c7", "to": "e8", "kind": "threat" },
+        { "from": "c7", "to": "a8", "kind": "threat" }
+      ]
+    },
+    {
+      "id": "gabel-demo",
+      "type": "demo",
+      "introDe": "Der Springer springt mit Schach auf c7.",
+      "startFen": "r3k3/pp3ppp/8/1N6/8/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "b5c7", "commentDe": "Sc7+: Gabel! Der Springer greift König und Turm an." },
+        { "uci": "e8d7", "commentDe": "Der König muss aus dem Schach." },
+        { "uci": "c7a8", "commentDe": "Sxa8: Weiß gewinnt den Turm." }
+      ]
+    },
+    {
+      "id": "springergabel",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Finde die Gabel und gewinne den Turm.",
+      "fen": "6k1/pp1r1p1p/6p1/8/4N3/7P/PPP2PP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "e4f6",
+          "comment": "Schach und Angriff auf den Turm d7.",
+          "children": [{ "move": "g8f8", "children": [{ "move": "f6d7", "comment": "Der Turm ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Suche ein Feld, von dem aus der Springer König und Turm angreift."],
+      "explanationDe": "Sf6+ und Sxd7: Die Springergabel gewinnt den Turm.",
+      "puzzle": { "rating": 400, "themes": ["fork"] }
+    },
+    {
+      "id": "bauerngabel",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Auch ein Bauer kann eine Gabel machen.",
+      "fen": "6k1/ppp2pp1/3n1n1p/8/4P3/7P/PPP2PP1/2B3K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e4e5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Ein Bauer greift die beiden Felder schräg vor sich an."],
+      "explanationDe": "e5: Der Bauer greift beide Springer an. Einer geht verloren.",
+      "puzzle": { "rating": 400, "themes": ["fork"] }
+    },
+    {
+      "id": "quiz-gabel",
+      "type": "quiz",
+      "questionDe": "Weiß hat Sc7+ gespielt. Was greift der Springer an?",
+      "fen": "r3k3/ppN2ppp/8/8/8/8/5PPP/6K1 b - - 1 1",
+      "options": [
+        { "id": "beide", "textDe": "Den König e8 und den Turm a8", "correct": true, "feedbackDe": "Richtig: eine Gabel mit Schach." },
+        { "id": "koenig", "textDe": "Nur den König", "correct": false, "feedbackDe": "Schau auch auf a8." },
+        { "id": "bauer", "textDe": "Den Bauern b7", "correct": false, "feedbackDe": "Ein Springer auf c7 greift b7 nicht an." }
+      ],
+      "asserts": [{ "kind": "isCheck", "fen": "r3k3/ppN2ppp/8/8/8/8/5PPP/6K1 b - - 1 1", "expect": true }]
+    },
+    {
+      "id": "familiengabel",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne die schwarze Dame.",
+      "fen": "r2q3k/ppp3p1/7p/4N3/8/7P/PPP1QPP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "e5f7",
+          "comment": "Schach – und die Dame d8 ist angegriffen.",
+          "children": [{ "move": "h8g8", "children": [{ "move": "f7d8", "comment": "Die Dame ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Von f7 aus greift der Springer h8 und d8 an."],
+      "explanationDe": "Sf7+ und Sxd8: Die Gabel gewinnt die Dame für einen Springer.",
+      "puzzle": { "rating": 450, "themes": ["fork"] }
+    },
+    {
+      "id": "damengabel",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Die Dame kann auch gabeln.",
+      "fen": "r5k1/4b1pp/p7/4n3/8/8/PP4PP/3Q2K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "d1d5",
+          "comment": "Schach und Angriff auf den Turm a8.",
+          "children": [{ "move": "g8f8", "children": [{ "move": "d5a8", "comment": "Der Turm ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Suche ein Feld auf den Diagonalen zu g8 und a8."],
+      "explanationDe": "Dd5+ und Dxa8+: Die Dame greift König und Turm gleichzeitig an."
+    },
+    {
+      "id": "quiz-springer",
+      "type": "quiz",
+      "questionDe": "Warum ist der Springer so gut für Gabeln?",
+      "options": [
+        { "id": "sprung", "textDe": "Er springt in viele Richtungen und kann nicht abgeblockt werden.", "correct": true, "feedbackDe": "Richtig. Deshalb übersieht man Springergabeln leicht." },
+        { "id": "stark", "textDe": "Er ist die stärkste Figur.", "correct": false, "feedbackDe": "Die stärkste Figur ist die Dame. Der Springer ist 3 Punkte wert." },
+        { "id": "weit", "textDe": "Er zieht so weit er will.", "correct": false, "feedbackDe": "Der Springer zieht immer genau einen L-Sprung." }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "taktik-grundlagen-test",
+  "courseId": "taktik-grundlagen",
+  "order": 6,
+  "version": 1,
+  "kind": "course_test",
+  "titleDe": "Kurstest: Taktik-Grundlagen",
+  "summaryDe": "Gabel, Fesselung, Spieß und Abzug im Test.",
+  "practiceThemes": ["fork", "pin", "skewer", "discoveredAttack"],
+  "passThreshold": 0.8,
+  "steps": [
+    {
+      "id": "start",
+      "type": "explanation",
+      "textDe": "Sechs Aufgaben aus allen vier Taktiken. Suche immer zuerst nach Schachs, Schlagzügen und Drohungen."
+    },
+    {
+      "id": "gabel",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne den Turm.",
+      "fen": "4k3/1r3pp1/p6p/8/4N3/7P/PPP2PP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        { "move": "e4d6", "children": [{ "move": "e8d7", "children": [{ "move": "d6b7", "children": [] }] }] }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Suche eine Springergabel mit Schach."],
+      "explanationDe": "Sd6+ und Sxb7: Gabel von König und Turm.",
+      "puzzle": { "rating": 400, "themes": ["fork"] }
+    },
+    {
+      "id": "fesselung",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne eine Figur.",
+      "fen": "1nr1k3/pp3pp1/4b2p/8/3P4/2N4P/PPP2PP1/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d4d5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Läufer e6 steht vor seinem König auf der e-Linie."],
+      "explanationDe": "d5: Der gefesselte Läufer kann nicht ausweichen."
+    },
+    {
+      "id": "quiz-spiess",
+      "type": "quiz",
+      "questionDe": "Bei welcher Taktik steht die wertvollere Figur vorn und muss weichen?",
+      "options": [
+        { "id": "spiess", "textDe": "Beim Spieß", "correct": true, "feedbackDe": "Richtig. Danach fällt die Figur dahinter." },
+        { "id": "fesselung", "textDe": "Bei der Fesselung", "correct": false, "feedbackDe": "Bei der Fesselung steht die wertvollere Figur hinten." },
+        { "id": "gabel", "textDe": "Bei der Gabel", "correct": false, "feedbackDe": "Bei der Gabel werden zwei Figuren in verschiedenen Richtungen angegriffen." }
+      ]
+    },
+    {
+      "id": "spiess",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne den Turm.",
+      "fen": "8/4k2r/1p4p1/2p5/1n6/7P/1PP2PP1/R5K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        { "move": "a1a7", "children": [{ "move": "e7e6", "children": [{ "move": "a7h7", "children": [] }] }] }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["König und Turm stehen auf der 7. Reihe."],
+      "explanationDe": "Ta7+ und Txh7: ein Spieß auf der 7. Reihe.",
+      "puzzle": { "rating": 400, "themes": ["skewer"] }
+    },
+    {
+      "id": "abzug",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne die Dame.",
+      "fen": "5r1k/pppq4/6pp/4N3/8/1P6/PBP2PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e5d7", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Springer steht auf der langen Diagonale des Läufers."],
+      "explanationDe": "Sxd7+: Der Springer schlägt die Dame, der Läufer gibt Abzugsschach.",
+      "puzzle": { "rating": 400, "themes": ["discoveredAttack"] }
+    },
+    {
+      "id": "doppelschach",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "r2qkb1r/pppp1ppp/8/8/4N3/8/PPP2PPP/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        { "move": "e4d6", "children": [] },
+        { "move": "e4f6", "children": [] }
+      ],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Ein Springerzug gibt Doppelschach."],
+      "explanationDe": "Sd6# oder Sf6#: Springer und Turm geben gleichzeitig Schach.",
+      "puzzle": { "rating": 450, "themes": ["doubleCheck", "mateIn1"] }
+    }
+  ]
+}

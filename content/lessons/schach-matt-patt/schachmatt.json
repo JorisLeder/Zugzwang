@@ -1,0 +1,106 @@
+{
+  "id": "schachmatt",
+  "courseId": "schach-matt-patt",
+  "order": 2,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Schachmatt",
+  "summaryDe": "Steht der König im Schach und gibt es keine Abwehr, ist er schachmatt. Damit endet die Partie.",
+  "practiceThemes": ["mateIn1"],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 1.4.1 (Ziel der Partie: Schachmatt)",
+    "FIDE-Schachregeln 2023, Art. 5.1.1 (Gewinn durch Schachmatt)"
+  ],
+  "steps": [
+    {
+      "id": "matt",
+      "type": "explanation",
+      "textDe": "Steht der König im Schach und gibt es keine Abwehr, ist er schachmatt. Die Partie ist sofort zu Ende. Wer mattsetzt, gewinnt.",
+      "fen": "3R2k1/5ppp/8/8/8/8/5PPP/6K1 b - - 1 1",
+      "orientation": "w",
+      "marks": [{ "square": "g8", "kind": "check" }]
+    },
+    {
+      "id": "matt-pruefen",
+      "type": "explanation",
+      "textDe": "So prüfst du ein Matt. Kann der König wegziehen? Kann sich etwas dazwischenstellen? Kann der Angreifer geschlagen werden? Dreimal nein heißt Schachmatt.",
+      "fen": "3R2k1/5ppp/8/8/8/8/5PPP/6K1 b - - 1 1",
+      "orientation": "w",
+      "arrows": [{ "from": "d8", "to": "g8", "kind": "threat" }]
+    },
+    {
+      "id": "quiz-matt",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug. Ist das Schachmatt?",
+      "fen": "6k1/6Q1/6K1/8/8/8/8/8 b - - 0 1",
+      "options": [
+        { "id": "ja", "textDe": "Ja, Schachmatt.", "correct": true, "feedbackDe": "Richtig. Die Dame gibt Schach und wird vom König gedeckt. Alle Fluchtfelder sind angegriffen." },
+        { "id": "schlagen", "textDe": "Nein, Schwarz schlägt die Dame.", "correct": false, "feedbackDe": "Die Dame ist vom weißen König gedeckt. Der König darf sie nicht schlagen." }
+      ],
+      "asserts": [
+        { "kind": "isCheckmate", "fen": "6k1/6Q1/6K1/8/8/8/8/8 b - - 0 1", "expect": true },
+        { "kind": "isLegalMove", "fen": "6k1/6Q1/6K1/8/8/8/8/8 b - - 0 1", "move": "g8g7", "expect": false }
+      ]
+    },
+    {
+      "id": "treppe-demo",
+      "type": "demo",
+      "introDe": "Mit zwei Türmen setzt du den König am Rand matt. Ein Turm sperrt eine Reihe, der andere gibt Schach.",
+      "startFen": "7k/8/8/8/8/8/R7/1R4K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "b1b7", "commentDe": "Tb7: Der Turm sperrt die 7. Reihe.", "arrows": [{ "from": "b1", "to": "b7", "kind": "played" }] },
+        { "uci": "h8g8", "commentDe": "Schwarz hat nur noch g8." },
+        { "uci": "a2a8", "commentDe": "Ta8# – Schachmatt. Der König kann nirgendwo hin.", "arrows": [{ "from": "a2", "to": "a8", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "matt-finden-1",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "6k1/R7/8/8/8/8/8/1R4K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b1b8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Turm auf a7 sperrt schon die 7. Reihe."],
+      "explanationDe": "Tb8#: Ein Turm sperrt die 7. Reihe, der andere gibt auf der 8. Reihe Schach.",
+      "puzzle": { "rating": 150, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "treppenmatt",
+      "type": "play_out",
+      "promptDe": "Setze mit zwei Türmen matt. Treibe den König Reihe für Reihe an den Rand.",
+      "fen": "8/8/8/4k3/8/8/8/RR5K w - - 0 1",
+      "userColor": "w",
+      "goal": "checkmate",
+      "maxMoves": 20,
+      "botElo": 600,
+      "successDe": "Schachmatt! Du hast die Treppe bis zum Rand gebaut.",
+      "failDe": "Noch kein Matt. Ein Turm sperrt die Reihe, der andere gibt Schach – immer im Wechsel."
+    },
+    {
+      "id": "quiz-ziel",
+      "type": "quiz",
+      "questionDe": "Was ist das Ziel im Schach?",
+      "options": [
+        { "id": "matt", "textDe": "Den gegnerischen König mattsetzen", "correct": true, "feedbackDe": "Genau. Wer mattsetzt, gewinnt die Partie." },
+        { "id": "alle", "textDe": "Alle gegnerischen Figuren schlagen", "correct": false, "feedbackDe": "Man muss nicht alles schlagen. Es zählt nur das Matt." },
+        { "id": "koenig", "textDe": "Den König schlagen", "correct": false, "feedbackDe": "Der König wird nie geschlagen. Die Partie endet schon mit dem Matt." }
+      ]
+    },
+    {
+      "id": "matt-finden-2",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze mit der Dame matt.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d1d8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die schwarzen Bauern versperren dem König den Weg."],
+      "explanationDe": "Dd8#: Grundreihenmatt mit der Dame.",
+      "puzzle": { "rating": 180, "themes": ["mateIn1", "backRankMate"] }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "id": "dame-und-koenig",
+  "courseId": "brett-und-figuren",
+  "order": 3,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Dame und König",
+  "summaryDe": "Die Dame ist die stärkste Figur. Der König ist die wichtigste Figur und zieht nur ein Feld weit.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.4 (Dame)",
+    "FIDE-Schachregeln 2023, Art. 3.8.1 (König)",
+    "FIDE-Schachregeln 2023, Art. 3.9.2 (Den eigenen König nicht ins Schach stellen)"
+  ],
+  "steps": [
+    {
+      "id": "dame",
+      "type": "explanation",
+      "textDe": "Die Dame zieht wie Turm und Läufer zusammen: gerade und schräg, so weit sie will. Darum ist sie die stärkste Figur.",
+      "fen": "4k3/8/8/8/3Q4/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "d4", "to": "d8", "kind": "hint" },
+        { "from": "d4", "to": "h4", "kind": "hint" },
+        { "from": "d4", "to": "h8", "kind": "hint" },
+        { "from": "d4", "to": "a1", "kind": "hint" },
+        { "from": "d4", "to": "a4", "kind": "hint" },
+        { "from": "d4", "to": "a7", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "koenig",
+      "type": "explanation",
+      "textDe": "Der König zieht nur ein Feld weit, aber in jede Richtung. Er ist die wichtigste Figur. Wird er mattgesetzt, ist die Partie verloren.",
+      "fen": "4k3/8/8/8/3K4/8/8/8 w - - 0 1",
+      "orientation": "w",
+      "marks": [
+        { "square": "c3", "kind": "hint-target" },
+        { "square": "c4", "kind": "hint-target" },
+        { "square": "c5", "kind": "hint-target" },
+        { "square": "d3", "kind": "hint-target" },
+        { "square": "d5", "kind": "hint-target" },
+        { "square": "e3", "kind": "hint-target" },
+        { "square": "e4", "kind": "hint-target" },
+        { "square": "e5", "kind": "hint-target" }
+      ]
+    },
+    {
+      "id": "koenig-sicher",
+      "type": "explanation",
+      "textDe": "Der König darf nie auf ein Feld ziehen, das eine gegnerische Figur angreift. Darum können sich die Könige nie direkt berühren. Die rot markierten Felder sind für beide Könige verboten.",
+      "fen": "8/8/3k4/8/3K4/8/8/8 w - - 0 1",
+      "orientation": "w",
+      "marks": [
+        { "square": "c5", "kind": "danger" },
+        { "square": "d5", "kind": "danger" },
+        { "square": "e5", "kind": "danger" }
+      ]
+    },
+    {
+      "id": "dame-demo",
+      "type": "demo",
+      "introDe": "Schau, wie weit die Dame in einem Zug kommt.",
+      "startFen": "4k3/8/8/8/8/8/8/3QK3 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "d1d5", "commentDe": "Dd5: Die Dame zieht gerade nach vorn.", "arrows": [{ "from": "d1", "to": "d5", "kind": "played" }] },
+        { "uci": "e8f8", "commentDe": "Schwarz zieht mit dem König ein Feld zur Seite." },
+        { "uci": "d5h5", "commentDe": "Dh5: Jetzt zieht die Dame quer über die Reihe.", "arrows": [{ "from": "d5", "to": "h5", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "dame-schlaegt",
+      "type": "find_move",
+      "promptDe": "Schlage mit der Dame den schwarzen Turm.",
+      "fen": "7k/8/8/8/r7/8/8/3Q2K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d1a4", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Turm steht schräg von deiner Dame aus."],
+      "explanationDe": "Dxa4: Die Dame zieht schräg über c2 und b3 und schlägt den Turm."
+    },
+    {
+      "id": "koenig-schlaegt",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem König den ungedeckten Bauern.",
+      "fen": "4k3/8/8/4p3/4K3/8/8/8 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e4e5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Bauer steht direkt vor deinem König."],
+      "explanationDe": "Kxe5: Der König darf schlagen, wenn das Feld danach nicht angegriffen ist."
+    },
+    {
+      "id": "quiz-koenig",
+      "type": "quiz",
+      "questionDe": "Darf der weiße König nach c5 ziehen?",
+      "fen": "2r1k3/8/8/8/3K4/8/8/8 w - - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein, der Turm auf c8 greift das Feld c5 an.", "correct": true, "feedbackDe": "Richtig. Der König darf nie auf ein angegriffenes Feld ziehen." },
+        { "id": "ja", "textDe": "Ja, c5 ist frei.", "correct": false, "feedbackDe": "Das Feld ist frei, aber der Turm auf c8 greift es an." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "2r1k3/8/8/8/3K4/8/8/8 w - - 0 1", "move": "d4c5", "expect": false },
+        { "kind": "isLegalMove", "fen": "2r1k3/8/8/8/3K4/8/8/8 w - - 0 1", "move": "d4e5", "expect": true }
+      ]
+    },
+    {
+      "id": "quiz-dame",
+      "type": "quiz",
+      "questionDe": "Wie zieht die Dame?",
+      "options": [
+        { "id": "beides", "textDe": "Gerade und schräg, so weit sie will", "correct": true, "feedbackDe": "Genau: wie Turm und Läufer zusammen." },
+        { "id": "schraeg", "textDe": "Nur schräg", "correct": false, "feedbackDe": "Nur schräg zieht der Läufer. Die Dame kann auch gerade ziehen." },
+        { "id": "ein-feld", "textDe": "Nur ein Feld weit", "correct": false, "feedbackDe": "Nur ein Feld weit zieht der König." }
+      ]
+    }
+  ]
+}

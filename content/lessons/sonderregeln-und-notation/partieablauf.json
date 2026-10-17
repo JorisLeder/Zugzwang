@@ -1,0 +1,98 @@
+{
+  "id": "partieablauf",
+  "courseId": "sonderregeln-und-notation",
+  "order": 5,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Partieablauf und Ergebnis",
+  "summaryDe": "Wer anfängt, was „berührt – geführt“ bedeutet und wie eine Partie endet.",
+  "practiceThemes": ["mateIn1"],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 1.2 (Weiß beginnt, abwechselnd ziehen)",
+    "FIDE-Schachregeln 2023, Art. 4.2.1 (Zurechtrücken)",
+    "FIDE-Schachregeln 2023, Art. 4.3 (Berührt – geführt)",
+    "FIDE-Schachregeln 2023, Art. 5.1.1 (Gewinn durch Schachmatt)",
+    "FIDE-Schachregeln 2023, Art. 5.1.2 (Aufgabe)",
+    "FIDE-Schachregeln 2023, Art. 6.9 (Zeitüberschreitung)"
+  ],
+  "steps": [
+    {
+      "id": "ablauf",
+      "type": "explanation",
+      "textDe": "Weiß beginnt, dann wird abwechselnd gezogen. Passen gibt es nicht: Wer am Zug ist, muss ziehen.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w"
+    },
+    {
+      "id": "beruehrt",
+      "type": "explanation",
+      "textDe": "Am echten Brett gilt: berührt – geführt. Berührst du absichtlich eine eigene Figur, musst du mit ihr ziehen, wenn das geht. Berührst du eine gegnerische Figur, musst du sie schlagen, wenn das geht. Willst du nur zurechtrücken, sag es vorher an."
+    },
+    {
+      "id": "ergebnis",
+      "type": "explanation",
+      "textDe": "So schreibt man das Ergebnis: 1-0 heißt Weiß gewinnt, 0-1 heißt Schwarz gewinnt, ½-½ heißt Remis. Gewinnen kannst du durch Matt oder wenn der Gegner aufgibt. Auch die Zeit kann entscheiden."
+    },
+    {
+      "id": "narrenmatt",
+      "type": "demo",
+      "introDe": "Die kürzeste mögliche Partie: das Narrenmatt. Ergebnis 0-1.",
+      "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "f2f3", "commentDe": "1. f3? Der König bekommt eine Lücke." },
+        { "uci": "e7e5", "commentDe": "1… e5" },
+        { "uci": "g2g4", "commentDe": "2. g4?? Jetzt ist die Diagonale zum König offen." },
+        { "uci": "d8h4", "commentDe": "2… Dh4# – Schachmatt. Schwarz gewinnt, das Ergebnis lautet 0-1." }
+      ]
+    },
+    {
+      "id": "zeit",
+      "type": "explanation",
+      "textDe": "Läuft deine Bedenkzeit ab, verlierst du. Es gibt eine Ausnahme: Kann dein Gegner mit keiner Zugfolge mehr mattsetzen, ist die Partie Remis."
+    },
+    {
+      "id": "quiz-zeit",
+      "type": "quiz",
+      "questionDe": "Weiß hat König und Dame, Schwarz nur den König. Die Zeit von Weiß läuft ab. Wie endet die Partie?",
+      "options": [
+        { "id": "remis", "textDe": "Remis – Schwarz kann mit dem König allein nie mattsetzen.", "correct": true, "feedbackDe": "Richtig. Kann der Gegner nicht mehr mattsetzen, ist es Remis." },
+        { "id": "schwarz", "textDe": "Schwarz gewinnt, weil die Zeit von Weiß abgelaufen ist.", "correct": false, "feedbackDe": "Schwarz hat nur den König. Damit ist kein Matt möglich." },
+        { "id": "weiss", "textDe": "Weiß gewinnt, weil Weiß mehr Material hat.", "correct": false, "feedbackDe": "Material allein gewinnt keine Partie." }
+      ]
+    },
+    {
+      "id": "quiz-ergebnis",
+      "type": "quiz",
+      "questionDe": "Was bedeutet das Ergebnis 0-1?",
+      "options": [
+        { "id": "schwarz", "textDe": "Schwarz hat gewonnen.", "correct": true, "feedbackDe": "Richtig. Die erste Zahl gehört zu Weiß, die zweite zu Schwarz." },
+        { "id": "weiss", "textDe": "Weiß hat gewonnen.", "correct": false, "feedbackDe": "Ein Sieg für Weiß wäre 1-0." },
+        { "id": "remis", "textDe": "Remis", "correct": false, "feedbackDe": "Ein Remis schreibt man ½-½." }
+      ]
+    },
+    {
+      "id": "matt-fuer-schwarz",
+      "type": "find_move",
+      "promptDe": "Schwarz am Zug. Setze matt wie im Narrenmatt.",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2",
+      "orientation": "b",
+      "solution": [{ "move": "d8h4", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Diagonale von d8 nach e1 ist offen."],
+      "explanationDe": "Dh4#: Die Dame gibt über h4 Schach, nichts kann sich dazwischenstellen.",
+      "puzzle": { "rating": 150, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "quiz-beruehrt",
+      "type": "quiz",
+      "questionDe": "Du berührst absichtlich deinen Springer. Er kann ziehen. Was gilt?",
+      "options": [
+        { "id": "ziehen", "textDe": "Du musst mit dem Springer ziehen.", "correct": true, "feedbackDe": "Richtig: berührt – geführt." },
+        { "id": "andere", "textDe": "Du darfst trotzdem eine andere Figur ziehen.", "correct": false, "feedbackDe": "Nur wenn der Springer keinen regelgemäßen Zug hat." },
+        { "id": "zurueck", "textDe": "Du stellst ihn zurück und überlegst neu.", "correct": false, "feedbackDe": "Das geht nur beim Zurechtrücken mit vorheriger Ansage." }
+      ]
+    }
+  ]
+}

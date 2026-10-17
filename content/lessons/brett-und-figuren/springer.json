@@ -1,0 +1,115 @@
+{
+  "id": "springer",
+  "courseId": "brett-und-figuren",
+  "order": 4,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Der Springer",
+  "summaryDe": "Der Springer zieht in Form eines L und darf als einzige Figur über andere springen.",
+  "practiceThemes": [],
+  "sources": ["FIDE-Schachregeln 2023, Art. 3.6 (Springer)"],
+  "steps": [
+    {
+      "id": "springer-zieht",
+      "type": "explanation",
+      "textDe": "Der Springer zieht in Form eines L: zwei Felder gerade und dann eins zur Seite. Er landet immer auf einem Feld der anderen Farbe. Von d4 erreicht er die acht markierten Felder.",
+      "fen": "4k3/8/8/8/3N4/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "marks": [
+        { "square": "b3", "kind": "hint-target" },
+        { "square": "b5", "kind": "hint-target" },
+        { "square": "c2", "kind": "hint-target" },
+        { "square": "c6", "kind": "hint-target" },
+        { "square": "e2", "kind": "hint-target" },
+        { "square": "e6", "kind": "hint-target" },
+        { "square": "f3", "kind": "hint-target" },
+        { "square": "f5", "kind": "hint-target" }
+      ]
+    },
+    {
+      "id": "springer-springt",
+      "type": "explanation",
+      "textDe": "Der Springer ist die einzige Figur, die über andere Figuren springen darf. Darum kann er in der Grundstellung sofort ziehen.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "g1", "to": "f3", "kind": "hint" },
+        { "from": "b1", "to": "c3", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "springer-demo",
+      "type": "demo",
+      "introDe": "Die Springer springen über die Bauern ins Spiel.",
+      "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "g1f3", "commentDe": "Sf3: Der Springer springt über die Bauern." },
+        { "uci": "b8c6", "commentDe": "Sc6: Schwarz macht es genauso." },
+        { "uci": "b1c3", "commentDe": "Sc3: Jetzt ist auch der zweite weiße Springer im Spiel." }
+      ]
+    },
+    {
+      "id": "springer-schlaegt-turm",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Springer den schwarzen Turm.",
+      "fen": "4k3/8/8/5r2/3N4/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d4f5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Zwei Felder nach rechts, eins nach oben – oder umgekehrt."],
+      "explanationDe": "Sxf5: Ein Springerzug von d4 nach f5 schlägt den Turm."
+    },
+    {
+      "id": "springer-schlaegt-bauer",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Springer den schwarzen Bauern.",
+      "fen": "4k3/8/8/8/8/7p/8/4K1N1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "g1h3", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Zwei Felder nach oben, eins zur Seite."],
+      "explanationDe": "Sxh3: Der Springer springt von g1 nach h3 und schlägt den Bauern."
+    },
+    {
+      "id": "quiz-ecke",
+      "type": "quiz",
+      "questionDe": "Auf wie viele Felder kann der Springer auf a1 ziehen?",
+      "fen": "7k/7p/8/8/8/8/8/N6K w - - 0 1",
+      "options": [
+        { "id": "zwei", "textDe": "Auf 2 Felder: b3 und c2", "correct": true, "feedbackDe": "Richtig. In der Ecke hat der Springer nur zwei Felder. In der Mitte sind es acht." },
+        { "id": "vier", "textDe": "Auf 4 Felder", "correct": false, "feedbackDe": "Zähle nach: Von a1 erreicht er nur b3 und c2." },
+        { "id": "acht", "textDe": "Auf 8 Felder", "correct": false, "feedbackDe": "Acht Felder hat er nur in der Mitte des Bretts." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "7k/7p/8/8/8/8/8/N6K w - - 0 1", "move": "a1b3", "expect": true },
+        { "kind": "isLegalMove", "fen": "7k/7p/8/8/8/8/8/N6K w - - 0 1", "move": "a1c2", "expect": true },
+        { "kind": "isLegalMove", "fen": "7k/7p/8/8/8/8/8/N6K w - - 0 1", "move": "a1b2", "expect": false }
+      ]
+    },
+    {
+      "id": "springer-schlaegt-dame",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Springer die schwarze Dame.",
+      "fen": "4k3/8/8/4q3/8/5N2/8/7K w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f3e5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Die Dame steht einen Springerzug von f3 entfernt."],
+      "explanationDe": "Sxe5: Auch die stärkste Figur kann vom Springer geschlagen werden."
+    },
+    {
+      "id": "quiz-springen",
+      "type": "quiz",
+      "questionDe": "Welche Figur darf über andere Figuren springen?",
+      "options": [
+        { "id": "springer", "textDe": "Der Springer", "correct": true, "feedbackDe": "Richtig. Alle anderen Figuren brauchen einen freien Weg." },
+        { "id": "laeufer", "textDe": "Der Läufer", "correct": false, "feedbackDe": "Der Läufer braucht eine freie Diagonale." },
+        { "id": "dame", "textDe": "Die Dame", "correct": false, "feedbackDe": "Auch die Dame darf nicht über andere Figuren ziehen." }
+      ]
+    }
+  ]
+}

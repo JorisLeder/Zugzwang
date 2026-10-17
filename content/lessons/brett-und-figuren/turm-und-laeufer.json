@@ -1,0 +1,115 @@
+{
+  "id": "turm-und-laeufer",
+  "courseId": "brett-und-figuren",
+  "order": 2,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Turm und Läufer",
+  "summaryDe": "Der Turm zieht gerade, der Läufer schräg. Beide ziehen so weit sie wollen und schlagen gegnerische Figuren.",
+  "practiceThemes": [],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.1 (Schlagen, keine eigenen Figuren)",
+    "FIDE-Schachregeln 2023, Art. 3.2 (Läufer)",
+    "FIDE-Schachregeln 2023, Art. 3.3 (Turm)",
+    "FIDE-Schachregeln 2023, Art. 3.5 (Nicht über andere Figuren)"
+  ],
+  "steps": [
+    {
+      "id": "turm-zieht",
+      "type": "explanation",
+      "textDe": "Der Turm zieht gerade: auf seiner Linie oder seiner Reihe. Er zieht so weit er will. Über andere Figuren springt er nicht.",
+      "fen": "4k3/8/8/8/3R4/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "d4", "to": "d8", "kind": "hint" },
+        { "from": "d4", "to": "d1", "kind": "hint" },
+        { "from": "d4", "to": "a4", "kind": "hint" },
+        { "from": "d4", "to": "h4", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "laeufer-zieht",
+      "type": "explanation",
+      "textDe": "Der Läufer zieht schräg, auf den Diagonalen. Auch er zieht so weit er will. Ein Läufer bleibt immer auf Feldern seiner Farbe.",
+      "fen": "4k3/8/8/8/3B4/8/8/4K3 w - - 0 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "d4", "to": "h8", "kind": "hint" },
+        { "from": "d4", "to": "a1", "kind": "hint" },
+        { "from": "d4", "to": "a7", "kind": "hint" },
+        { "from": "d4", "to": "g1", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "schlagen-demo",
+      "type": "demo",
+      "introDe": "Steht eine gegnerische Figur im Weg, darf der Turm sie schlagen. Er nimmt ihren Platz ein, die geschlagene Figur verlässt das Brett.",
+      "startFen": "4k3/8/b7/8/8/8/8/R3K3 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "a1a6", "commentDe": "Txa6: Der Turm schlägt den Läufer auf a6.", "arrows": [{ "from": "a1", "to": "a6", "kind": "played" }] },
+        { "uci": "e8d7", "commentDe": "Schwarz zieht mit dem König weiter." }
+      ]
+    },
+    {
+      "id": "turm-schlaegt",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Turm den schwarzen Springer.",
+      "fen": "6k1/1n6/8/8/8/8/1R6/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b2b7", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Springer steht auf derselben Linie wie dein Turm."],
+      "explanationDe": "Txb7: Der Turm zieht die b-Linie hinauf und schlägt den Springer."
+    },
+    {
+      "id": "laeufer-schlaegt",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Läufer den schwarzen Turm.",
+      "fen": "k7/8/5r2/8/8/8/1B6/7K w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b2f6", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Turm steht auf der langen Diagonale deines Läufers."],
+      "explanationDe": "Lxf6: Der Läufer zieht schräg über c3, d4 und e5 und schlägt den Turm."
+    },
+    {
+      "id": "quiz-farbe",
+      "type": "quiz",
+      "questionDe": "Ein Läufer steht auf einem hellen Feld. Kann er jemals ein dunkles Feld erreichen?",
+      "options": [
+        { "id": "nein", "textDe": "Nein, er bleibt immer auf hellen Feldern.", "correct": true, "feedbackDe": "Richtig. Darum gibt es einen hellfeldrigen und einen dunkelfeldrigen Läufer." },
+        { "id": "zwei", "textDe": "Ja, nach zwei Zügen.", "correct": false, "feedbackDe": "Auf einer Diagonale haben alle Felder dieselbe Farbe." },
+        { "id": "schlagen", "textDe": "Ja, wenn er eine Figur schlägt.", "correct": false, "feedbackDe": "Auch beim Schlagen zieht der Läufer schräg und bleibt auf seiner Farbe." }
+      ]
+    },
+    {
+      "id": "quiz-ueberspringen",
+      "type": "quiz",
+      "questionDe": "Darf der weiße Turm von a1 nach a8 ziehen?",
+      "fen": "4k3/8/8/8/P7/8/8/R3K3 w - - 0 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein, der eigene Bauer auf a4 steht im Weg.", "correct": true, "feedbackDe": "Genau. Der Turm springt nicht über andere Figuren. Er kommt nur bis a3." },
+        { "id": "ja", "textDe": "Ja, der Turm springt über den Bauern.", "correct": false, "feedbackDe": "Nur der Springer darf über andere Figuren springen." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "4k3/8/8/8/P7/8/8/R3K3 w - - 0 1", "move": "a1a8", "expect": false },
+        { "kind": "isLegalMove", "fen": "4k3/8/8/8/P7/8/8/R3K3 w - - 0 1", "move": "a1a3", "expect": true }
+      ]
+    },
+    {
+      "id": "laeufer-ziel",
+      "type": "find_move",
+      "promptDe": "Schlage mit dem Läufer den schwarzen Springer.",
+      "fen": "7k/8/n7/8/8/8/8/5BK1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f1a6", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Folge der Diagonale von f1 nach oben links."],
+      "explanationDe": "Lxa6: Der Läufer zieht über e2, d3, c4 und b5 bis a6."
+    }
+  ]
+}

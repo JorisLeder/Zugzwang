@@ -1,0 +1,98 @@
+{
+  "id": "spiess",
+  "courseId": "taktik-grundlagen",
+  "order": 3,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Der Spieß",
+  "summaryDe": "Eine wertvolle Figur wird angegriffen und muss weichen – dahinter fällt eine andere.",
+  "practiceThemes": ["skewer"],
+  "steps": [
+    {
+      "id": "spiess",
+      "type": "explanation",
+      "textDe": "Beim Spieß greifst du eine wertvolle Figur an, oft den König. Sie muss weichen. Dann schlägst du die Figur, die dahinter steht. Der Spieß ist eine umgedrehte Fesselung: Die wertvollere Figur steht vorn.",
+      "fen": "8/8/8/R3k2r/8/8/8/6K1 b - - 1 1",
+      "orientation": "w",
+      "arrows": [{ "from": "a5", "to": "h5", "kind": "threat" }]
+    },
+    {
+      "id": "spiess-demo",
+      "type": "demo",
+      "introDe": "König und Turm stehen auf derselben Reihe.",
+      "startFen": "8/8/8/4k2r/8/8/8/R5K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "a1a5", "commentDe": "Ta5+: Schach! Hinter dem König steht der Turm h5." },
+        { "uci": "e5d4", "commentDe": "Der König muss die Reihe verlassen …" },
+        { "uci": "a5h5", "commentDe": "Txh5: … und Weiß gewinnt den Turm." }
+      ]
+    },
+    {
+      "id": "laeuferspiess",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Spieße König und Turm auf.",
+      "fen": "r7/p4pp1/1pk4p/8/8/7P/PPP1BPP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "e2f3",
+          "comment": "Schach auf der langen Diagonale.",
+          "children": [{ "move": "c6d6", "children": [{ "move": "f3a8", "comment": "Der Turm ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["König c6 und Turm a8 stehen auf einer Diagonale."],
+      "explanationDe": "Lf3+ und Lxa8: Der König muss weichen, der Turm dahinter fällt.",
+      "puzzle": { "rating": 400, "themes": ["skewer"] }
+    },
+    {
+      "id": "quiz-unterschied",
+      "type": "quiz",
+      "questionDe": "Was ist der Unterschied zwischen Spieß und Fesselung?",
+      "options": [
+        { "id": "vorn", "textDe": "Beim Spieß steht die wertvollere Figur vorn, bei der Fesselung hinten.", "correct": true, "feedbackDe": "Richtig. Beim Spieß muss die vordere Figur weichen." },
+        { "id": "gleich", "textDe": "Es gibt keinen Unterschied.", "correct": false, "feedbackDe": "Es kommt darauf an, welche Figur vorn steht." },
+        { "id": "springer", "textDe": "Einen Spieß macht nur der Springer.", "correct": false, "feedbackDe": "Spieße machen Läufer, Türme und Damen – Figuren, die weit ziehen." }
+      ]
+    },
+    {
+      "id": "turmspiess-dame",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne die schwarze Dame.",
+      "fen": "8/5pp1/7p/8/1k5q/1P5P/2P2PP1/R5K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "a1a4",
+          "comment": "Schach – hinter dem König steht die Dame.",
+          "children": [{ "move": "b4c3", "children": [{ "move": "a4h4", "comment": "Die Dame ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["König und Dame stehen auf der 4. Reihe.", "Der Bauer b3 deckt a4."],
+      "explanationDe": "Ta4+ und Txh4: Der Turm ist auf a4 vom Bauern gedeckt, der König muss weichen."
+    },
+    {
+      "id": "grundreihe-spiess",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne den Turm a8.",
+      "fen": "r3k3/pp3pp1/2n5/8/8/8/PPP2PP1/6KR w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "h1h8",
+          "comment": "Schach auf der 8. Reihe.",
+          "children": [{ "move": "e8d7", "children": [{ "move": "h8a8", "comment": "Der Turm ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Die h-Linie ist offen."],
+      "explanationDe": "Th8+ und Txa8: König und Turm standen auf derselben Reihe.",
+      "puzzle": { "rating": 350, "themes": ["skewer"] }
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "id": "taktik-mix",
+  "courseId": "taktik-grundlagen",
+  "order": 5,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Taktik-Mix",
+  "summaryDe": "Gabel, Fesselung, Spieß und Abzug gemischt. Erkennst du, welche Taktik passt?",
+  "practiceThemes": ["fork", "pin", "skewer", "discoveredAttack"],
+  "steps": [
+    {
+      "id": "mix",
+      "type": "explanation",
+      "textDe": "Jetzt mischen wir alle Taktiken. Suche bei jeder Aufgabe zuerst alle Schachs, Schlagzüge und Drohungen. Oft zeigt dir ein ungeschützter König oder eine ungedeckte Figur den Weg."
+    },
+    {
+      "id": "mix-gabel",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne Material.",
+      "fen": "2q2rk1/pp3ppp/8/3N4/8/8/PPPQ1PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "d5e7",
+          "comment": "Gabel von König und Dame.",
+          "children": [{ "move": "g8h8", "children": [{ "move": "e7c8", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Springer kann König und Dame zugleich angreifen."],
+      "explanationDe": "Se7+ und Sxc8: eine Springergabel.",
+      "puzzle": { "rating": 400, "themes": ["fork"] }
+    },
+    {
+      "id": "mix-fesselung",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne die Dame.",
+      "fen": "6k1/ppp3pp/2n1q3/8/8/1PN5/P1P2PPP/5BK1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "f1c4",
+          "comment": "Die Dame ist an den König gefesselt.",
+          "children": [{ "move": "e6c4", "children": [{ "move": "b3c4", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Dame e6 und König g8 stehen auf einer Diagonale."],
+      "explanationDe": "Lc4: eine Fesselung. Der Bauer b3 deckt den Läufer."
+    },
+    {
+      "id": "quiz-motiv",
+      "type": "quiz",
+      "questionDe": "Weiß hat Ta5+ gespielt. Welche Taktik ist das?",
+      "fen": "8/8/8/R3k2r/8/8/8/6K1 b - - 1 1",
+      "options": [
+        { "id": "spiess", "textDe": "Ein Spieß", "correct": true, "feedbackDe": "Richtig. Der König muss weichen, der Turm dahinter fällt." },
+        { "id": "gabel", "textDe": "Eine Gabel", "correct": false, "feedbackDe": "Bei einer Gabel greift eine Figur in zwei Richtungen an. Hier stehen König und Turm hintereinander." },
+        { "id": "fesselung", "textDe": "Eine Fesselung", "correct": false, "feedbackDe": "Bei einer Fesselung stünde die wertvollere Figur hinten." }
+      ],
+      "asserts": [{ "kind": "isCheck", "fen": "8/8/8/R3k2r/8/8/8/6K1 b - - 1 1", "expect": true }]
+    },
+    {
+      "id": "mix-spiess",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne Material.",
+      "fen": "4r3/p4ppp/2k3n1/5b2/8/8/PP3PPP/3Q2K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "d1a4",
+          "comment": "Schach – hinter dem König steht der Turm e8.",
+          "children": [{ "move": "c6d6", "children": [{ "move": "a4e8", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["König c6 und Turm e8 stehen auf einer Diagonale."],
+      "explanationDe": "Da4+ und Dxe8: ein Spieß mit der Dame."
+    },
+    {
+      "id": "vorteil-verwerten",
+      "type": "play_out",
+      "promptDe": "Du hast die Taktik gefunden und eine Dame mehr. Setze jetzt matt.",
+      "fen": "2r3k1/5p1p/6p1/8/8/7P/3R1PP1/3Q2K1 w - - 0 1",
+      "userColor": "w",
+      "goal": "checkmate",
+      "maxMoves": 25,
+      "botElo": 800,
+      "successDe": "Schachmatt! Du hast deinen Vorteil verwertet.",
+      "failDe": "Noch kein Matt. Tausche die Türme und treibe den König mit Dame und Turm an den Rand."
+    },
+    {
+      "id": "mix-abzug",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne die Dame.",
+      "fen": "r7/pp3pkp/2q3p1/8/3N4/1P6/PBP2PPP/5RK1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d4c6", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Springer verdeckt die lange Diagonale des Läufers b2."],
+      "explanationDe": "Sxc6+: Der Springer schlägt die Dame mit Abzugsschach durch den Läufer.",
+      "puzzle": { "rating": 450, "themes": ["discoveredAttack"] }
+    },
+    {
+      "id": "quiz-zuerst",
+      "type": "quiz",
+      "questionDe": "Du suchst eine Taktik. Womit fängst du an?",
+      "options": [
+        { "id": "csd", "textDe": "Mit allen Schachs, Schlagzügen und Drohungen", "correct": true, "feedbackDe": "Richtig. Diese Züge zwingen den Gegner und verraten die meisten Taktiken." },
+        { "id": "ruhig", "textDe": "Mit ruhigen Zügen am Rand", "correct": false, "feedbackDe": "Ruhige Züge sind manchmal stark, aber zuerst prüfst du die forcierenden Züge." },
+        { "id": "koenig", "textDe": "Mit Zügen des eigenen Königs", "correct": false, "feedbackDe": "Taktiken entstehen meist durch Angriffe auf gegnerische Figuren." }
+      ]
+    }
+  ]
+}

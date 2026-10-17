@@ -1,0 +1,105 @@
+{
+  "id": "keine-figuren-verschenken-test",
+  "courseId": "keine-figuren-verschenken",
+  "order": 6,
+  "version": 1,
+  "kind": "course_test",
+  "titleDe": "Kurstest: Keine Figuren verschenken",
+  "summaryDe": "Hängende Figuren, Zählen, Tauschen und Drohungen im Test.",
+  "practiceThemes": ["hangingPiece", "capturingDefender"],
+  "passThreshold": 0.8,
+  "steps": [
+    {
+      "id": "start",
+      "type": "explanation",
+      "textDe": "Sieben Aufgaben. Mach bei jeder den Sicherheits-Check: Was hängt, was ist gedeckt, was droht?"
+    },
+    {
+      "id": "laeufer-schlaegt-turm",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne Material.",
+      "fen": "6k1/pppb1pp1/7p/4r3/8/1P5P/PBPN1PP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b2e5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Folge der langen Diagonale deines Läufers."],
+      "explanationDe": "Lxe5: Der Turm war ungedeckt.",
+      "puzzle": { "rating": 300, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "zaehlen",
+      "type": "find_move",
+      "promptDe": "Schwarz am Zug. Zähle auf d4 und gewinne eine Figur.",
+      "fen": "6k1/ppp2pp1/1bn4p/8/3N4/5N1P/PPP2PP1/6K1 b - - 0 1",
+      "orientation": "b",
+      "solution": [
+        { "move": "c6d4", "children": [{ "move": "f3d4", "children": [{ "move": "b6d4", "children": [] }] }] },
+        { "move": "b6d4", "children": [{ "move": "f3d4", "children": [{ "move": "c6d4", "children": [] }] }] }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Springer c6 und Läufer b6 greifen d4 an. Wer deckt?"],
+      "explanationDe": "Zwei Angreifer gegen einen Verteidiger: Am Ende hast du eine Figur mehr."
+    },
+    {
+      "id": "quiz-haengt",
+      "type": "quiz",
+      "questionDe": "Weiß am Zug. Welche schwarze Figur hängt?",
+      "fen": "6k1/ppp2pp1/2n4p/3b4/8/2N2N1P/PPP2PP1/6K1 w - - 0 1",
+      "options": [
+        { "id": "laeufer", "textDe": "Der Läufer d5", "correct": true, "feedbackDe": "Richtig. Der Springer c3 greift ihn an, und keine Figur deckt ihn." },
+        { "id": "springer", "textDe": "Der Springer c6", "correct": false, "feedbackDe": "Der Springer c6 wird gar nicht angegriffen." },
+        { "id": "nichts", "textDe": "Keine Figur hängt.", "correct": false, "feedbackDe": "Schau dir den Läufer d5 an." }
+      ],
+      "asserts": [{ "kind": "bestMove", "fen": "6k1/ppp2pp1/2n4p/3b4/8/2N2N1P/PPP2PP1/6K1 w - - 0 1", "move": "c3d5" }]
+    },
+    {
+      "id": "laeufer-gegen-turm",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Finde einen guten Tausch.",
+      "fen": "6k1/pp3pp1/2r2n1p/8/8/2N2B1P/PPP2PP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f3c6", "children": [{ "move": "b7c6", "children": [] }] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Ein Turm ist mehr wert als ein Läufer."],
+      "explanationDe": "Lxc6 bxc6: Du gibst 3 Punkte und bekommst 5."
+    },
+    {
+      "id": "dame-gewinnen",
+      "type": "find_move",
+      "promptDe": "Schwarz am Zug. Weiß hat einen Fehler gemacht. Nutze ihn aus.",
+      "fen": "3q2k1/p1pb1pp1/1p5p/1Q6/8/7P/PPP2PP1/4R1K1 b - - 0 1",
+      "orientation": "b",
+      "solution": [{ "move": "d7b5", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Die weiße Dame steht auf einer Diagonale deines Läufers."],
+      "explanationDe": "Lxb5: Die weiße Dame war ungedeckt.",
+      "puzzle": { "rating": 250, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "springer-gegen-turm",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Gewinne Material durch einen Tausch.",
+      "fen": "6k1/ppp3p1/4bp2/4p3/3r4/5N1P/PPP1BPP1/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "f3d4", "children": [{ "move": "e5d4", "children": [] }] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Turm d4 ist gedeckt. Ist er trotzdem eine gute Beute?"],
+      "explanationDe": "Sxd4 exd4: Springer (3) gegen Turm (5)."
+    },
+    {
+      "id": "quiz-check",
+      "type": "quiz",
+      "questionDe": "Was machst du vor jedem Zug?",
+      "options": [
+        { "id": "check", "textDe": "Den Sicherheits-Check: Drohungen, ungedeckte Figuren, gegnerische Antworten", "correct": true, "feedbackDe": "Richtig. So verschenkst du keine Figuren." },
+        { "id": "schnell", "textDe": "Möglichst schnell ziehen", "correct": false, "feedbackDe": "Schnelligkeit hilft nicht, wenn dabei Figuren hängen bleiben." },
+        { "id": "angriff", "textDe": "Immer angreifen, egal was droht", "correct": false, "feedbackDe": "Erst die Drohungen des Gegners prüfen, dann angreifen." }
+      ]
+    }
+  ]
+}

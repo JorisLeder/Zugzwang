@@ -1,0 +1,118 @@
+{
+  "id": "schach-matt-patt-test",
+  "courseId": "schach-matt-patt",
+  "order": 6,
+  "version": 1,
+  "kind": "course_test",
+  "titleDe": "Kurstest: Schach, Matt und Patt",
+  "summaryDe": "Schach abwehren, mattsetzen, Patt erkennen und die Remis-Regeln anwenden.",
+  "practiceThemes": ["mateIn1"],
+  "passThreshold": 0.8,
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.9.2 (Kein Zug darf den König im Schach lassen)",
+    "FIDE-Schachregeln 2023, Art. 5.1.1 (Gewinn durch Schachmatt)",
+    "FIDE-Schachregeln 2023, Art. 5.2.1 (Patt)",
+    "FIDE-Schachregeln 2023, Art. 5.2.2 (Kein Matt mehr möglich)"
+  ],
+  "steps": [
+    {
+      "id": "start",
+      "type": "explanation",
+      "textDe": "Sieben Aufgaben zu Schach, Matt, Patt und Remis. Löse möglichst viele im ersten Versuch."
+    },
+    {
+      "id": "quiz-abwehr",
+      "type": "quiz",
+      "questionDe": "Weiß steht im Schach. Welcher Zug wehrt es ab?",
+      "fen": "4r1k1/8/8/8/8/2B5/8/4K3 w - - 0 1",
+      "options": [
+        { "id": "le5", "textDe": "Le5", "correct": true, "feedbackDe": "Richtig. Der Läufer stellt sich zwischen Turm und König." },
+        { "id": "lb4", "textDe": "Lb4", "correct": false, "feedbackDe": "Nach Lb4 steht der König weiter im Schach." },
+        { "id": "ke2", "textDe": "Ke2", "correct": false, "feedbackDe": "Auf e2 stünde der König immer noch im Schach." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/2B5/8/4K3 w - - 0 1", "move": "c3e5", "expect": true },
+        { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/2B5/8/4K3 w - - 0 1", "move": "c3b4", "expect": false },
+        { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/2B5/8/4K3 w - - 0 1", "move": "e1e2", "expect": false }
+      ]
+    },
+    {
+      "id": "matt-tuerme",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "7k/1R6/8/8/8/8/8/R5K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "a1a8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Ein Turm sperrt schon die 7. Reihe."],
+      "explanationDe": "Ta8#: Der Turm auf b7 sperrt die 7. Reihe.",
+      "puzzle": { "rating": 150, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "quiz-patt",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug. Was liegt vor?",
+      "fen": "7k/7P/6K1/8/8/8/8/8 b - - 0 1",
+      "options": [
+        { "id": "patt", "textDe": "Patt – Remis", "correct": true, "feedbackDe": "Richtig. Schwarz hat keinen Zug und steht nicht im Schach." },
+        { "id": "matt", "textDe": "Schachmatt", "correct": false, "feedbackDe": "Der König steht nicht im Schach." },
+        { "id": "schlagen", "textDe": "Schwarz schlägt den Bauern h7.", "correct": false, "feedbackDe": "Der Bauer ist vom König auf g6 gedeckt." }
+      ],
+      "asserts": [{ "kind": "isStalemate", "fen": "7k/7P/6K1/8/8/8/8/8 b - - 0 1", "expect": true }]
+    },
+    {
+      "id": "matt-statt-patt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt – ohne Patt.",
+      "fen": "k7/8/1K6/8/8/8/8/2Q5 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c1c8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Dein König deckt a7 und b7."],
+      "explanationDe": "Dc8#: Die Dame gibt auf der 8. Reihe Schach, dein König deckt den Rest.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "quiz-remis",
+      "type": "quiz",
+      "questionDe": "Welche Stellung ist sofort Remis?",
+      "options": [
+        { "id": "kl", "textDe": "König und Läufer gegen König", "correct": true, "feedbackDe": "Richtig. Mit einem Läufer allein ist kein Matt möglich." },
+        { "id": "kd", "textDe": "König und Dame gegen König", "correct": false, "feedbackDe": "Mit der Dame kannst du mattsetzen." },
+        { "id": "kt", "textDe": "König und Turm gegen König", "correct": false, "feedbackDe": "Mit dem Turm kannst du mattsetzen." }
+      ],
+      "asserts": [
+        { "kind": "isInsufficientMaterial", "fen": "8/8/4k3/8/8/3KB3/8/8 w - - 0 1", "expect": true },
+        { "kind": "isInsufficientMaterial", "fen": "8/8/4k3/8/8/3K4/8/Q7 w - - 0 1", "expect": false }
+      ]
+    },
+    {
+      "id": "abwehr-schlagen",
+      "type": "find_move",
+      "promptDe": "Weiß steht im Schach. Finde die beste Abwehr.",
+      "fen": "r5k1/pp3ppp/8/8/8/5n2/PP3PPP/R5K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "g2f3", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Du kannst den Springer schlagen."],
+      "explanationDe": "gxf3: Der Bauer schlägt den Springer. Das Schach ist weg und du hast eine Figur gewonnen.",
+      "puzzle": { "rating": 200, "themes": ["hangingPiece"] }
+    },
+    {
+      "id": "matt-turm",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "2k5/8/2K5/8/8/8/8/7R w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "h1h8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Könige stehen sich gegenüber."],
+      "explanationDe": "Th8#: Schach am Rand, dein König deckt die Felder der 7. Reihe.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    }
+  ]
+}

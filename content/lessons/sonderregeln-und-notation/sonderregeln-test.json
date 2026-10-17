@@ -1,0 +1,110 @@
+{
+  "id": "sonderregeln-test",
+  "courseId": "sonderregeln-und-notation",
+  "order": 6,
+  "version": 1,
+  "kind": "course_test",
+  "titleDe": "Kurstest: Sonderregeln und Notation",
+  "summaryDe": "Rochade, en passant, Umwandlung und Notation im Test.",
+  "practiceThemes": ["promotion"],
+  "passThreshold": 0.8,
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 3.7.4.1 (En passant)",
+    "FIDE-Schachregeln 2023, Art. 3.7.4.2 (Nur im nächsten Zug)",
+    "FIDE-Schachregeln 2023, Art. 3.7.5.1 (Umwandlung)",
+    "FIDE-Schachregeln 2023, Art. 3.8.2 (Rochade)",
+    "FIDE-Schachregeln 2023, Art. 3.8.2.2 (Rochade vorübergehend verhindert)",
+    "FIDE-Schachregeln 2023, Anhang C (Algebraische Notation)"
+  ],
+  "steps": [
+    {
+      "id": "start",
+      "type": "explanation",
+      "textDe": "Sieben Aufgaben zu den Sonderregeln und zur Notation. Viel Erfolg!"
+    },
+    {
+      "id": "rochade",
+      "type": "find_move",
+      "promptDe": "Bring deinen König mit 0-0 in Sicherheit.",
+      "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 1 5",
+      "orientation": "w",
+      "solution": [{ "move": "e1g1", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["0-0 ist die kurze Rochade."],
+      "explanationDe": "0-0: König nach g1, Turm nach f1."
+    },
+    {
+      "id": "quiz-rochade",
+      "type": "quiz",
+      "questionDe": "Der schwarze Turm greift d1 an. Welche Rochade ist erlaubt?",
+      "fen": "4k3/8/8/8/8/8/3r4/R3K2R w KQ - 0 1",
+      "options": [
+        { "id": "kurz", "textDe": "Nur 0-0", "correct": true, "feedbackDe": "Richtig. Bei 0-0-0 müsste der König über das angegriffene Feld d1 ziehen." },
+        { "id": "lang", "textDe": "Nur 0-0-0", "correct": false, "feedbackDe": "Der König darf nicht über d1 ziehen, weil der Turm es angreift." },
+        { "id": "beide", "textDe": "Beide", "correct": false, "feedbackDe": "Die lange Rochade führt den König über das angegriffene Feld d1." }
+      ],
+      "asserts": [
+        { "kind": "isLegalMove", "fen": "4k3/8/8/8/8/8/3r4/R3K2R w KQ - 0 1", "move": "e1g1", "expect": true },
+        { "kind": "isLegalMove", "fen": "4k3/8/8/8/8/8/3r4/R3K2R w KQ - 0 1", "move": "e1c1", "expect": false }
+      ]
+    },
+    {
+      "id": "en-passant",
+      "type": "find_move",
+      "promptDe": "Weiß hat gerade f2–f4 gezogen. Schlage mit Schwarz en passant.",
+      "fen": "4k3/8/8/8/4pP2/8/8/4K3 b - f3 0 1",
+      "orientation": "b",
+      "solution": [{ "move": "e4f3", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Der Bauer ist über f3 gezogen."],
+      "explanationDe": "exf3 e.p.: Der Bauer landet auf f3, der Bauer f4 verschwindet."
+    },
+    {
+      "id": "quiz-ep",
+      "type": "quiz",
+      "questionDe": "Weiß zieht e2–e4 an deinem Bauern d4 vorbei. Wann darfst du en passant schlagen?",
+      "options": [
+        { "id": "sofort", "textDe": "Nur sofort im nächsten Zug", "correct": true, "feedbackDe": "Richtig. Danach ist die Chance vorbei." },
+        { "id": "spaeter", "textDe": "Auch noch ein paar Züge später", "correct": false, "feedbackDe": "En passant geht nur im direkt folgenden Zug." },
+        { "id": "nie", "textDe": "Gar nicht, das darf nur Weiß", "correct": false, "feedbackDe": "Beide Seiten dürfen en passant schlagen." }
+      ]
+    },
+    {
+      "id": "umwandlung-matt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Wandle um und setze matt.",
+      "fen": "6k1/1P3ppp/8/8/8/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b7b8q", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die neue Figur gibt auf der Grundreihe Schach."],
+      "explanationDe": "b8=D#: Grundreihenmatt mit der neuen Dame. Auch b8=T wäre Matt.",
+      "puzzle": { "rating": 200, "themes": ["promotion", "mateIn1", "backRankMate"] }
+    },
+    {
+      "id": "quiz-notation",
+      "type": "quiz",
+      "questionDe": "Was bedeutet exd6 e.p.?",
+      "options": [
+        { "id": "ep", "textDe": "Der Bauer e5 schlägt en passant und landet auf d6.", "correct": true, "feedbackDe": "Richtig: e.p. steht für en passant." },
+        { "id": "laeufer", "textDe": "Ein Läufer schlägt auf d6.", "correct": false, "feedbackDe": "Ein Läuferzug hätte den Buchstaben L." },
+        { "id": "umwandlung", "textDe": "Ein Bauer wird auf d6 umgewandelt.", "correct": false, "feedbackDe": "Umgewandelt wird nur auf der letzten Reihe, z. B. d8=D." }
+      ]
+    },
+    {
+      "id": "spiele-e4",
+      "type": "find_move",
+      "promptDe": "Spiele den Zug 1. e4.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e2e4", "children": [] }],
+      "acceptAnyMate": false,
+      "claim": { "kind": "rule" },
+      "hintsDe": ["Ein Zug ohne Buchstaben ist ein Bauernzug."],
+      "explanationDe": "e4: Der Bauer zieht von e2 nach e4."
+    }
+  ]
+}

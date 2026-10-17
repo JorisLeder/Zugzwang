@@ -1,0 +1,101 @@
+{
+  "id": "abzug",
+  "courseId": "taktik-grundlagen",
+  "order": 4,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Abzug und Abzugsschach",
+  "summaryDe": "Eine Figur zieht weg und gibt die Linie für eine andere frei. Mit Schach ist das oft entscheidend.",
+  "practiceThemes": ["discoveredAttack", "doubleCheck"],
+  "steps": [
+    {
+      "id": "abzug",
+      "type": "explanation",
+      "textDe": "Beim Abzug zieht eine Figur weg und gibt die Linie für eine andere Figur frei. Gibt die freigegebene Figur Schach, heißt das Abzugsschach. Geben beide Figuren Schach, ist es ein Doppelschach – dann hilft nur ein Königszug.",
+      "fen": "q3k3/5ppp/8/8/4B3/8/5PPP/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "arrows": [
+        { "from": "e1", "to": "e8", "kind": "hint" },
+        { "from": "e4", "to": "a8", "kind": "hint" }
+      ]
+    },
+    {
+      "id": "abzug-demo",
+      "type": "demo",
+      "introDe": "Der Läufer steht zwischen Turm und König.",
+      "startFen": "q3k3/5ppp/8/8/4B3/8/5PPP/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "e4a8", "commentDe": "Lxa8+: Der Läufer schlägt die Dame und gibt die e-Linie frei – Abzugsschach durch den Turm!" },
+        { "uci": "e8d7", "commentDe": "Schwarz muss auf das Schach reagieren. Die Dame ist weg." }
+      ]
+    },
+    {
+      "id": "abzugsschach",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Ziehe den Springer mit Abzugsschach und gewinne die Dame.",
+      "fen": "2bqk2r/ppp2pp1/7p/4N3/8/3B3P/PPP2PP1/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "e5c6",
+          "comment": "Abzugsschach durch den Turm – und der Springer greift die Dame an.",
+          "children": [{ "move": "e8d7", "children": [{ "move": "c6d8", "comment": "Die Dame ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Turm e1 gibt Schach, sobald der Springer wegzieht.", "Von welchem Feld greift der Springer die Dame an?"],
+      "explanationDe": "Sc6+: Schwarz muss das Schach abwehren. Danach schlägt der Springer die Dame.",
+      "puzzle": { "rating": 450, "themes": ["discoveredAttack"] }
+    },
+    {
+      "id": "quiz-doppelschach",
+      "type": "quiz",
+      "questionDe": "Schwarz steht im Doppelschach. Was kann Schwarz tun?",
+      "fen": "r2qk2r/ppp2ppp/8/1B6/8/8/PPP2PPP/4R1K1 b - - 1 1",
+      "options": [
+        { "id": "koenig", "textDe": "Nur mit dem König ziehen", "correct": true, "feedbackDe": "Richtig. Gegen zwei Schachs hilft kein Dazwischenziehen und kein Schlagen." },
+        { "id": "dazwischen", "textDe": "Eine Figur dazwischenstellen", "correct": false, "feedbackDe": "Damit wehrst du nur eines der beiden Schachs ab." },
+        { "id": "schlagen", "textDe": "Eine der schachgebenden Figuren schlagen", "correct": false, "feedbackDe": "Das andere Schach bliebe bestehen." }
+      ],
+      "asserts": [
+        { "kind": "isCheck", "fen": "r2qk2r/ppp2ppp/8/1B6/8/8/PPP2PPP/4R1K1 b - - 1 1", "expect": true },
+        { "kind": "isLegalMove", "fen": "r2qk2r/ppp2ppp/8/1B6/8/8/PPP2PPP/4R1K1 b - - 1 1", "move": "c7c6", "expect": false },
+        { "kind": "isLegalMove", "fen": "r2qk2r/ppp2ppp/8/1B6/8/8/PPP2PPP/4R1K1 b - - 1 1", "move": "d8e7", "expect": false },
+        { "kind": "isLegalMove", "fen": "r2qk2r/ppp2ppp/8/1B6/8/8/PPP2PPP/4R1K1 b - - 1 1", "move": "e8f8", "expect": true }
+      ]
+    },
+    {
+      "id": "doppelschach-matt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze mit einem Doppelschach matt.",
+      "fen": "r2qkb1r/ppp2ppp/8/8/8/8/PPP1BPPP/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e2b5", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Läufer gibt Schach und macht die e-Linie für den Turm frei."],
+      "explanationDe": "Lb5#: Läufer und Turm geben gleichzeitig Schach. Der König hat kein Feld.",
+      "puzzle": { "rating": 400, "themes": ["doubleCheck", "mateIn1"] }
+    },
+    {
+      "id": "abzug-dame",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Der Läufer d3 verdeckt den Turm d1. Gewinne die Dame.",
+      "fen": "r1bq2k1/ppp2ppp/5n2/8/8/3B4/PPP1QPPP/3R2K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "d3h7",
+          "comment": "Schach – und der Turm greift jetzt die Dame an.",
+          "children": [{ "move": "g8h7", "children": [{ "move": "d1d8", "comment": "Die Dame ist gewonnen.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": false,
+      "claim": { "kind": "best" },
+      "hintsDe": ["Der Läufer muss mit Schach wegziehen, sonst schlägt die Dame den Turm."],
+      "explanationDe": "Lxh7+: Schwarz muss das Schach beantworten. Danach schlägt der Turm die Dame."
+    }
+  ]
+}
