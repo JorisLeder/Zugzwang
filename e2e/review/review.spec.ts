@@ -88,7 +88,9 @@ test.describe('game review of an imported PGN (P0-10, P0-15)', () => {
     expect(['mistake', 'miss', 'blunder']).toContain(cls);
     await expect(board(page).locator(`[data-annotation="c2"] [data-classification="${cls}"]`)).toBeVisible();
     await expect(page.locator(`button[data-ply="${FIXTURE_GAME.blunder.ply}"] [data-classification="${cls}"]`).filter({ visible: true })).toHaveCount(1);
-    await expect(detail.getByTestId('explanation-teaser')).toContainText('Dc2');
+    // Sentence 1 names 14.Dc2 when the engine's reply line shows a consequence ("Nach Dc2 …"), otherwise it is the
+    // missed win ("Hier konnte Weiß den Springer auf f2 schlagen."): which one depends on this run's engine lines.
+    await expect(detail.getByTestId('explanation-teaser')).toContainText(/Dc2|Hier konnte Weiß den Springer auf f2 schlagen/);
 
     // "Nochmal versuchen" – success path with Txf2.
     await detail.getByRole('button', { name: 'Nochmal versuchen' }).click();
