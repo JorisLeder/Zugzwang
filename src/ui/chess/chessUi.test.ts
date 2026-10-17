@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { START_FEN } from '@/core/chess';
 import { ChessGame } from '@/lib/chess';
-import { evalWords, leadingSide, whiteShare } from './evalBar';
-import { movePairs } from './moveList';
+import { evalWords, leadingSide, whiteShare } from './evalBarModel';
+import { movePairs } from './moveListModel';
 import { CHESS_UI_DE } from './strings.de';
 
 describe('whiteShare (PRD win-percentage formula)', () => {

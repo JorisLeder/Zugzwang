@@ -1,7 +1,7 @@
 import type { Score } from '@/core/engine';
 import { formatEval } from '@/i18n/format';
 import { cn } from '@/lib/cn';
-import { evalWords, leadingSide, whiteShare } from './evalBar';
+import { evalWords, leadingSide, whiteShare } from './evalBarModel';
 import { CHESS_UI_DE } from './strings.de';
 
 /** Props of `EvalBar`. */

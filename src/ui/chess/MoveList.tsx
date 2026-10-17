@@ -5,7 +5,7 @@ import { formatSan } from '@/lib/chess';
 import { cn } from '@/lib/cn';
 import { useSettings } from '@/app/services';
 import { ClassificationBadge } from '@/ui/primitives';
-import { movePairs } from './moveList';
+import { movePairs } from './moveListModel';
 import { CHESS_UI_DE } from './strings.de';
 import { scrollIntoContainer, useMediaQuery } from './useMediaQuery';
 
