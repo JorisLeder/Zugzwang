@@ -13,13 +13,14 @@ Schachregeln laufen ausschließlich über [chess.js](https://github.com/jhlywa/c
 FIDE-Regeln geprüft; Analyse und Bots nutzen [Stockfish](https://stockfishchess.org). Die vollständige Produktbeschreibung
 steht in [`docs/PRD.md`](docs/PRD.md).
 
-**Status:** in Entwicklung (V1). Gebaut von einem Agenten-Team (Manager, Coder, Reviewer, Regel-Prüfer, Designer,
-Tester) – Rollen in [`.claude/agents/`](.claude/agents/), Arbeitsstand in [`docs/team/STATUS.md`](docs/team/STATUS.md).
+**Status:** in Entwicklung (V1), gebaut mit Claude-Code-Agenten-Workflows. Bewusst ohne Agenten-Kontextdateien
+(AGENTS.md/CLAUDE.md) und ohne Planungsdokumente im Repository: Die Verträge in `src/core` und die Tests sind die
+Spezifikation. Kommentare wie „DESIGN §4.3“ oder „D-13“ verweisen auf entfernte Planungsdokumente.
 
 ---
 
 Chess learning web app (PWA) in German: rated puzzles, lessons from the rules to tactics, bots with a coach, and game
-analysis with explanations. Product spec: `docs/PRD.md`. Team documents: `docs/team/` (start with `CONVENTIONS.md`).
+analysis with explanations. Product spec: `docs/PRD.md`.
 
 ## Setup
 
@@ -45,14 +46,13 @@ npm run dev       # copies the Stockfish engine to public/engine/ and starts Vit
 | `npm run validate:content` | Runs every validator in `scripts/validate/` (legality + Stockfish checks of all content); `-- --quick` skips engine checks |
 | `npm run openings:build` | Build the opening book (WP-02) |
 | `npm run bench:analysis` | Time the analysis of the 40-move fixture game (WP-02) |
-| `npm run puzzles:import-lichess` | Import the official Lichess puzzle CSV (WP-03) |
-| `npm run bots:calibrate` | Bot calibration report (WP-04) |
+| `npm run puzzles:import-lichess` | Import the official Lichess puzzle CSV (CC0, needs access to database.lichess.org; `-- --help` lists options) |
+| `npm run bots:calibrate` | Bot calibration report (written to `.cache/bot-calibration.md`) |
 | `npm run puzzles:generate` | Generate the puzzle bank with Stockfish (WP-10) |
 | `npm run supabase:seed-content` | SQL seed for static content (WP-11) |
 | `npm run lighthouse` | Lighthouse mobile performance (WP-12) |
 
 Scripts owned by later packages print `not implemented yet (WP-xx)` until they are delivered.
-Parallel-safe variants of the commands (for several coders in one tree) are in `docs/team/CONVENTIONS.md`.
 
 ## Local mode and cloud mode
 
@@ -60,8 +60,8 @@ Parallel-safe variants of the commands (for several coders in one tree) are in `
   clearly ("Lokaler Modus – Fortschritt nur auf diesem Gerät").
 - **Cloud mode**: copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Then
   login is required and progress syncs across devices via Supabase. Setting up the Supabase project (migrations with
-  Row Level Security, edge functions, secrets) is described in `docs/setup/SUPABASE.md` and `docs/setup/SYNC.md`
-  (written by WP-08/WP-11). Only public `VITE_` values belong in the client; the Claude API key lives only in the
+  Row Level Security, edge functions, secrets) will be described in this README
+  once the backend package is done. Only public `VITE_` values belong in the client; the Claude API key lives only in the
   `explain` edge function.
 - `VITE_CLOUD_EVAL=true` optionally uses the Lichess cloud evaluation to speed up analysis; the local engine is
   always the fallback.

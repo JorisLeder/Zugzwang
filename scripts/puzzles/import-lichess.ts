@@ -3,8 +3,8 @@
  *
  * Imports the official Lichess puzzle database (CC0, https://database.lichess.org/#puzzles) into the static puzzle
  * bank format of the app (manifest + chunk JSON, D-25) and writes a CSV for the Supabase seed. Every row is checked
- * with chess.js (via `@/lib/chess`); malformed and illegal rows are skipped and counted. Documentation:
- * `scripts/puzzles/README.md`. Needs a machine with access to database.lichess.org (not reachable from the build box).
+ * with chess.js (via `@/lib/chess`); malformed and illegal rows are skipped and counted. Run with
+ * `--help` for all options (popularity/plays/rating filters, chunk size, --append). Needs a machine with access to database.lichess.org (not reachable from the build box).
  */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

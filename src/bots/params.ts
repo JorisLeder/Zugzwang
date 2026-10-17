@@ -1,6 +1,6 @@
 /**
  * Elo-dependent parameters of the bot models (D-16). Tuned with `npm run bots:calibrate`
- * (`docs/team/bot-calibration.md`); change them only together with a new calibration run.
+ * (`.cache/bot-calibration.md`); change them only together with a new calibration run.
  */
 import type { BotProfile } from '@/core/bots';
 

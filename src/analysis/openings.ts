@@ -1,6 +1,6 @@
 /**
  * Opening book (PRD "Analyse-Pipeline" step 1, D-07 "book"): positions of the Lichess chess-openings data set
- * (CC0-1.0, built by `npm run openings:build`, see `SOURCES.md`). The JSON (~1 MB) is loaded lazily with a dynamic
+ * (CC0-1.0, built by `npm run openings:build`, see `THIRD_PARTY_NOTICES.md`). The JSON (~1 MB) is loaded lazily with a dynamic
  * `import()` on first use, so it stays out of the main bundle and works in Node and the browser alike.
  */
 import type { Fen } from '@/core/chess';

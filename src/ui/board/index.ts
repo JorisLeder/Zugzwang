@@ -1,4 +1,4 @@
-/** `@/ui/board` – the chessboard and its controls (WP-01). API: `src/ui/board/README.md`. */
+/** `@/ui/board` – the chessboard and its controls (WP-01). */
 export { Board, type BoardProps } from './Board';
 export { BoardMenu, type BoardMenuProps } from './BoardMenu';
 export { FlipBoardButton, type FlipBoardButtonProps } from './FlipBoardButton';

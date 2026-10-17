@@ -10,7 +10,7 @@ function boardsBefore(pgn: string): string[] {
   return game.history().map((m) => m.fenBefore);
 }
 
-// The seven games and expected ranges of scalachess DividerTest (commit e3f7eb8, see SOURCES.md).
+// The seven games and expected ranges of scalachess DividerTest (commit e3f7eb8, see THIRD_PARTY_NOTICES.md).
 const GAMES: Array<{ name: string; pgn: string; middle: [number, number]; end: [number, number] | null }> = [
   {
     name: 'game1',

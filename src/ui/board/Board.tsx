@@ -6,7 +6,6 @@
  * `data-fen`; every square `data-square="e4"`; every piece `data-piece="wP"`; promotion buttons
  * `data-testid="promotion-q|r|b|n"`. Extra test hooks: `data-highlights` on the inner square element,
  * `data-arrow`/`data-arrow-source`/`data-arrow-kind` on arrows, `data-annotation`, `data-feedback`, `board-cursor`.
- * API documentation: `src/ui/board/README.md`.
  */
 import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { Chessboard, type ChessboardOptions, type PieceDropHandlerArgs, type SquareHandlerArgs } from 'react-chessboard';

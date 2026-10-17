@@ -194,7 +194,7 @@ export interface ReportMeta {
   notes?: string[];
 }
 
-/** Renders `docs/team/bot-calibration.md`. */
+/** Renders `.cache/bot-calibration.md`. */
 export function renderReport(stats: BotStats[], criteria: CriterionResult[], meta: ReportMeta): string {
   const rows = [...stats]
     .sort((a, b) => a.elo - b.elo)

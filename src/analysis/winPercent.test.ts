@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { expectedPoints, expectedPointsLoss, scoreWinPercent, winningChances, winPercent } from './winPercent';
 
-// Reference values computed independently from the Lichess formula (SOURCES.md):
+// Reference values computed independently from the Lichess formula (THIRD_PARTY_NOTICES.md):
 // W(cp) = 50 + 50 · (2 / (1 + e^(−0.00368208 · cp)) − 1), cp clamped to ±1000.
 describe('winPercent (Lichess)', () => {
   it.each([

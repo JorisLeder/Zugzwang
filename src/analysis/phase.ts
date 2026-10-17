@@ -1,5 +1,5 @@
 /**
- * Game phases per ply – a port of the Lichess "Divider" (scalachess `chess.Divider`, MIT, see `SOURCES.md`).
+ * Game phases per ply – a port of the Lichess "Divider" (scalachess `chess.Divider`, MIT, see `THIRD_PARTY_NOTICES.md`).
  *
  * The divider looks at the positions **before** every move (index i = position after i plies):
  * - middlegame starts at the first position with ≤ 10 minor/major pieces (both sides, kings and pawns excluded), or a

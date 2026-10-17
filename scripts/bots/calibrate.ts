@@ -1,5 +1,5 @@
 /**
- * `npm run bots:calibrate` – measures every bot of the roster and writes `docs/team/bot-calibration.md`
+ * `npm run bots:calibrate` – measures every bot of the roster and writes `.cache/bot-calibration.md`
  * (BACKLOG WP-04 acceptance criteria 2 and 3).
  *
  * Each bot plays one move in every calibration position (`fixtureGames.ts`, ≥ 200 positions) with its production
@@ -13,7 +13,7 @@
  *   --seed N          random seed (default 20261016)
  *   --json FILE       also write the statistics as JSON (for sharded runs)
  *   --merge F1,F2     do not measure – merge JSON files of sharded runs and write the report
- *   --no-report       do not write docs/team/bot-calibration.md
+ *   --no-report       do not write .cache/bot-calibration.md
  * Reference evaluations are cached in `.cache/bots-calibration/` (keyed by FEN and depth).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -28,7 +28,7 @@ import { aggregate, checkCriteria, moveLoss, renderReport, spread, type BotStats
 import { calibrationPositions, CLASSICAL_GAMES, type CalibrationPosition } from './fixtureGames';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const REPORT = join(ROOT, 'docs', 'team', 'bot-calibration.md');
+const REPORT = join(ROOT, '.cache', 'bot-calibration.md');
 const CACHE_DIR = join(ROOT, '.cache', 'bots-calibration');
 
 function arg(name: string): string | undefined {

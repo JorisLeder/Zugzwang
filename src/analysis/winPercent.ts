@@ -1,7 +1,7 @@
 /**
  * Win percentage and expected points (PRD "Analyse-Pipeline" step 3, D-07, D-08).
  *
- * Constants and edge handling follow Lichess (scalachess `chess.eval.WinPercent`, see `SOURCES.md`):
+ * Constants and edge handling follow Lichess (scalachess `chess.eval.WinPercent`, see `THIRD_PARTY_NOTICES.md`):
  * - centipawns are clamped to ±1000 before the logistic conversion (`Cp.CEILING`);
  * - a forced mate counts as ±1000 cp (the side that mates gets the ceiling, the side that is mated the floor);
  * - "mate 0" (the side to move is already checkmated) is a loss for the side to move.

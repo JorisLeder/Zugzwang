@@ -1,6 +1,6 @@
 /**
  * Move and game accuracy (PRD "Analyse-Pipeline" step 3). Formulas re-implemented from the Lichess sources listed in
- * `SOURCES.md` (lila `AccuracyPercent`, scalalib `Maths`); constants are copied exactly.
+ * `THIRD_PARTY_NOTICES.md` (lila `AccuracyPercent`, scalalib `Maths`); constants are copied exactly.
  */
 import type { Color } from '@/core/chess';
 

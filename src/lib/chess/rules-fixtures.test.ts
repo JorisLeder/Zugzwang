@@ -1,5 +1,6 @@
 /**
- * Runs all 65 rules fixtures of docs/team/RULES.md §6.2 (FIDE Laws 2023) against `ChessGame`.
+ * Runs all 65 rules fixtures (FIDE Laws of Chess, in force from 1 Jan 2023, https://handbook.fide.com/chapter/e012023;
+ * article per case in `art`, verified with chess.js 1.4.0) against `ChessGame`.
  * Reasons in the fixtures use the auditor's short names; they map to our `GameEndReason`s below.
  */
 import { describe, expect, it } from 'vitest';
