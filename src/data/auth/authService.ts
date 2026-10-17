@@ -26,11 +26,19 @@ export class AuthError extends Error {
 
 const LOCAL_MODE_MESSAGE = 'Lokaler Modus: Eine Anmeldung ist nicht nötig.';
 
-/** Auth service of local mode. */
-export function createLocalAuthService(userId: () => string): AuthService {
-  const store = createValueStore<AuthSession | null>({ userId: userId(), provider: 'local' });
+/** Local-mode auth service; `setUserId` updates the session once the local profile is known. */
+export interface LocalAuthService extends AuthService {
+  setUserId(userId: string): void;
+}
+
+/** Auth service of local mode: a permanent `local` session, nothing to log in to. */
+export function createLocalAuthService(initialUserId: string): LocalAuthService {
+  const store = createValueStore<AuthSession | null>({ userId: initialUserId, provider: 'local' });
   return {
     mode: 'local',
+    setUserId(userId) {
+      if (store.get()?.userId !== userId) store.set({ userId, provider: 'local' });
+    },
     session: () => store.get(),
     observe: () => store,
     signInWithEmailLink: async () => {
@@ -161,7 +169,8 @@ export function createSupabaseAuthService(opts: SupabaseAuthOptions): CloudAuthS
 
     async signOut() {
       const client = await opts.client();
-      const { error } = await client.auth.signOut();
+      // `local`: ends the session on this device only (other devices stay logged in).
+      const { error } = await client.auth.signOut({ scope: 'local' });
       if (error) console.warn('Auth: sign-out failed on the server', error);
       store.set(null);
     },

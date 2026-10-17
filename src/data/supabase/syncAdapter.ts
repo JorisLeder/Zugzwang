@@ -5,8 +5,8 @@
  * - Append-only tables (+ initial ratings): `upsert(rows, { onConflict, ignoreDuplicates: true })` – rows the server
  *   already has come back as `duplicate` (= success).
  * - Lesson progress and active minutes: RPCs (`upsert_lesson_progress`, `upsert_daily_minutes`) – merged on the server.
- * - Profile: read the server row first and upsert the LWW merge (settings by `settings.updatedAt`) – the
- *   `updated_at` guard; the server trigger applies the same rule for concurrent writers.
+ * - Profile: plain upsert in one request; the server's `updated_at` guard (trigger) keeps the newer values – settings
+ *   by `settings.updatedAt`, the other fields by `updated_at` (same rule as `mergeProfile`).
  * - Other tables: upsert by primary key (rows for the same key in one batch are collapsed first).
  * - Consecutive entries of the same table/op are pushed in one request, in outbox order. A retryable failure
  *   (network, 5xx, 401, 408, 429) stops the push so later rows (e.g. moves of a new game) never overtake earlier ones.
@@ -118,17 +118,7 @@ export function createSupabaseSyncAdapter(opts: SupabaseSyncAdapterOptions): Dat
         byKey.set(k, r);
       }
     }
-    let out = [...byKey.values()];
-    if (table === 'profiles') {
-      const current = await client.from('profiles').select('*').eq('id', uid);
-      const failed = fromResponse(group, current);
-      if (failed) return failed;
-      const server = current.data?.[0];
-      if (server) {
-        out = out.map((r) => toRow.profile(mergeProfile(fromRow.profile(server as unknown as ProfileRow), fromRow.profile(r as unknown as ProfileRow))) as unknown as Row);
-      }
-    }
-    const res = await client.from(table).upsert(out, { onConflict: pk.join(',') });
+    const res = await client.from(table).upsert([...byKey.values()], { onConflict: pk.join(',') });
     return fromResponse(group, res) ?? group.map((e) => ({ id: e.id, ok: true }));
   }
 
@@ -136,22 +126,26 @@ export function createSupabaseSyncAdapter(opts: SupabaseSyncAdapterOptions): Dat
     const uid = opts.userId();
     if (!uid) return [];
     const client = await opts.client();
-    const changes: RemoteChange[] = [];
-    for (const table of tables) {
-      for (let from = 0; ; from += pageSize) {
-        const res = await client
-          .from(table)
-          .select('*')
-          .eq(USER_ID_COLUMN[table], uid)
-          .order(PRIMARY_KEYS[table].at(-1)!, { ascending: true })
-          .range(from, from + pageSize - 1);
-        if (res.error) throw new Error(`Laden von ${table} fehlgeschlagen: ${res.error.message}`);
-        const rows = res.data ?? [];
-        for (const row of rows) changes.push({ table, row, op: 'insert' });
-        if (rows.length < pageSize) break;
-      }
-    }
-    return changes;
+    // Tables in parallel (one round trip for a full pull), pages of one table in order.
+    const perTable = await Promise.all(
+      tables.map(async (table) => {
+        const changes: RemoteChange[] = [];
+        for (let from = 0; ; from += pageSize) {
+          const res = await client
+            .from(table)
+            .select('*')
+            .eq(USER_ID_COLUMN[table], uid)
+            .order(PRIMARY_KEYS[table].at(-1)!, { ascending: true })
+            .range(from, from + pageSize - 1);
+          if (res.error) throw new Error(`Laden von ${table} fehlgeschlagen: ${res.error.message}`);
+          const rows = res.data ?? [];
+          for (const row of rows) changes.push({ table, row, op: 'insert' });
+          if (rows.length < pageSize) break;
+        }
+        return changes;
+      }),
+    );
+    return perTable.flat();
   }
 
   return {

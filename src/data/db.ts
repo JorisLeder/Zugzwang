@@ -19,6 +19,16 @@ export const DB_NAME = 'zugzwang';
 /** Outbox row: the entry plus its auto-increment position (push order). */
 export interface OutboxRow extends OutboxEntry {
   seq?: number;
+  /**
+   * Revision of the payload: a newer write of the same row (upsert tables) replaces the payload of the pending entry
+   * in place and increments `rev`; a push confirms the entry only if `rev` is unchanged.
+   */
+  rev?: number;
+}
+
+/** An outbox entry the backend rejected permanently (kept in `meta` for support and the export). */
+export interface DeadLetter extends OutboxEntry {
+  droppedAt: string;
 }
 
 /** Key/value row of `meta`. */
@@ -37,6 +47,8 @@ export const META = {
   bankVersion: 'bankVersion',
   /** Last successful full pull (cloud mode). */
   lastPullAt: 'lastPullAt',
+  /** Entries the backend rejected permanently (`DeadLetter[]`). */
+  deadLetters: 'deadLetters',
 } as const;
 
 /** Schema version 1 (primary key first, then indexes). */

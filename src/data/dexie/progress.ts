@@ -91,6 +91,9 @@ export function createProgressService(ctx: DataContext): ProgressService & Progr
       const attempt: PuzzleAttempt = { ...rest, id: newId(), createdAt: ctx.nowIso() };
       if (attempt.mode === 'demo') return { attempt, rating: null }; // demo attempts are not stored
       const rating = await db.transaction('rw', [db.puzzleAttempts, db.ratings, db.themeStats, db.dailyActivity, db.profile, db.outbox], async () => {
+        // Strictly increasing timestamps keep the attempt order (rating history, server replay) unambiguous.
+        const last = await db.puzzleAttempts.orderBy('createdAt').last();
+        if (last && last.createdAt >= attempt.createdAt) attempt.createdAt = new Date(Date.parse(last.createdAt) + 1).toISOString();
         let next: RatingRecord | null = null;
         if (isRatedAttempt(attempt.mode)) {
           const before = await ratingOrDefault('puzzle', attempt.createdAt);
@@ -147,16 +150,12 @@ export function createProgressService(ctx: DataContext): ProgressService & Progr
         if (duplicate) throw new Error(`Duplicate seq ${e.seq} for game ${e.gameId}`);
         const created: GameMoveEvent = { ...structuredClone(e), id: newId(), createdAt: ctx.nowIso() };
         await db.gameMoves.add(created);
-        const entries: OutboxEntry[] = [];
         const g = await db.games.get(e.gameId);
-        if (g) {
-          const updated: Game = { ...g, updatedAt: created.createdAt };
-          await db.games.put(updated);
-          // The game row first: `game_moves.game_id` references it.
-          entries.push(outbox.game(updated, ctx.userId(), created.createdAt));
-        }
-        entries.push(outbox.gameMove(created, ctx.userId(), created.createdAt));
-        await enqueue(ctx, ...entries);
+        // Locally the game moves to the top of "newest first"; on the server a trigger on `game_moves` bumps
+        // `games.updated_at`, so a move is one single insert (≤ 1 s to the database, P0-02). The game row itself was
+        // queued by `createGame` before, so it still reaches the server first (`game_moves.game_id` references it).
+        if (g) await db.games.put({ ...g, updatedAt: created.createdAt });
+        await enqueue(ctx, outbox.gameMove(created, ctx.userId(), created.createdAt));
         return created;
       });
       ctx.enqueued();

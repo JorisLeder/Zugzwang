@@ -74,7 +74,7 @@ export interface SbAuth {
   exchangeCodeForSession(code: string): Promise<{ data: { session: SbSession | null }; error: SbError | null }>;
   verifyOtp(args: { token_hash: string; type: 'email' | 'magiclink' | 'signup' }): Promise<{ data: { session: SbSession | null }; error: SbError | null }>;
   setSession(args: { access_token: string; refresh_token: string }): Promise<{ data: { session: SbSession | null }; error: SbError | null }>;
-  signOut(): Promise<{ error: SbError | null }>;
+  signOut(opts?: { scope?: 'global' | 'local' | 'others' }): Promise<{ error: SbError | null }>;
 }
 
 /** The client subset. */

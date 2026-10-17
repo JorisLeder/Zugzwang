@@ -13,7 +13,7 @@ import { liveQuery } from 'dexie';
 import type { OutboxEntry, PushResult, RemoteChange, SyncService, SyncState } from '@/core/storage';
 import type { UserTableName } from '@/core/tables';
 import { createValueStore } from '@/lib/observable';
-import type { OutboxRow, ZugzwangDb } from '../db';
+import type { DeadLetter, OutboxRow, ZugzwangDb } from '../db';
 import { META } from '../db';
 import { DERIVED_TABLES } from './tables';
 
@@ -100,6 +100,8 @@ export interface SyncEngineOptions {
   backoffMaxMs?: number;
   /** Entries per push (default 100). */
   batchSize?: number;
+  /** A permanently rejected entry is dropped (dead letter) after this many attempts (default 5). */
+  maxPermanentAttempts?: number;
   now?: () => Date;
 }
 
@@ -114,7 +116,7 @@ export interface SyncEngine extends SyncService {
   pullAll(): Promise<void>;
   /** Subscribes to realtime changes (returns the unsubscribe function). */
   subscribeRealtime(): () => void;
-  /** Resolves once no flush is running or scheduled by a write (tests). */
+  /** Resolves once no flush (or refresh of server values) is running or scheduled by a write (tests). */
   idle(): Promise<void>;
 }
 
@@ -129,6 +131,7 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
   const baseMs = opts.backoffBaseMs ?? 1000;
   const maxMs = opts.backoffMaxMs ?? 60_000;
   const batchSize = opts.batchSize ?? 100;
+  const maxPermanentAttempts = opts.maxPermanentAttempts ?? 5;
   const now = opts.now ?? (() => new Date());
   const enabled = mode === 'cloud' && adapter.kind !== 'none';
 
@@ -141,6 +144,8 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let retryTimer: ReturnType<typeof setTimeout> | null = null;
   let started = false;
+  let derivedDue = false;
+  let refreshing: Promise<void> | null = null;
   const unsubs: Array<() => void> = [];
 
   const store = createValueStore<SyncState>(compute());
@@ -207,7 +212,7 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
     try {
       await opts.applyRemote(await adapter.pull(DERIVED_TABLES));
     } catch (e) {
-      console.warn('Sync: refreshing server values failed', e);
+      if ((e as { name?: string } | null)?.name !== 'DatabaseClosedError') console.warn('Sync: refreshing server values failed', e);
     }
   }
 
@@ -223,25 +228,36 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
       afterSeq = batch[batch.length - 1]!.seq!;
       let results: PushResult[];
       try {
-        results = await adapter.push(batch.map(({ seq: _seq, ...e }) => e));
+        results = await adapter.push(batch.map(({ seq: _seq, rev: _rev, ...e }) => e));
       } catch (e) {
         results = batch.map((b) => ({ id: b.id, ok: false, retryable: true, error: message(e) }));
       }
       const byId = new Map(results.map((r) => [r.id, r]));
+      const sentRev = new Map(batch.map((b) => [b.id, b.rev ?? 0]));
       const okIds = batch.filter((b) => byId.get(b.id)?.ok).map((b) => b.id);
       const bad = batch.map((b) => byId.get(b.id) ?? { id: b.id, ok: false, retryable: true, error: 'Keine Antwort' }).filter((r) => !r.ok);
-      await db.transaction('rw', db.outbox, async () => {
-        if (okIds.length) await db.outbox.where('id').anyOf(okIds).delete();
+      const dropped: DeadLetter[] = [];
+      await db.transaction('rw', db.outbox, db.meta, async () => {
+        // Confirm only what was sent: a payload replaced meanwhile (newer write of the same row) stays queued.
+        if (okIds.length) await db.outbox.where('id').anyOf(okIds).filter((e) => (e.rev ?? 0) === sentRev.get(e.id)).delete();
         for (const r of bad) {
-          await db.outbox
-            .where('id')
-            .equals(r.id)
-            .modify((e) => {
-              e.attempts += 1;
-              e.lastError = r.error;
-            });
+          const row = await db.outbox.where('id').equals(r.id).first();
+          if (!row || row.seq === undefined) continue;
+          const attempts = row.attempts + 1;
+          if (r.retryable === false && attempts >= maxPermanentAttempts) {
+            const { seq: _seq, rev: _rev, ...entry } = row;
+            dropped.push({ ...entry, attempts, lastError: r.error, droppedAt: now().toISOString() });
+            await db.outbox.delete(row.seq);
+          } else {
+            await db.outbox.update(row.seq, { attempts, lastError: r.error });
+          }
+        }
+        if (dropped.length) {
+          const letters = ((await db.meta.get(META.deadLetters))?.value as DeadLetter[] | undefined) ?? [];
+          await db.meta.put({ key: META.deadLetters, value: [...letters, ...dropped].slice(-200) });
         }
       });
+      if (dropped.length) console.warn(`Sync: ${dropped.length} Eintrag/Einträge vom Server dauerhaft abgelehnt`, dropped.map((d) => d.lastError));
       pushed += okIds.length;
       if (bad.length) failed ??= bad[0];
       await recount();
@@ -258,7 +274,16 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
     lastError = undefined;
     lastSyncedAt = now().toISOString();
     publish();
-    if (pushed > 0) await refreshDerived();
+    if (pushed > 0) derivedDue = true;
+  }
+
+  /** Pulls the server-computed values after a successful push – outside the flush, so new writes never wait for it. */
+  function scheduleDerivedRefresh(): void {
+    if (!derivedDue || refreshing) return;
+    derivedDue = false;
+    refreshing = refreshDerived().finally(() => {
+      refreshing = null;
+    });
   }
 
   const engine: SyncEngine = {
@@ -283,6 +308,7 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
           running = null;
           publish();
         }
+        scheduleDerivedRefresh();
       })();
       return running;
     },
@@ -344,6 +370,7 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
       for (let i = 0; i < 100; i++) {
         if (debounceTimer) await new Promise((r) => setTimeout(r, debounceMs + 5));
         else if (running) await running;
+        else if (refreshing) await refreshing;
         else return;
       }
     },

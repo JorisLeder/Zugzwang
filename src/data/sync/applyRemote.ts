@@ -7,7 +7,8 @@
  *   `mergeGame` (newer wins, finished stays finished, device fields by the newer heartbeat).
  * - Server-computed values (ratings, daily activity, theme stats) replace the provisional local ones – unless local
  *   writes that affect them are still in the outbox; then ratings are kept and counters are merged field-wise (max).
- *   The sync service pulls them again once the outbox is empty.
+ *   The sync service pulls them again once the outbox is empty. A server rating with fewer rated games than the local
+ *   one is an outdated event and ignored.
  */
 import type { RemoteChange } from '@/core/storage';
 import {
@@ -73,6 +74,9 @@ async function applyUpsert(db: ZugzwangDb, table: TableName, row: Row, pending: 
       const r = fromRow.rating(row as unknown as RatingRow, false);
       const affectedBy: TableName = r.kind === 'bot' ? 'games' : 'puzzle_attempts';
       if (pending.has(affectedBy) || pending.has('ratings')) return;
+      // An older server value (late realtime event) never replaces a newer one.
+      const local = await db.ratings.get(r.kind);
+      if (local && r.gamesCount < local.gamesCount) return;
       await db.ratings.put(r);
       return;
     }
