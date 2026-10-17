@@ -3,7 +3,7 @@ import { useServices, useSettings } from '@/app/services';
 import type { ExplanationText } from '@/core/explain';
 import type { Puzzle } from '@/core/puzzles';
 import { formatSan } from '@/lib/chess';
-import { motifTags } from '@/puzzles';
+import { motifTags, PUZZLE_DOMAIN_DE } from '@/puzzles';
 import { CoachBubble, Tag } from '@/ui/primitives';
 import { STRINGS_DE } from '../strings.de';
 
@@ -55,10 +55,12 @@ export function PuzzleExplanation({ puzzle, explanation, feedback = true }: Puzz
           </ul>
         </section>
       )}
-      {explanation && (
+      {explanation ? (
         <CoachBubble name={STRINGS_DE.coachName} feedback={feedback ? { value: vote, onVote } : undefined}>
           <ExplanationSegments explanation={explanation} />
         </CoachBubble>
+      ) : (
+        <p className="text-body-sm text-muted">{PUZZLE_DOMAIN_DE.noExplanation}</p>
       )}
     </div>
   );

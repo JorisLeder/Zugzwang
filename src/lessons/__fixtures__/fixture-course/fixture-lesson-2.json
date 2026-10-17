@@ -1,0 +1,30 @@
+{
+  "id": "fixture-lesson-2",
+  "courseId": "fixture-course",
+  "order": 2,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Grundreihe erkennen",
+  "summaryDe": "Du wendest das Grundreihenmatt in einer neuen Stellung an.",
+  "practiceThemes": ["backRankMate"],
+  "steps": [
+    {
+      "id": "recap",
+      "type": "explanation",
+      "textDe": "Merke: Ein König hinter drei eigenen Bauern hat keine Fluchtfelder. Ein Turm oder eine Dame auf der Grundreihe setzt dann matt.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1"
+    },
+    {
+      "id": "quiz-which-move",
+      "type": "quiz",
+      "questionDe": "Weiß am Zug. Welcher Zug setzt matt?",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1",
+      "options": [
+        { "id": "td8", "textDe": "Td8", "correct": true, "feedbackDe": "Der Turm gibt Schach auf der Grundreihe, und der König kann nicht fliehen." },
+        { "id": "td7", "textDe": "Td7", "correct": false, "feedbackDe": "Das ist kein Schach – Schwarz hat Zeit für einen Gegenzug." },
+        { "id": "kf1", "textDe": "Kf1", "correct": false, "feedbackDe": "Ein Königszug greift den schwarzen König nicht an." }
+      ],
+      "asserts": [{ "kind": "isCheckmate", "fen": "3R2k1/5ppp/8/8/8/8/5PPP/6K1 b - - 1 1", "expect": true }]
+    }
+  ]
+}

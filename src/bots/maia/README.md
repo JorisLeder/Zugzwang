@@ -9,13 +9,14 @@ expected-points loss, Elo-dependent depth and "blindness" to opponent replies, n
 ## How to plug Maia in later
 
 1. **Model:** convert Maia-2 (rapid or blitz) to ONNX (`torch.onnx.export`, opset ≥ 17) and serve it from
-   `public/models/maia2-<variant>.onnx`. Check the model licence (Maia: GPL-3.0) and add it to `THIRD_PARTY_NOTICES.md`.
+   `public/models/maia2-<variant>.onnx`. Check the licence of the code and the weights before shipping (the original Maia repository is GPL-3.0; verify
+   Maia-2's own terms) and add it to `THIRD_PARTY_NOTICES.md`.
 2. **Runtime:** add `onnxruntime-web` (WASM backend, single thread is enough). Load it lazily from
    `MaiaBotEngine.load()` so it never enters the main chunk; keep the session in a Web Worker next to Stockfish.
-3. **Input encoding:** Maia-2 takes the board as 18 × 8 × 8 planes (pieces per colour and type, side to move,
+3. **Input encoding** (from the Maia-2 reference code – verify against the version you convert): the board as 18 × 8 × 8 planes (pieces per colour and type, side to move,
    castling rights, e.p.) mirrored for Black, plus the player's and the opponent's Elo bucket. Build the planes from
    `boardPieces(fen)` / `parseFen(fen)` (`@/lib/chess`) – never from chess.js directly.
-4. **Output decoding:** the policy head gives logits over Maia's 1880-move vocabulary (UCI, mirrored for Black).
+4. **Output decoding:** the policy head gives logits over Maia-2's fixed move vocabulary (about 1 900 UCI moves mirrored for Black; take the exact list from the reference code).
    Mask illegal moves with `ChessGame.fromFen(fen).legalMoves()`, apply softmax, sample with a temperature ≈ 1
    (or take the arg-max for "typical" play).
 5. **Wiring:** in `createBotEngine` wrap the Stockfish engine: `new MaiaBotEngine(stockfish)`; route bots with

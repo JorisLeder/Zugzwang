@@ -1,0 +1,23 @@
+[Event "Turnier"]
+[Round "1"]
+[White "A"]
+[Black "B"]
+[Result "1-0"]
+
+1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0
+
+[Event "Turnier"]
+[Round "2"]
+[White "B"]
+[Black "A"]
+[Result "0-1"]
+
+1. f3 e5 2. g4 Qh4# 0-1
+
+[Event "Turnier"]
+[Round "3"]
+[White "A"]
+[Black "C"]
+[Result "1/2-1/2"]
+
+1. d4 d5 2. c4 e6 1/2-1/2

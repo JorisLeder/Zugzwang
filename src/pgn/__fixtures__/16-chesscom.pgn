@@ -1,0 +1,17 @@
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2026.10.02"]
+[Round "-"]
+[White "SpielerA"]
+[Black "SpielerB"]
+[Result "1-0"]
+[ECO "D37"]
+[WhiteElo "800"]
+[BlackElo "790"]
+[TimeControl "600"]
+[Termination "SpielerA won by resignation"]
+[StartTime "18:00:00"]
+[EndDate "2026.10.02"]
+[Link "https://www.chess.com/game/live/123"]
+
+1. d4 {[%clk 0:09:58]} 1... d5 {[%clk 0:09:57]} 2. c4 {[%clk 0:09:55]} 2... e6 {[%clk 0:09:54]} 3. Nc3 Nf6 4. Bg5 Be7 5. e3 O-O 6. Nf3 Nbd7 7. Rc1 c6 8. Bd3 dxc4 9. Bxc4 Nd5 1-0

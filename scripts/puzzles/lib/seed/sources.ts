@@ -91,7 +91,7 @@ export const SEED_SOURCES: SeedPuzzleSource[] = [
     line: ['b6', 'Ba6#'],
     rating: 600,
     themes: ['mateIn1', 'bodenMate', 'mate', 'oneMove', 'middlegame'],
-    explanation: 'Der Bauernzug hat das Feld b7 geöffnet. [[Ba6#]] setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – ein Bodens Matt.',
+    explanation: 'Der Bauernzug hat das Feld b7 geöffnet. [[Ba6#]] setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – das ist Bodens Matt.',
   },
   {
     id: 'seed-0010',

@@ -1,0 +1,7 @@
+% Diese Zeile ist eine Escape-Zeile und wird ignoriert.
+[Event "Escape-Zeilen"]
+[Result "*"]
+% Noch eine Escape-Zeile zwischen den Tags.
+
+; Ein Zeilenkommentar vor den Zügen
+1. c4 e5 2. Nc3 Nf6 3. Nf3 Nc6 4. g3 d5 5. cxd5 Nxd5 *

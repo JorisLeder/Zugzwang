@@ -1,0 +1,15 @@
+{
+  "courses": [
+    {
+      "id": "fixture-course",
+      "stage": 1,
+      "order": 0,
+      "version": 1,
+      "titleDe": "Testkurs: Grundreihe",
+      "descriptionDe": "Ein kurzer Beispielkurs mit allen fünf Schritttypen (nur in Testläufen sichtbar).",
+      "status": "available",
+      "lessonIds": ["fixture-lesson", "fixture-lesson-2"],
+      "testLessonId": "fixture-test"
+    }
+  ]
+}

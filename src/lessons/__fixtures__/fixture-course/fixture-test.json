@@ -1,0 +1,46 @@
+{
+  "id": "fixture-test",
+  "courseId": "fixture-course",
+  "order": 3,
+  "version": 1,
+  "kind": "course_test",
+  "titleDe": "Kurstest: Grundreihe",
+  "summaryDe": "Drei Aufgaben zum Grundreihenmatt. Zum Bestehen brauchst du 80 %.",
+  "practiceThemes": ["backRankMate"],
+  "passThreshold": 0.8,
+  "steps": [
+    {
+      "id": "test-definition",
+      "type": "quiz",
+      "questionDe": "Was ist ein Grundreihenmatt?",
+      "options": [
+        { "id": "right", "textDe": "Ein Matt auf der Grundreihe, weil eigene Bauern dem König die Flucht versperren.", "correct": true, "feedbackDe": "Genau – die eigenen Bauern werden zur Falle." },
+        { "id": "stalemate", "textDe": "Ein Patt am Brettrand.", "correct": false, "feedbackDe": "Bei einem Patt steht der König nicht im Schach." },
+        { "id": "king", "textDe": "Ein Matt nur mit dem König.", "correct": false, "feedbackDe": "Ein König allein kann nie Schach geben." }
+      ]
+    },
+    {
+      "id": "test-find-mate",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt in einem Zug.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1",
+      "solution": [{ "move": "d1d8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Schau dir die achte Reihe an."],
+      "explanationDe": "Td8 ist Matt: Der König kann weder nach f8 noch nach h8, und die Bauern versperren die anderen Felder."
+    },
+    {
+      "id": "test-recognise",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug. Was liegt hier vor?",
+      "fen": "3R2k1/5ppp/8/8/8/8/5PPP/6K1 b - - 1 1",
+      "options": [
+        { "id": "mate", "textDe": "Schachmatt", "correct": true, "feedbackDe": "Der König steht im Schach und hat kein freies Feld." },
+        { "id": "stalemate", "textDe": "Patt", "correct": false, "feedbackDe": "Der König steht im Schach – das ist kein Patt." },
+        { "id": "check", "textDe": "Nur Schach – der König kann fliehen", "correct": false, "feedbackDe": "Alle Fluchtfelder sind versperrt oder angegriffen." }
+      ],
+      "asserts": [{ "kind": "isCheckmate", "fen": "3R2k1/5ppp/8/8/8/8/5PPP/6K1 b - - 1 1", "expect": true }]
+    }
+  ]
+}

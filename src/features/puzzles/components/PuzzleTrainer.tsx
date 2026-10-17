@@ -179,7 +179,9 @@ export function PuzzleTrainer({
 
   const panel = (
     <div className="flex flex-col gap-4" data-testid="puzzle-panel" data-phase={state.phase} data-puzzle-id={puzzle.id}>
-      {headerMeta && <div className="flex flex-wrap items-center gap-2 lg:hidden">{headerMeta}</div>}
+      {/* Phones and tablets have no panel header: name the mode (and the motif in Themen-Training) here. */}
+      <p className="text-caption text-muted lg:hidden">{modeTitle}</p>
+      {headerMeta && <div className="flex flex-wrap items-center gap-2">{headerMeta}</div>}
       {notice && <p className="text-body-sm text-muted">{notice}</p>}
       <div className="flex flex-col gap-2">
         <p role="status" aria-live="polite" data-testid="puzzle-status" className="text-body-lg font-semibold text-text">
@@ -270,7 +272,6 @@ export function PuzzleTrainer({
               </p>
               {menu}
             </div>
-            {headerMeta && <div className="flex flex-wrap items-center gap-2">{headerMeta}</div>}
           </div>
         }
         board={

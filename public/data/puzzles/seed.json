@@ -350,7 +350,7 @@
   "openingTags": [],
   "source": "seed",
   "explanation": {
-   "plain": "Der Bauernzug hat das Feld b7 geöffnet. La6# setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – ein Bodens Matt.",
+   "plain": "Der Bauernzug hat das Feld b7 geöffnet. La6# setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – das ist Bodens Matt.",
    "segments": [
     {
      "type": "text",
@@ -362,7 +362,7 @@
     },
     {
      "type": "text",
-     "text": " setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – ein Bodens Matt."
+     "text": " setzt matt: Dein Läufer auf f4 nimmt dem König die Felder b8 und c7 – das ist Bodens Matt."
     }
    ],
    "source": "rule",

@@ -1,0 +1,6 @@
+[Event "Umwandlungen"]
+[Result "*"]
+[SetUp "1"]
+[FEN "4k3/P6P/8/8/8/8/p6p/4K3 w - - 0 1"]
+
+1. a8=Q+ Kd7 2. h8N a1=R+ 3. Kd2 h1=B 4. Qb7+ Bxb7 *

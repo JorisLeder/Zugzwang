@@ -1,0 +1,87 @@
+{
+  "id": "fixture-lesson",
+  "courseId": "fixture-course",
+  "order": 1,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Das Grundreihenmatt",
+  "summaryDe": "Du lernst, warum ein König auf der Grundreihe in Gefahr ist.",
+  "practiceThemes": ["backRankMate", "mateIn1"],
+  "sources": ["FIDE-Schachregeln 2023, Art. 5.1.1 (Schachmatt)", "FIDE-Schachregeln 2023, Art. 5.2.1 (Patt)"],
+  "steps": [
+    {
+      "id": "intro",
+      "type": "explanation",
+      "textDe": "Der schwarze König steht hinter seinen eigenen Bauern. Die Bauern schützen ihn, nehmen ihm aber auch die Fluchtfelder.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "d1", "to": "d8", "kind": "hint" }],
+      "marks": [{ "square": "g8", "kind": "danger" }]
+    },
+    {
+      "id": "demo",
+      "type": "demo",
+      "introDe": "Schau zu, was passiert, wenn Schwarz nicht aufpasst.",
+      "startFen": "6k1/p4ppp/8/8/8/8/5PPP/3R2K1 b - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "a7a5", "commentDe": "Schwarz zieht den a-Bauern und übersieht die Gefahr auf der Grundreihe." },
+        {
+          "uci": "d1d8",
+          "commentDe": "Td8 – Matt! Die eigenen Bauern versperren dem König die Flucht.",
+          "arrows": [{ "from": "d1", "to": "d8", "kind": "played" }]
+        }
+      ]
+    },
+    {
+      "id": "find-mate-in-two",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt in zwei Zügen.",
+      "fen": "7k/8/5K2/8/8/8/8/R7 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "f6g6",
+          "comment": "Der König sperrt die Felder g7 und h7.",
+          "children": [{ "move": "h8g8", "children": [{ "move": "a1a8", "comment": "Ta8 – Matt auf der Grundreihe.", "children": [] }] }]
+        },
+        {
+          "move": "f6f7",
+          "comment": "Auch so geht es: Der König sperrt g7 und g8.",
+          "children": [{ "move": "h8h7", "children": [{ "move": "a1h1", "comment": "Th1 – Matt am Rand.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 2 },
+      "hintsDe": ["Ein sofortiges Schach hilft hier nicht – der König entkommt nach h7.", "Bring zuerst deinen König näher heran."],
+      "explanationDe": "Erst nimmt dein König dem schwarzen König die Fluchtfelder, dann setzt der Turm auf der Grundreihe matt."
+    },
+    {
+      "id": "quiz-stalemate",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug. Was liegt hier vor?",
+      "fen": "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",
+      "options": [
+        { "id": "mate", "textDe": "Schachmatt", "correct": false, "feedbackDe": "Der schwarze König steht nicht im Schach." },
+        { "id": "stalemate", "textDe": "Patt – die Partie ist remis", "correct": true, "feedbackDe": "Schwarz hat keinen regelgemäßen Zug und steht nicht im Schach." },
+        { "id": "check", "textDe": "Schach", "correct": false, "feedbackDe": "Keine weiße Figur greift den König an." }
+      ],
+      "asserts": [
+        { "kind": "isStalemate", "fen": "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1", "expect": true },
+        { "kind": "isCheckmate", "fen": "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1", "expect": false }
+      ]
+    },
+    {
+      "id": "play-out",
+      "type": "play_out",
+      "promptDe": "Setze mit König und Turm matt. Du hast drei Züge.",
+      "fen": "k7/8/2K5/8/8/8/8/7R w - - 0 1",
+      "userColor": "w",
+      "goal": "checkmate",
+      "maxMoves": 3,
+      "botElo": "max",
+      "successDe": "Geschafft – Matt mit König und Turm!",
+      "failDe": "Noch kein Matt. Nimm dem König zuerst mit deinem König die Felder und versuch es nochmal."
+    }
+  ]
+}

@@ -2,9 +2,10 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ServicesProvider, useSettingsStore } from '@/app/services';
+import type { AppServices } from '@/core/services';
 import { DEFAULT_SETTINGS, type SelfAssessment } from '@/core/profile';
 import type { Puzzle } from '@/core/puzzles';
-import { createFakeAppServices, createMemoryDataServices, FIXTURE_PUZZLES, seededRandom, type MemoryDataServices } from '@/core/testing';
+import { createFakeAppServices, createMemoryDataServices, FakeExplanationService, FIXTURE_PUZZLES, seededRandom, type MemoryDataServices } from '@/core/testing';
 import { ChessGame } from '@/lib/chess';
 import { DEMO_PUZZLES, puzzleStartFen } from '@/puzzles';
 import { Component as DemoPage } from './pages/DemoPuzzlesPage';
@@ -27,13 +28,16 @@ interface SetupOptions {
   assessment?: SelfAssessment;
   /** Mark the bank as loaded (the fetch of the manifest fails in jsdom → the stored bank is used). */
   bankLoaded?: boolean;
+  explain?: AppServices['explain'];
+  /** Reuse a data layer (remount = "after reload" on the wave-1 memory data layer, D-50). */
+  data?: MemoryDataServices;
 }
 
-async function setup(url: string, { puzzles = FIXTURE_PUZZLES, assessment, bankLoaded = true }: SetupOptions = {}) {
-  const data = createMemoryDataServices({ puzzles, random: seededRandom(5), timeZone: 'Europe/Berlin' });
+async function setup(url: string, { puzzles = FIXTURE_PUZZLES, assessment, bankLoaded = true, explain, data: shared }: SetupOptions = {}) {
+  const data = shared ?? createMemoryDataServices({ puzzles, random: seededRandom(5), timeZone: 'Europe/Berlin' });
   if (bankLoaded) await data.repos.puzzles.setBankVersion('test');
   if (assessment) await data.progress.initializeFromSelfAssessment(assessment);
-  const services = createFakeAppServices({ data });
+  const services = createFakeAppServices({ data, ...(explain ? { explain } : {}) });
   const router = createMemoryRouter(
     [
       { path: '/puzzles', element: <HubPage /> },
@@ -46,12 +50,12 @@ async function setup(url: string, { puzzles = FIXTURE_PUZZLES, assessment, bankL
     ],
     { initialEntries: [url] },
   );
-  render(
+  const view = render(
     <ServicesProvider services={services}>
       <RouterProvider router={router} />
     </ServicesProvider>,
   );
-  return { data: data as MemoryDataServices, router };
+  return { data: data as MemoryDataServices, router, unmount: view.unmount };
 }
 
 function square(sq: string): HTMLElement {
@@ -206,6 +210,25 @@ describe('Bewertete Puzzles', () => {
   });
 });
 
+describe('Bewertete Puzzles after a reload (remount on the same data layer, D-50)', () => {
+  it('keeps the rating and never serves the rated puzzle again', async () => {
+    const a = fixture('fixture-hanging-queen');
+    const b = fixture('fixture-scholars-mate');
+    const first = await setup('/puzzles/rated', { puzzles: [a, b], assessment: 'newcomer' });
+    await waitFor(() => expect(screen.getByTestId('puzzle-panel')).toHaveAttribute('data-phase', 'user'), WAIT);
+    const solvedId = screen.getByTestId('puzzle-panel').getAttribute('data-puzzle-id')!;
+    await solve(solvedId === a.id ? a : b);
+    await screen.findByTestId('rating-result');
+    const rating = Math.round((await first.data.repos.ratings.get('puzzle'))!.rating);
+    expect(rating).toBeGreaterThan(400);
+    first.unmount();
+    await setup('/puzzles/rated', { data: first.data });
+    await waitFor(() => expect(screen.getByTestId('puzzle-panel')).toHaveAttribute('data-phase', 'user'), WAIT);
+    expect(screen.getByTestId('puzzle-panel').getAttribute('data-puzzle-id')).toBe(solvedId === a.id ? b.id : a.id);
+    expect(screen.getByTestId('rating-chip')).toHaveTextContent(`Dein Rating ${rating}`);
+  });
+});
+
 describe('Lernmodus', () => {
   it('accepts any checkmating move and then shows motif tags and the explanation (AC 2, 7)', async () => {
     const p = fixture('fixture-two-mates');
@@ -251,6 +274,28 @@ describe('Lernmodus', () => {
     expect(boardFen()).toBe(ChessGame.fromMoves(p.fen, p.moves.slice(0, 2)).fen());
     await waitFor(async () => expect(await data.repos.puzzleAttempts.list()).toHaveLength(1));
     expect((await data.repos.puzzleAttempts.list())[0]).toMatchObject({ mode: 'learning', solved: false, solutionShown: true, hintsUsed: 3 });
+  });
+
+  it('uses the rule-based explanation for puzzles without a stored one (Lichess) and never shows an empty panel', async () => {
+    const lichess: Puzzle = { ...fixture('fixture-knight-fork'), id: 'lichess-1', source: 'lichess', explanation: undefined };
+    await setup('/puzzles/learn?puzzle=lichess-1', { puzzles: [lichess] });
+    await solve(lichess);
+    // FakeExplanationService.explainRuleBased renders the best move of the puzzle facts.
+    expect(screen.getByTestId('puzzle-explanation')).toHaveTextContent('Besser: Se7+.');
+    expect(within(screen.getByTestId('puzzle-explanation')).getByText('Gabel')).toBeInTheDocument();
+  });
+
+  it('shows a short note when no explanation can be produced', async () => {
+    const lichess: Puzzle = { ...fixture('fixture-hanging-queen'), id: 'lichess-2', source: 'lichess', explanation: undefined };
+    const broken = new FakeExplanationService();
+    broken.explainRuleBased = () => {
+      throw new Error('no template');
+    };
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await setup('/puzzles/learn?puzzle=lichess-2', { puzzles: [lichess], explain: broken });
+    await solve(lichess);
+    expect(screen.getByTestId('puzzle-explanation')).toHaveTextContent('Für dieses Puzzle gibt es noch keine Erklärung.');
+    warn.mockRestore();
   });
 
   it('keyboard: H gives a hint, F flips the board', async () => {

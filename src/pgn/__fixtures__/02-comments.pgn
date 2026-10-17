@@ -1,0 +1,11 @@
+[Event "Kommentare"]
+[White "Anna"]
+[Black "Ben"]
+[Result "0-1"]
+{ Ein Kommentar vor dem ersten Zug }
+1. e4 { Der beliebteste Zug,
+laut Statistik } e5 ; ein Zeilenkommentar bis zum Ende
+2. Nf3 {[%clk 0:05:00]} Nc6 3. Bc4 { mehrzeilig
+über
+drei Zeilen } Bc5 4. c3 Nf6 5. d4 exd4 6. cxd4 Bb4+ 7. Bd2 Bxd2+ 8. Nbxd2 d5
+{ Schwarz öffnet das Zentrum. } 9. exd5 Nxd5 10. Qb3 Nce7 11. O-O O-O 12. Rfe1 c6 0-1

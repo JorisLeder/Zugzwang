@@ -114,7 +114,7 @@ async function measure(bots: BotProfile[], positions: CalibrationPosition[], ref
   return { stats, positions: positions.length, refDepth, seed, durationSec: (Date.now() - t0) / 1000 };
 }
 
-function writeReport(result: ShardResult): void {
+function writeReport(result: ShardResult, shards = 1): void {
   const criteria = checkCriteria(result.stats);
   const ordered = [...result.stats].sort((a, b) => a.elo - b.elo);
   const report = renderReport(ordered, criteria, {
@@ -128,8 +128,9 @@ function writeReport(result: ShardResult): void {
     parameters: BOT_ROSTER.filter((b) => ordered.some((s) => s.id === b.id)).map(describeParams),
     notes: [
       'Targets are the BACKLOG values (criterion 2: best-move share 25–75 % and (inaccuracies + mistakes) ≥ 2 × blunders for the 800–2000 bots; criterion 3: compute ≤ 1 s, think time 1–8 s); none was changed.',
-      'The calibration positions come from master games and a fixture game, so many positions are sharp: absolute loss values are higher than in typical beginner games; the ordering between bots is what the model guarantees.',
+      'The calibration positions come from master games and a fixture game, so many positions are sharp: absolute loss values are higher than in typical beginner games; check 2a compares the bots with each other, no check uses an absolute loss value.',
       'Measured on a shared 4-core machine while other packages ran; the movetime caps keep compute ≤ 1 s, but under load the searches are shallower, which slightly raises the losses of the stronger bots.',
+      ...(shards > 1 ? [`Measured in ${shards} parallel shards (\`--json\` + \`--merge\`, same positions and seed); the run time is that of the longest shard.`] : []),
     ],
   });
   writeFileSync(REPORT, report);
@@ -148,7 +149,7 @@ async function main(): Promise<void> {
       seed: parts[0]!.seed,
       durationSec: Math.max(...parts.map((p) => p.durationSec)),
     };
-    writeReport(result);
+    writeReport(result, parts.length);
     return;
   }
   const ids = arg('--bots')?.split(',');

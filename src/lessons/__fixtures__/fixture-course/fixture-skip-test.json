@@ -1,0 +1,38 @@
+{
+  "id": "fixture-skip-test",
+  "courseId": "fixture-course",
+  "order": 0,
+  "version": 1,
+  "kind": "skip_test",
+  "titleDe": "Einstufungstest: Regeln",
+  "summaryDe": "Zwei kurze Fragen zu den Regeln. Bestehst du, startest du direkt in Stufe 1.",
+  "practiceThemes": [],
+  "sources": ["FIDE-Schachregeln 2023, Art. 3.7.5.1 (Umwandlung)", "FIDE-Schachregeln 2023, Art. 5.1.1 (Schachmatt)"],
+  "steps": [
+    {
+      "id": "skip-mate",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug. Was liegt hier vor?",
+      "fen": "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1",
+      "options": [
+        { "id": "mate", "textDe": "Schachmatt", "correct": true, "feedbackDe": "Die Dame gibt Schach, ist vom König gedeckt, und der schwarze König hat kein Feld." },
+        { "id": "stalemate", "textDe": "Patt", "correct": false, "feedbackDe": "Der König steht im Schach – das ist kein Patt." },
+        { "id": "capture", "textDe": "Schwarz schlägt die Dame", "correct": false, "feedbackDe": "Die Dame ist vom weißen König gedeckt, der König darf sie nicht schlagen." }
+      ],
+      "asserts": [
+        { "kind": "isCheckmate", "fen": "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1", "expect": true },
+        { "kind": "isLegalMove", "fen": "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1", "move": "h8g7", "expect": false }
+      ]
+    },
+    {
+      "id": "skip-promotion",
+      "type": "quiz",
+      "questionDe": "Ein Bauer erreicht die letzte Reihe. Was passiert?",
+      "options": [
+        { "id": "choice", "textDe": "Er wird in eine Dame, einen Turm, einen Läufer oder einen Springer der eigenen Farbe umgewandelt.", "correct": true, "feedbackDe": "Richtig – du wählst die neue Figur selbst, meist die Dame." },
+        { "id": "queen", "textDe": "Er wird immer zur Dame.", "correct": false, "feedbackDe": "Du darfst auch Turm, Läufer oder Springer wählen." },
+        { "id": "stays", "textDe": "Er bleibt ein Bauer.", "correct": false, "feedbackDe": "Die Umwandlung ist Pflicht – der Bauer wird ersetzt." }
+      ]
+    }
+  ]
+}

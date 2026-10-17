@@ -30,13 +30,20 @@ export interface BankChunk {
   puzzles: Puzzle[];
 }
 
+/** Builds the manifest from chunk entries with known hashes; the version is derived from all hashes. */
+export function manifestFromHashes(prefix: string, chunks: ReadonlyArray<PuzzleBankManifest['chunks'][number]>): PuzzleBankManifest {
+  return {
+    version: `${prefix}-${sha256Hex(chunks.map((c) => c.sha256).join(':')).slice(0, 12)}`,
+    chunks: chunks.map((c) => ({ file: c.file, count: c.count, source: c.source, sha256: c.sha256 })),
+  };
+}
+
 /** Builds the manifest for serialised chunks; `prefix` starts the version string (e.g. `seed`, `lichess`). */
 export function buildManifest(prefix: string, chunks: Array<{ file: string; source: Puzzle['source']; count: number; text: string }>): PuzzleBankManifest {
-  const hashes = chunks.map((c) => sha256Hex(c.text));
-  return {
-    version: `${prefix}-${sha256Hex(hashes.join(':')).slice(0, 12)}`,
-    chunks: chunks.map((c, i) => ({ file: c.file, count: c.count, source: c.source, sha256: hashes[i]! })),
-  };
+  return manifestFromHashes(
+    prefix,
+    chunks.map((c) => ({ file: c.file, count: c.count, source: c.source, sha256: sha256Hex(c.text) })),
+  );
 }
 
 /** Writes the chunks and the manifest to `dir` (created if needed). Returns the manifest. */
