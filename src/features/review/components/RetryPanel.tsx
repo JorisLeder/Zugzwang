@@ -16,13 +16,16 @@ export interface RetryPanelProps {
   onHint: () => void;
   onReveal: () => void;
   onBack: () => void;
+  /** Thumbs up/down of the explanation shown after the retry. */
+  vote: 1 | -1 | null;
+  onVote: (vote: 1 | -1) => void;
 }
 
 /**
  * Panel of "Nochmal versuchen" (DESIGN §8.1/§8.2): task, hints on request (piece, then target square), feedback per
  * attempt, the remaining tries and – after success or the reveal – the better move with the explanation.
  */
-export function RetryPanel({ state, analysed, notation, onHint, onReveal, onBack }: RetryPanelProps) {
+export function RetryPanel({ state, analysed, notation, onHint, onReveal, onBack, vote, onVote }: RetryPanelProps) {
   const side = state.mover === 'w' ? STRINGS_DE.white : STRINGS_DE.black;
   const done = state.phase === 'success' || state.phase === 'revealed';
   const explanation = analysed.explanation ?? (analysed.facts ? explainRuleBased(analysed.facts) : null);
@@ -48,7 +51,7 @@ export function RetryPanel({ state, analysed, notation, onHint, onReveal, onBack
   if (!done && state.hint >= 2) hints.push(STRINGS_DE.retryHintTarget(capitalize(piecePronoun(state.hintPiece, 'nom')), state.hintTo));
 
   return (
-    <section data-testid="retry-panel" data-phase={state.phase} className="flex flex-col gap-3" aria-live="polite">
+    <section data-testid="retry-panel" data-phase={state.phase} data-played={state.playedMove} className="flex flex-col gap-3" aria-live="polite">
       <h2 className="text-h3 text-text">{STRINGS_DE.retry}</h2>
       {!done && (
         <CoachBubble
@@ -81,7 +84,7 @@ export function RetryPanel({ state, analysed, notation, onHint, onReveal, onBack
         </CoachBubble>
       )}
       {done && (
-        <CoachBubble tone={state.phase === 'success' ? 'praise' : 'neutral'}>
+        <CoachBubble tone={state.phase === 'success' ? 'praise' : 'neutral'} feedback={explanation ? { value: vote, onVote } : undefined}>
           <span className="flex flex-col gap-2">
             <span role="status" data-testid="retry-result" className="font-semibold">
               {state.phase === 'success' ? (state.alternative ? STRINGS_DE.retryAlternative : STRINGS_DE.retryCorrect) : STRINGS_DE.retryRevealed}{' '}

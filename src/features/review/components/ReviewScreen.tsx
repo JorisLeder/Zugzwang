@@ -102,9 +102,9 @@ export function ReviewScreen({ controller, state, duplicate = false }: ReviewScr
         return;
       }
       if (retrying || shortcutsOpen || e.shiftKey) return;
-      const target = e.target as HTMLElement | null;
+      const target = e.target instanceof Element ? e.target : null;
       if (e.key === 'Enter') {
-        if (target && target !== document.body && target.closest('button, a, summary, input, textarea, select, [role="slider"]')) return;
+        if (target && target.closest('button, a, summary, input, textarea, select, [role="slider"]')) return;
         if (analysed && canRetry(analysed) && !revealed.has(ply)) {
           e.preventDefault();
           startRetry();
@@ -211,7 +211,12 @@ export function ReviewScreen({ controller, state, duplicate = false }: ReviewScr
       {maxPly === 0 && <p className="text-body text-muted">{STRINGS_DE.noMoves}</p>}
       {statusArea}
       {retry.state && analysed ? (
-        <RetryPanel state={retry.state} analysed={analysed} notation={notation} onHint={retry.hint} onReveal={retry.reveal} onBack={retry.stop} />
+        <RetryPanel state={retry.state} analysed={analysed} notation={notation} onHint={retry.hint}
+          onReveal={retry.reveal}
+          onBack={retry.stop}
+          vote={votes[ply] ?? null}
+          onVote={vote}
+        />
       ) : (
         <MoveDetail
           ply={ply}
@@ -255,8 +260,8 @@ export function ReviewScreen({ controller, state, duplicate = false }: ReviewScr
   const canRetryHere = !retrying && analysed !== undefined && canRetry(analysed) && !revealed.has(ply);
   const actions = (
     <>
-      <IconButton label={STRINGS_DE.prevMove} icon={<ChevronLeft />} disabled={retrying || ply <= 0} onClick={() => goTo(ply - 1)} />
-      <IconButton label={STRINGS_DE.nextMove} icon={<ChevronRight />} disabled={retrying || ply >= maxPly} onClick={() => goTo(ply + 1)} />
+      <IconButton label={STRINGS_DE.prevMove} icon={<ChevronLeft />} className="lg:hidden" disabled={retrying || ply <= 0} onClick={() => goTo(ply - 1)} />
+      <IconButton label={STRINGS_DE.nextMove} icon={<ChevronRight />} className="lg:hidden" disabled={retrying || ply >= maxPly} onClick={() => goTo(ply + 1)} />
       {canRetryHere ? (
         <Button className="min-w-0 flex-1 lg:flex-none" icon={<RotateCcw />} onClick={startRetry}>
           {STRINGS_DE.retry}

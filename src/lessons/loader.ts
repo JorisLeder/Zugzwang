@@ -142,6 +142,11 @@ export function parseCatalog(raw: unknown, file = `${CONTENT_ROOT}/catalog.json`
   return { courses: sortCourses(unique), errors };
 }
 
+/** A fresh copy of the catalog data (callers may keep and compare it by identity). */
+function copyCatalog(data: LessonCatalogData): LessonCatalogData {
+  return { courses: [...data.courses], errors: [...data.errors] };
+}
+
 /** Creates a loader over the given sources. Results are cached; failed imports are retried on the next call. */
 export function createLessonLoader(sources: LessonSources): LessonLoader {
   const lessonCache = new Map<string, Promise<LessonLoadResult>>();
@@ -159,9 +164,25 @@ export function createLessonLoader(sources: LessonSources): LessonLoader {
     return fixturePromise;
   }
 
-  async function loadCatalog(opts: LoadOptions): Promise<LessonCatalogData> {
+  const catalogCache = new Map<string, Promise<LessonCatalogData>>();
+
+  /** Cached per `e2e` flag; a failed import is not cached (the next call tries again). */
+  function loadCatalog(opts: LoadOptions): Promise<LessonCatalogData> {
+    const key = opts.e2e ? 'e2e' : 'app';
+    const cached = catalogCache.get(key);
+    if (cached) return cached.then(copyCatalog);
+    const promise = buildCatalog(opts).then(({ data, cacheable }) => {
+      if (!cacheable) catalogCache.delete(key);
+      return data;
+    });
+    catalogCache.set(key, promise);
+    return promise.then(copyCatalog);
+  }
+
+  async function buildCatalog(opts: LoadOptions): Promise<{ data: LessonCatalogData; cacheable: boolean }> {
     const file = `${CONTENT_ROOT}/catalog.json`;
     let data: LessonCatalogData;
+    let cacheable = true;
     if (!sources.catalog) {
       data = { courses: [], errors: [{ file, messageDe: E.catalogMissing }] };
     } else {
@@ -170,11 +191,13 @@ export function createLessonLoader(sources: LessonSources): LessonLoader {
       } catch (err) {
         console.warn('Lesson catalog could not be imported', err);
         data = { courses: [], errors: [{ file, messageDe: E.importFailed }] };
+        cacheable = false;
       }
     }
     for (const stray of sources.strayFiles ?? []) data.errors.push({ file: stray, messageDe: E.unknownFile });
     if (opts.e2e) {
       const fx = await fixtures();
+      if (!fx) cacheable = false;
       if (fx) {
         const parsed = parseCatalog({ courses: fx.courses }, 'src/lessons/__fixtures__');
         const ids = new Set(data.courses.map((c) => c.id));
@@ -185,7 +208,7 @@ export function createLessonLoader(sources: LessonSources): LessonLoader {
       }
     }
     if (data.errors.length > 0) console.warn('Lesson content problems', data.errors);
-    return data;
+    return { data, cacheable };
   }
 
   async function importLesson(courseId: string, lessonId: string, opts: LoadOptions): Promise<LessonLoadResult> {

@@ -1,0 +1,30 @@
+/** `@/data/progress` – pure progress rules (ratings, theme stats, lesson merge, LWW, daily activity, streak). */
+export {
+  addToDay,
+  computeStreak,
+  dayKeyOf,
+  emptyDay,
+  isTrainingDay,
+  maxDay,
+  type DailyDelta,
+  type StreakInfo,
+} from './daily';
+export {
+  applyThemeStats,
+  botOpponentElo,
+  countsForThemeStats,
+  defaultRating,
+  gameScore,
+  isRatedAttempt,
+  isRatedBotGame,
+  isThemeSuccess,
+  lessonStepsGained,
+  mergeGame,
+  mergeLessonProgress,
+  mergeProfile,
+  mergeSettings,
+  puzzleScore,
+  rateBotGame,
+  ratePuzzleAttempt,
+  type AttemptOutcome,
+} from './rules';

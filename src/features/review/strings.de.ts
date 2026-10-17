@@ -10,6 +10,7 @@ export const STRINGS_DE = {
   emptyTitle: 'Noch keine Partien',
   emptyText: (bot: string, elo: number) =>
     `Spiel eine Partie gegen ${bot} (${elo}) – passend zu deinem Niveau. Danach siehst du hier deine Analyse.`,
+  emptyTextNoBot: 'Spiel eine Partie gegen einen Bot oder importiere eine PGN – danach siehst du hier deine Analyse.',
   startGame: 'Partie starten',
   loadError: 'Das hat nicht geklappt. Versuch es nochmal.',
   vs: 'gegen',
@@ -19,6 +20,7 @@ export const STRINGS_DE = {
   sourcePgn: 'PGN',
   notAnalysed: 'Noch nicht analysiert',
   accuracyShort: (text: string) => `Genauigkeit ${text}`,
+  accuracyBoth: (w: string, b: string) => `Genauigkeit ${w} (Weiß) · ${b} (Schwarz)`,
   blunders: (n: number) => (n === 1 ? '1 Patzer' : `${n} Patzer`),
   plies: (n: number) => (n === 1 ? '1 Halbzug' : `${n} Halbzüge`),
   resultWin: 'Gewonnen',

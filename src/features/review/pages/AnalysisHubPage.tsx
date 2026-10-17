@@ -9,13 +9,8 @@ import type { Game } from '@/core/games';
 import { useSubscribable } from '@/lib/observable';
 import { Page } from '@/ui/layout';
 import { Badge, Button, Card, CardMeta, EmptyState } from '@/ui/primitives';
-import { accuracyText, gameDateLabel, gameTitle, resultLabel } from '../review';
+import { accuracyText, gameDateLabel, gameTitle, resultLabel, reviewableGames } from '../review';
 import { STRINGS_DE } from '../strings.de';
-
-/** Games shown in the hub: finished bot games and every imported game. */
-export function reviewableGames(games: readonly Game[]): Game[] {
-  return games.filter((g) => (g.source === 'bot' ? g.status === 'finished' : true));
-}
 
 /**
  * Analyse – the learner's games (bot games and imported PGNs) with date, opponent, result and accuracy once analysed;

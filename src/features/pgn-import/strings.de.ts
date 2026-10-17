@@ -1,4 +1,27 @@
-/** German strings of this feature (D-35). PLACEHOLDER (WP-00) – owned by WP-05. */
+/** German strings of the PGN import (D-35, P0-15). */
 export const STRINGS_DE = {
   analysisImport: 'PGN importieren',
+  subtitle: 'Füge eine Partie im PGN-Format ein oder lade eine .pgn-Datei hoch. Danach wird sie automatisch analysiert.',
+  backToHub: 'Zur Analyse-Übersicht',
+  pasteLabel: 'PGN einfügen',
+  pastePlaceholder: '[Event "Vereinsabend"]\n[White "Anna"]\n[Black "Ben"]\n\n1. e4 e5 2. Sf3 Sc6 …',
+  uploadLabel: 'Datei hochladen',
+  uploadHint: '.pgn-Datei, höchstens 1 MB',
+  fileTooLarge: 'Die Datei ist zu groß (höchstens 1 MB). Teile sie auf und importiere sie in mehreren Teilen.',
+  fileReadError: 'Die Datei konnte nicht gelesen werden. Versuch es nochmal.',
+  submit: 'Importieren',
+  importing: 'Wird importiert …',
+  errorTitle: 'Die PGN konnte nicht gelesen werden',
+  chooseTitle: (n: number) => `${n} Partien gefunden`,
+  chooseText: 'Wähle die Partie, die du analysieren möchtest.',
+  chooseListLabel: 'Partien in der PGN',
+  analyseThis: 'Analysieren',
+  analyseThisLabel: (title: string) => `${title} importieren und analysieren`,
+  importAll: 'Alle importieren',
+  importFailed: 'Der Import hat nicht geklappt. Versuch es nochmal.',
+  lineError: (line: number) => `Zeile ${line}: `,
+  white: 'Weiß',
+  black: 'Schwarz',
+  resultText: (r: string) => (r === '1-0' ? '1:0' : r === '0-1' ? '0:1' : r === '1/2-1/2' ? '½:½' : 'offen'),
+  moveCount: (n: number) => (n === 1 ? '1 Zug' : `${n} Züge`),
 } as const;

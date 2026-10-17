@@ -206,3 +206,8 @@ export function summaryCategories(analysis: GameAnalysis): MoveClassification[] 
 export function winPctWhiteAt(analysis: GameAnalysis | null, ply: number): number {
   return analysis?.evalGraph.find((p) => p.ply === ply)?.winPctWhite ?? 50;
 }
+
+/** Games shown in the analysis hub: finished bot games and every imported game. */
+export function reviewableGames(games: readonly Game[]): Game[] {
+  return games.filter((g) => (g.source === 'bot' ? g.status === 'finished' : true));
+}
