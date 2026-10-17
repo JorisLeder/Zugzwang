@@ -18,6 +18,7 @@ export const APP_DE = {
   notFoundAction: 'Zur Startseite',
   errorTitle: 'Das hat nicht geklappt',
   errorText: 'Beim Laden dieser Seite ist ein Fehler aufgetreten. Versuch es nochmal.',
+  errorDetails: 'Technische Details (nur in der Entwicklerversion)',
   errorAction: 'Seite neu laden',
   loading: 'Wird geladen …',
 } as const;
