@@ -2,8 +2,7 @@
  * WP-05 e2e: PGN import → automatic game review with the real engine (Stockfish worker), summary, classification
  * symbols on board and list, explanations (rule-based; LLM path against a mocked `explain` endpoint with fallback),
  * "Nochmal versuchen" (success and reveal paths), "Variante erkunden", duplicates and the hub.
- * Wave 1 (D-50): the data layer is in memory – every flow stays inside one page load (client-side navigation only);
- * the reload test is `fixme` until WP-08 is integrated.
+ * Games and analyses are stored in IndexedDB, so a deep link survives a reload.
  */
 import type { Page } from '@playwright/test';
 import { paths } from '../../src/app/paths';
@@ -287,7 +286,7 @@ test.describe('PGN import errors (P0-15)', () => {
 });
 
 test.describe('deep link (D-50)', () => {
-  test.fixme('reload of /analysis/:gameId shows the stored analysis without re-analysing (needs WP-08 persistence)', async ({ page }) => {
+  test('reload of /analysis/:gameId shows the stored analysis without re-analysing', async ({ page }) => {
     await page.goto(paths.analysisImport());
     const id = await importPgn(page, SHORT_BLUNDER_PGN);
     await waitForAnalysis(page);

@@ -3,8 +3,7 @@
  * delta, next puzzle ≤ 300 ms), learning mode (any mate accepted, three hint stages, playable solution, explanation),
  * theme training (≥ 20 motifs, difficulty filter, success rate), demo (5 puzzles, nothing persisted) and offline use
  * after the bank is loaded. Runs on desktop and mobile.
- * Wave 1 (D-50): the data layer is in memory – flows stay inside one page load (client-side navigation only); the
- * reload test is `fixme` until WP-08 is integrated.
+ * Ratings and attempts are stored in IndexedDB, so they survive a reload.
  */
 import { paths } from '../../src/app/paths';
 import { hasHorizontalScroll } from '../support/app';
@@ -104,7 +103,6 @@ test.describe('Bewertete Puzzles (P0-04)', () => {
   });
 
   test('after a reload the rating stays and no rated puzzle is served twice', async ({ page }) => {
-    test.fixme(true, 'needs WP-08 persistence – enabled in the integration round');
     await page.goto(paths.puzzlesRated());
     await chooseSelfAssessment(page);
     const p = await currentPuzzle(page);
@@ -220,13 +218,36 @@ test.describe('Demo (P0-01)', () => {
     await expect(page.getByTestId('demo-cta')).toHaveText('Anmelden, um Fortschritt zu speichern');
     await expect(page.getByRole('button', { name: 'Gegen Bot ausspielen' })).toHaveCount(0);
     expect(bankRequests).toEqual([]);
-    // `zz-theme` is the app shell's theme mirror (written on every page before React starts), not demo progress.
-    const stored = await page.evaluate(async () => ({
-      local: Object.keys(localStorage).filter((k) => k !== 'zz-theme'),
-      session: Object.keys(sessionStorage),
-      dbs: ((await indexedDB.databases?.()) ?? []).map((d) => d.name),
-    }));
-    expect(stored).toEqual({ local: [], session: [], dbs: [] });
+    // Nothing of the demo is stored. What the app shell keeps on every page is not demo progress: `zz-theme` (theme
+    // mirror, written before React starts), `zz-device-id` (this tab's id for the game lease) and, in local mode, the
+    // `zugzwang` database with the local profile created on the first start. Every progress table must stay empty.
+    const stored = await page.evaluate(async () => {
+      const tables = ['ratings', 'puzzleAttempts', 'games', 'gameMoves', 'gameAnalyses', 'lessonProgress', 'dailyActivity', 'themeStats', 'reviewQueue', 'explanationFeedback', 'outbox', 'puzzles'];
+      const dbs = ((await indexedDB.databases?.()) ?? []).map((d) => d.name);
+      const rows: Record<string, number> = {};
+      if (dbs.includes('zugzwang')) {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const req = indexedDB.open('zugzwang');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+        for (const t of tables.filter((name) => db.objectStoreNames.contains(name))) {
+          rows[t] = await new Promise<number>((resolve, reject) => {
+            const req = db.transaction(t).objectStore(t).count();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        }
+        db.close();
+      }
+      return {
+        local: Object.keys(localStorage).filter((k) => k !== 'zz-theme'),
+        session: Object.keys(sessionStorage).filter((k) => k !== 'zz-device-id'),
+        dbs: dbs.filter((name) => name !== 'zugzwang'),
+        progressRows: Object.entries(rows).filter(([, n]) => n > 0),
+      };
+    });
+    expect(stored).toEqual({ local: [], session: [], dbs: [], progressRows: [] });
   });
 });
 

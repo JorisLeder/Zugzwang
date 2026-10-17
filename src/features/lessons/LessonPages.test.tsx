@@ -136,8 +136,12 @@ describe('Lernpfad', () => {
     expect(stage1).toHaveAttribute('data-status', 'locked');
     expect(within(stage1).getByText(/bestehe den Einstufungstest/)).toBeInTheDocument();
     expect(document.querySelector(`[data-course-id="${COURSE}"]`)).toHaveAttribute('data-status', 'locked');
-    expect(document.querySelector('[data-stage-id="4"]')).toHaveAttribute('data-status', 'planned');
-    expect(within(document.querySelector('[data-stage-id="4"]') as HTMLElement).getByText('Diese Stufe ist in Vorbereitung.')).toBeInTheDocument();
+    // Stufe 4 has no available course yet: the stage is planned and lists the catalog's planned courses as such.
+    const stage4 = document.querySelector('[data-stage-id="4"]') as HTMLElement;
+    expect(stage4).toHaveAttribute('data-status', 'planned');
+    const plannedCards = [...stage4.querySelectorAll('[data-course-id]')];
+    expect(plannedCards.length).toBeGreaterThan(0);
+    for (const card of plannedCards) expect(card).toHaveAttribute('data-status', 'planned');
     expect(await screen.findByTestId('skip-test')).toHaveTextContent('Einstufungstest starten');
   });
 

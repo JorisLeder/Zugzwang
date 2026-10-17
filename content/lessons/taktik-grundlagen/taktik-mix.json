@@ -90,7 +90,7 @@
       "maxMoves": 25,
       "botElo": 800,
       "successDe": "Schachmatt! Du hast deinen Vorteil verwertet.",
-      "failDe": "Noch kein Matt. Tausche die Türme und treibe den König mit Dame und Turm an den Rand."
+      "failDe": "Noch kein Matt. Lass Dame und Turm zusammenarbeiten und treibe den König an den Rand."
     },
     {
       "id": "mix-abzug",

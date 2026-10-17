@@ -1,8 +1,7 @@
 /**
  * WP-06 e2e: Lernpfad, skip test, the lesson player with all five step types (fixture course, D-52), progress per step
  * with resume, stars, the end screen (next lesson, matching puzzles, practice game), 360 px and keyboard use.
- * Runs on desktop and mobile. Wave 1 (D-50): the data layer is in memory – flows stay inside one page load; the reload
- * test is `fixme` until WP-08 is integrated.
+ * Runs on desktop and mobile. Progress is stored in IndexedDB, so it survives a reload.
  */
 import type { Page } from '@playwright/test';
 import { paths } from '../../src/app/paths';
@@ -154,7 +153,7 @@ test.describe('progress and resume (AC 2)', () => {
     await expect(page.getByTestId('next-lesson')).toContainText('Weiter bei Schritt 3 von 5');
   });
 
-  test.fixme('reload resumes at the saved step (needs the persistent data layer, WP-08 / D-50)', async ({ page }) => {
+  test('reload resumes at the saved step (persistent data layer)', async ({ page }) => {
     await openFixtureLesson(page);
     await nextButton(page).click();
     await expectStep(page, 'demo', 1);

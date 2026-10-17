@@ -43,6 +43,7 @@ export { divideGame, gamePhase, gamePhases, type Division } from './phase';
 export { captureGain, seeMove } from './see';
 export {
   ANALYSIS_VERSION,
+  analysisEngineVersion,
   createAnalysisServiceWithOptions,
   DEFAULT_ANALYSIS_OPTIONS,
   DEFAULT_GAME_DEPTH,

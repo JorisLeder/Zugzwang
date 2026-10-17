@@ -42,12 +42,12 @@
     {
       "id": "wiederholung",
       "type": "explanation",
-      "textDe": "Remis durch dreimalige Stellungswiederholung: Kommt dieselbe Stellung zum dritten Mal vor, darf der Spieler am Zug Remis beanspruchen. Gleich heißt: dieselben Figuren auf denselben Feldern, derselbe Spieler am Zug und dieselben Zugmöglichkeiten. Bei der fünften Wiederholung ist die Partie automatisch Remis."
+      "textDe": "Remis durch dreimalige Stellungswiederholung: Kommt dieselbe Stellung zum dritten Mal vor, darf der Spieler am Zug Remis beanspruchen. Gleich heißt: dieselben Figuren auf denselben Feldern, derselbe Spieler am Zug und dieselben Zugmöglichkeiten. Kommt sie zum fünften Mal vor, ist die Partie automatisch Remis."
     },
     {
       "id": "dauerschach",
       "type": "demo",
-      "introDe": "Schwarz hat zwei Türme mehr. Doch Weiß gibt immer wieder Schach.",
+      "introDe": "Schwarz hat zwei Türme und droht Matt. Doch Weiß gibt immer wieder Schach.",
       "startFen": "4Q1k1/6p1/8/8/8/8/rr6/7K b - - 0 1",
       "orientation": "w",
       "moves": [
@@ -67,7 +67,7 @@
       "questionDe": "Dieselbe Stellung steht zum dritten Mal auf dem Brett. Was gilt?",
       "options": [
         { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig. Er muss es beanspruchen – es passiert nicht von selbst." },
-        { "id": "automatisch", "textDe": "Die Partie ist sofort automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst bei der fünften Wiederholung." },
+        { "id": "automatisch", "textDe": "Die Partie ist sofort automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst, wenn die Stellung zum fünften Mal vorkommt." },
         { "id": "verliert", "textDe": "Wer die Stellung wiederholt, verliert.", "correct": false, "feedbackDe": "Wiederholen ist erlaubt. Es führt zum Remis." }
       ]
     },

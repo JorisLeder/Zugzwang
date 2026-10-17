@@ -25,9 +25,9 @@
         { "uci": "f1c4", "commentDe": "Lc4: Der Läufer zielt auf f7." },
         { "uci": "b8c6" },
         { "uci": "d1h5", "commentDe": "Dh5: Jetzt droht Dxf7#." },
-        { "uci": "g7g6", "commentDe": "g6! Schwarz greift die Dame an und deckt das Matt." },
+        { "uci": "g7g6", "commentDe": "g6! Schwarz greift die Dame an und verhindert das Matt." },
         { "uci": "h5f3", "commentDe": "Df3: Weiß droht wieder Dxf7#." },
-        { "uci": "g8f6", "commentDe": "Sf6: Der Springer stellt sich vor f7. Die Drohung ist abgewehrt." }
+        { "uci": "g8f6", "commentDe": "Sf6: Der Springer sperrt die f-Linie. Die Drohung ist abgewehrt." }
       ]
     },
     {
@@ -73,7 +73,7 @@
       "acceptAnyMate": false,
       "claim": { "kind": "best" },
       "hintsDe": ["Du kannst die Diagonale des Läufers sperren oder dem König Luft geben."],
-      "explanationDe": "g3, h3 oder f4 wehren die Drohung ab. Jeder andere Zug verliert sofort."
+      "explanationDe": "g3, h3 oder f4 wehren die Drohung ab. Nach anderen Zügen verlierst du Material oder wirst mattgesetzt."
     },
     {
       "id": "quiz-frage",

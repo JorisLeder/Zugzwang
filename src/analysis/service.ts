@@ -47,6 +47,11 @@ import { expectedPointsLoss, scoreWinPercent } from './winPercent';
 /** Bump when the pipeline changes – stored in `engineVersion`, a different value triggers re-analysis. */
 export const ANALYSIS_VERSION = 1;
 
+/** `engineVersion` that this pipeline writes for an engine id; a stored analysis with another value is re-run. */
+export function analysisEngineVersion(engineId: string): string {
+  return `${engineId}+zz-analysis-${ANALYSIS_VERSION}`;
+}
+
 /** Depth/movetime of one kind of search. */
 export interface SearchLimits {
   depth: number;
@@ -594,7 +599,7 @@ class EngineAnalysisService implements AnalysisService {
     return {
       gameId: input.gameId,
       engineId: this.engine.id,
-      engineVersion: `${this.engine.id}+zz-analysis-${ANALYSIS_VERSION}`,
+      engineVersion: analysisEngineVersion(this.engine.id),
       depth,
       createdAt: new Date().toISOString(),
       accuracy,

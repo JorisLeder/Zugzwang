@@ -1,5 +1,6 @@
 /**
- * App shell in jsdom: six areas with German labels, aria-current, navigation, 404, settings store → theme.
+ * App shell in jsdom: six areas with German labels, aria-current, navigation, 404, settings store → theme, account
+ * section on the settings page.
  */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -48,8 +49,9 @@ describe('App shell', () => {
 
   it('renders deep links and the 404 page', async () => {
     renderAt('/analysis/game-123');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Partieanalyse' })).toBeInTheDocument();
-    expect(screen.getByText('Partie game-123')).toBeInTheDocument();
+    // The review page loads the game of the URL; this id does not exist on the (empty) device.
+    expect(await screen.findByRole('heading', { level: 1, name: 'Partie nicht gefunden' })).toBeInTheDocument();
+    expect(screen.getByText('Diese Partie gibt es auf diesem Gerät nicht (mehr).')).toBeInTheDocument();
   });
 
   it('shows a 404 page for unknown paths', async () => {
@@ -60,6 +62,8 @@ describe('App shell', () => {
   it('switches to the light theme via the settings store', async () => {
     renderAt('/settings');
     await screen.findByRole('heading', { level: 1, name: 'Einstellungen' });
+    expect(screen.getByRole('heading', { level: 2, name: 'Konto und Daten' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Daten exportieren' })).toBeInTheDocument();
     await userEvent.click(screen.getByRole('radio', { name: 'Hell' }));
     expect(document.documentElement.dataset.theme).toBe('light');
     expect(useSettingsStore.getState().settings.theme).toBe('light');

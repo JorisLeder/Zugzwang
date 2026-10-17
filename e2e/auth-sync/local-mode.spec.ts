@@ -1,7 +1,8 @@
 /**
  * Data layer in local mode (no Supabase variables): no login, local profile on the first start, mode visible,
- * progress kept in IndexedDB across reloads (WP-08 acceptance 6).
+ * progress kept in IndexedDB across reloads (WP-08 acceptance 6), export and deletion in the settings (acceptance 8).
  */
+import { readFile } from 'node:fs/promises';
 import type { Page } from '@playwright/test';
 import { freshStart, hasHorizontalScroll } from '../support/app';
 import { expect, test } from '../support/fixtures';
@@ -111,5 +112,45 @@ test.describe('local mode', () => {
     const dialog = page.getByRole('dialog', { name: 'Speichern und Synchronisieren' });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByTestId('sync-help-status')).toContainText('Lokal');
+  });
+
+  test('settings: "Daten exportieren" downloads all data as JSON; "Alle Daten löschen" wipes this device', async ({ page }) => {
+    await freshStart(page, '/settings');
+    await page.getByRole('radiogroup', { name: 'Brettdesign' }).getByRole('radio', { name: 'Holz' }).click();
+    await expect.poll(async () => (await storedProfile(page))?.settings.boardTheme).toBe('holz');
+    const before = (await storedProfile(page))!;
+
+    const account = page.getByTestId('account-section');
+    await expect(account.getByRole('heading', { name: 'Konto und Daten' })).toBeVisible();
+    await expect(account).toContainText('Lokaler Modus: Dein Fortschritt liegt nur in diesem Browser.');
+    await expect(account.getByRole('button', { name: 'Abmelden' })).toHaveCount(0);
+
+    const [download] = await Promise.all([page.waitForEvent('download'), account.getByRole('button', { name: 'Daten exportieren' }).click()]);
+    expect(download.suggestedFilename()).toMatch(/^zugzwang-export-\d{4}-\d{2}-\d{2}\.json$/);
+    const exported = JSON.parse(await readFile((await download.path())!, 'utf8')) as {
+      format: string;
+      mode: string;
+      profile: { id: string; settings: { boardTheme: string } };
+      puzzleAttempts: unknown[];
+      lessonProgress: unknown[];
+    };
+    expect(exported.format).toBe('zugzwang-export');
+    expect(exported.mode).toBe('local');
+    expect(exported.profile.id).toBe(before.id);
+    expect(exported.profile.settings.boardTheme).toBe('holz');
+    expect(Array.isArray(exported.puzzleAttempts) && Array.isArray(exported.lessonProgress)).toBe(true);
+    await expect(account.getByRole('status')).toHaveText('Export heruntergeladen');
+
+    await account.getByRole('button', { name: 'Alle Daten löschen' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Alle Daten löschen?' });
+    await expect(dialog).toBeVisible();
+    const confirm = dialog.getByRole('button', { name: 'Endgültig löschen' });
+    await expect(confirm).toBeDisabled();
+    await dialog.getByLabel('Tippe „LÖSCHEN“ zur Bestätigung').fill('löschen');
+    await confirm.click();
+    await expect(page).toHaveURL(/\/onboarding$/);
+    await expect(page.locator('html')).toHaveAttribute('data-board', 'moos');
+    await expect.poll(async () => (await storedProfile(page))?.settings.boardTheme).toBe('moos');
+    expect((await storedProfile(page))!.id).not.toBe(before.id);
   });
 });

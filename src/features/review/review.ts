@@ -2,7 +2,7 @@
  * Pure helpers of the game review (P0-10 UI): loading the main line of a game, deciding whether a stored analysis is
  * still current, player names, result and date labels, arrows and key-moment navigation.
  */
-import { ANALYSIS_VERSION } from '@/analysis';
+import { analysisEngineVersion } from '@/analysis';
 import { MOVE_CLASSIFICATIONS, type AnalysedMove, type GameAnalysis, type MoveClassification } from '@/core/analysis';
 import type { BotProfile } from '@/core/bots';
 import type { Arrow, Color, Fen, MoveRecord, San, Square, Uci } from '@/core/chess';
@@ -12,12 +12,9 @@ import { formatPercent } from '@/i18n';
 import { ChessGame, ChessRulesError, parseUci, uciLineToSan } from '@/lib/chess';
 import { STRINGS_DE } from './strings.de';
 
-/**
- * Engine version that the analysis service writes for an engine id (`${engineId}+zz-analysis-${ANALYSIS_VERSION}`,
- * WP-02). A stored analysis with another version is re-run (BACKLOG WP-05).
- */
+/** Engine version that the analysis service writes for an engine id. A stored analysis with another version is re-run. */
 export function currentEngineVersion(engineId: string): string {
-  return `${engineId}+zz-analysis-${ANALYSIS_VERSION}`;
+  return analysisEngineVersion(engineId);
 }
 
 /** Whether a stored analysis fits the game's moves and the current engine version. */

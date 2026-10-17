@@ -1,8 +1,7 @@
 /**
  * WP-04 e2e: bot list and setup, playing against a real bot (Stockfish worker), assistance levels, coach warning,
  * resignation/result, play from FEN, 360 px layout and keyboard moves. Runs on desktop and mobile.
- * Wave 1 (D-50): the data layer is in memory – flows stay inside one page load (client-side navigation only); the reload
- * and second-page tests are `fixme` until WP-08 is integrated.
+ * Games are stored in IndexedDB, so a reload resumes the game and a second page sees it.
  */
 import type { Page } from '@playwright/test';
 import { paths } from '../../src/app/paths';
@@ -184,7 +183,6 @@ test.describe('360 px and keyboard (criterion 9)', () => {
 
 test.describe('resume and two devices (P0-09, criterion 7)', () => {
   test('a reload resumes the game at the same move', async ({ page }) => {
-    test.fixme(true, 'needs WP-08 persistence – enabled in the integration round');
     await startFromHub(page, /^Pip, 100 Elo/, 'Training', 'Weiß');
     const start = await readFen(page);
     await clickMove(page, 'e2', 'e4');
@@ -196,7 +194,6 @@ test.describe('resume and two devices (P0-09, criterion 7)', () => {
   });
 
   test('a second page asks to take over; the first one becomes read-only', async ({ page, context }) => {
-    test.fixme(true, 'needs WP-08 persistence – enabled in the integration round');
     await startFromHub(page, /^Pip, 100 Elo/, 'Training', 'Weiß');
     const url = page.url();
     const second = await context.newPage();

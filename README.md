@@ -54,15 +54,30 @@ npm run dev       # copies the Stockfish engine to public/engine/ and starts Vit
 
 Scripts owned by later packages print `not implemented yet (WP-xx)` until they are delivered.
 
-## Local mode and cloud mode
+## Speichern & Synchronisieren
 
-- **Local mode** (default, no configuration): no login, all progress stays in this browser (IndexedDB). The app says so
-  clearly ("Lokaler Modus – Fortschritt nur auf diesem Gerät").
-- **Cloud mode**: copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Then
-  login is required and progress syncs across devices via Supabase. Setting up the Supabase project (migrations with
-  Row Level Security, edge functions, secrets) will be described in this README
-  once the backend package is done. Only public `VITE_` values belong in the client; the Claude API key lives only in the
-  `explain` edge function.
+The same content is shown in the app (help dialog behind the "Lokal"/sync status and the local-mode banner).
+
+- **Local mode** (default, no Supabase variables): progress stays in this browser (IndexedDB). No account, no login;
+  the app shows a "Lokal" badge and the banner "Lokaler Modus – Fortschritt nur auf diesem Gerät".
+- Local data is lost when the browser data is cleared. Back it up with "Daten exportieren" (JSON) in the settings
+  (Einstellungen → Konto und Daten), which also offers deleting all local data.
+- **Cloud mode**: copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` at build
+  time. Only these public values belong in the client, never a `service_role` key; the Claude API key lives only in
+  the `explain` edge function. Login is then required.
+- In Supabase, enable e-mail (magic link) and Google login, set the redirect URL `<origin>/auth/callback`, and limit
+  the session to 30 days. Setting up the project itself (migrations with Row Level Security, edge functions, secrets)
+  will be described here once the backend package is done.
+- **What syncs**: profile and settings, ratings, puzzle attempts, games with all moves, analyses, lesson progress,
+  daily activity and streak, theme stats, review items, explanation feedback.
+- **Not synced**: the puzzle bank, the bots and the lesson content (they ship with the app).
+- **Offline**: changes are queued and sent exactly once on reconnect; failures show "Nicht synchronisiert" and are
+  retried automatically (backoff from 1 s up to 60 s).
+- **Conflicts**: puzzle attempts and game moves are append-only; lesson progress keeps the furthest state; settings
+  keep the last change; the server computes ratings, streak and stats. A game running on another device can be taken
+  over.
+- The first login on a device that ran in local mode moves its local progress into the account once.
+- Account deletion in cloud mode needs the `delete-account` edge function (WP-11).
 - `VITE_CLOUD_EVAL=true` optionally uses the Lichess cloud evaluation to speed up analysis; the local engine is
   always the fallback.
 

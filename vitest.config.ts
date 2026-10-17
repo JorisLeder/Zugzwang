@@ -13,6 +13,9 @@ export default defineConfig({
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   test: {
+    // The on-disk transform cache keys a module by its own content, so an `import.meta.glob` map (lesson content,
+    // `src/lessons/index.ts`) stays stale after files are added – tests would then see an outdated file list.
+    fsModuleCache: false,
     testTimeout: 20_000,
     hookTimeout: 20_000,
     projects: [

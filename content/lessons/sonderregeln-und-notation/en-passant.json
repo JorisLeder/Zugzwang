@@ -69,7 +69,7 @@
       "options": [
         { "id": "bauer", "textDe": "Ein Bauer, der gerade einen Doppelschritt gemacht hat", "correct": true, "feedbackDe": "Richtig. Und schlagen darf auch nur ein Bauer." },
         { "id": "jede", "textDe": "Jede Figur, die neben einem Bauern steht", "correct": false, "feedbackDe": "En passant gibt es nur zwischen Bauern." },
-        { "id": "ein-feld", "textDe": "Ein Bauer, der nur ein Feld gezogen hat", "correct": false, "feedbackDe": "Dann steht er schon schräg vor dem Bauern und wird ganz normal geschlagen." }
+        { "id": "ein-feld", "textDe": "Ein Bauer, der nur ein Feld gezogen hat", "correct": false, "feedbackDe": "En passant gibt es nur nach einem Doppelschritt. Sonst schlägt der Bauer ganz normal schräg." }
       ]
     },
     {

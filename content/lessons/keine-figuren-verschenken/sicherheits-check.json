@@ -62,7 +62,7 @@
       "id": "richtig-schlagen",
       "type": "find_move",
       "promptDe": "Weiß am Zug. Der Springer e5 ist zweimal angegriffen. Schlage ihn – aber richtig.",
-      "fen": "3q2k1/ppp2pp1/3b3p/4n3/3P4/2N4P/PPP1QPP1/2B3K1 w - - 0 1",
+      "fen": "3q2k1/ppp2pp1/3b3p/4n3/3P4/2N4P/PPP1QPP1/6K1 w - - 0 1",
       "orientation": "w",
       "solution": [{ "move": "d4e5", "children": [] }],
       "acceptAnyMate": false,

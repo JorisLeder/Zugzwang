@@ -15,6 +15,7 @@ import {
   explainResponseSchema,
   fromRow,
   gameImportRequestSchema,
+  gameImportResponseSchema,
   lessonSchema,
   movesFromEvents,
   puzzleBankManifestSchema,
@@ -107,6 +108,13 @@ describe('schemas', () => {
     expect(gameImportRequestSchema.safeParse({ pgn: FIXTURE_GAME.pgn }).success).toBe(true);
     expect(gameImportRequestSchema.safeParse({ source: 'lichess', externalId: 'abcd1234' }).success).toBe(true);
     expect(gameImportRequestSchema.safeParse({}).success).toBe(false);
+  });
+
+  it('game import response', () => {
+    expect(gameImportResponseSchema.safeParse({ ok: true, gameId: 'g1', duplicate: false }).success).toBe(true);
+    expect(gameImportResponseSchema.safeParse({ ok: false, error: 'Ungültiger Zug', line: 7 }).success).toBe(true);
+    expect(gameImportResponseSchema.safeParse({ ok: true, gameId: '', duplicate: true }).success).toBe(false);
+    expect(gameImportResponseSchema.safeParse({ ok: false }).success).toBe(false);
   });
 
   it('manifest and lesson validation errors', () => {

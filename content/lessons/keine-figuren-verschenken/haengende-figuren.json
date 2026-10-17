@@ -11,7 +11,7 @@
     {
       "id": "haengend",
       "type": "explanation",
-      "textDe": "Eine Figur „hängt“, wenn sie angegriffen und nicht gedeckt ist. Dann kann der Gegner sie einfach schlagen. Die meisten Partien unter Einsteigern werden so entschieden."
+      "textDe": "Eine Figur „hängt“, wenn sie angegriffen und nicht gedeckt ist. Dann kann der Gegner sie einfach schlagen. Viele Partien unter Einsteigern werden so entschieden."
     },
     {
       "id": "pruefen",
@@ -82,13 +82,13 @@
       "id": "quiz-welche",
       "type": "quiz",
       "questionDe": "Weiß am Zug. Welche schwarze Figur hängt?",
-      "fen": "6k1/ppp2pp1/4p2p/3n4/6b1/2N4P/PPP2PP1/6K1 w - - 0 1",
+      "fen": "6k1/ppp2pp1/4p2p/3n4/3P2b1/5N1P/PPP2PP1/2B3K1 w - - 0 1",
       "options": [
         { "id": "laeufer", "textDe": "Der Läufer g4 – der Bauer h3 kann ihn schlagen.", "correct": true, "feedbackDe": "Richtig. hxg4 gewinnt den Läufer." },
-        { "id": "springer", "textDe": "Der Springer d5", "correct": false, "feedbackDe": "Der Springer ist vom Bauern e6 gedeckt. Nach Sxd5 exd5 ist es nur ein Tausch." },
+        { "id": "springer", "textDe": "Der Springer d5", "correct": false, "feedbackDe": "Keine weiße Figur greift den Springer an. Außerdem deckt ihn der Bauer e6." },
         { "id": "nichts", "textDe": "Keine Figur hängt.", "correct": false, "feedbackDe": "Schau dir den Läufer auf g4 an." }
       ],
-      "asserts": [{ "kind": "bestMove", "fen": "6k1/ppp2pp1/4p2p/3n4/6b1/2N4P/PPP2PP1/6K1 w - - 0 1", "move": "h3g4" }]
+      "asserts": [{ "kind": "bestMove", "fen": "6k1/ppp2pp1/4p2p/3n4/3P2b1/5N1P/PPP2PP1/2B3K1 w - - 0 1", "move": "h3g4" }]
     }
   ]
 }

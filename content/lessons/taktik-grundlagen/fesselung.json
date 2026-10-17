@@ -11,7 +11,7 @@
     {
       "id": "fesselung",
       "type": "explanation",
-      "textDe": "Bei einer Fesselung steht eine Figur vor einer wertvolleren Figur auf derselben Linie. Zieht sie weg, wird die Figur dahinter geschlagen. Steht dahinter der König, darf die gefesselte Figur gar nicht ziehen.",
+      "textDe": "Bei einer Fesselung greift ein Läufer, Turm oder eine Dame eine Figur an. Dahinter steht auf derselben Linie eine wertvollere Figur. Zieht die vordere weg, wird die Figur dahinter geschlagen. Steht dahinter der König, darf die gefesselte Figur die Linie nicht verlassen.",
       "fen": "4k3/ppp2ppp/2n5/1B6/3P4/8/PPP2PPP/6K1 w - - 0 1",
       "orientation": "w",
       "arrows": [{ "from": "b5", "to": "e8", "kind": "threat" }],
@@ -47,7 +47,7 @@
       "id": "dame-fesseln",
       "type": "find_move",
       "promptDe": "Weiß am Zug. Fessle die schwarze Dame und gewinne sie.",
-      "fen": "4k2r/pp1q1pp1/7p/8/8/2N4P/PPP2PP1/R4BK1 w - - 0 1",
+      "fen": "4k2r/pp1q1pp1/7p/8/8/2N4P/PPP2PP1/R3KB2 w - - 0 1",
       "orientation": "w",
       "solution": [
         {

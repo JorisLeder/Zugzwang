@@ -7,8 +7,8 @@
  *   user's access token; the server computes the same external id. When the function cannot be reached (offline,
  *   network error) the game is stored locally and reaches the backend through the outbox.
  */
-import { z } from 'zod';
 import type { GameImportRequest, GameImportResponse } from '@/core/games';
+import { gameImportResponseSchema } from '@/core/schemas';
 import type { AppServices } from '@/core/services';
 import { importedGameRecord, pgnExternalId, type PgnGame } from '@/pgn';
 import { STRINGS_DE } from './strings.de';
@@ -19,10 +19,6 @@ export type ImportOutcome = { ok: true; gameId: string; duplicate: boolean } | {
 /** Timeout of the `games-import` request. */
 export const IMPORT_TIMEOUT_MS = 15_000;
 
-const responseSchema = z.union([
-  z.object({ ok: z.literal(true), gameId: z.string().min(1), duplicate: z.boolean() }),
-  z.object({ ok: z.literal(false), error: z.string(), line: z.number().int().optional() }),
-]);
 
 /** Options (tests inject `fetchFn`, `now`, `isOnline`). */
 export interface ImportOptions {
@@ -85,7 +81,7 @@ async function importViaFunction(services: AppServices, game: PgnGame, fetchFn: 
   } catch {
     return { kind: 'done', outcome: { ok: false, errorDe: STRINGS_DE.importFailed } };
   }
-  const parsed = responseSchema.safeParse(json);
+  const parsed = gameImportResponseSchema.safeParse(json);
   if (!parsed.success) return { kind: 'done', outcome: { ok: false, errorDe: STRINGS_DE.importFailed } };
   const r: GameImportResponse = parsed.data;
   if (r.ok) return { kind: 'done', outcome: { ok: true, gameId: r.gameId, duplicate: r.duplicate } };

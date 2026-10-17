@@ -40,7 +40,7 @@
         {
           "move": "e5c6",
           "comment": "Abzugsschach durch den Turm – und der Springer greift die Dame an.",
-          "children": [{ "move": "e8d7", "children": [{ "move": "c6d8", "comment": "Die Dame ist gewonnen.", "children": [] }] }]
+          "children": [{ "move": "e8f8", "children": [{ "move": "c6d8", "comment": "Die Dame ist gewonnen.", "children": [] }] }]
         }
       ],
       "acceptAnyMate": false,

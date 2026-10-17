@@ -19,7 +19,7 @@
     {
       "id": "start",
       "type": "explanation",
-      "textDe": "Sieben Aufgaben zu Brett und Figuren. Löst du mindestens vier von fünf Aufgaben im ersten Versuch, hast du den Kurs geschafft.",
+      "textDe": "Sieben Aufgaben zu Brett und Figuren. Löst du mindestens sechs davon im ersten Versuch, hast du den Kurs geschafft.",
       "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       "orientation": "w"
     },

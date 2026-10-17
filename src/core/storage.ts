@@ -278,6 +278,6 @@ export interface DataServices {
   auth: AuthService;
   account: AccountService;
   activity: ActivityTracker;
-  /** Stable id of this device/browser (takeover dialog). */
+  /** Id of this tab, stable across reloads (active-game lease, takeover dialog). */
   deviceId: string;
 }

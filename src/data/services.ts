@@ -68,13 +68,18 @@ export interface DexieDataServices extends DataServices {
   close(): void;
 }
 
-/** Stable id of this browser (localStorage), a fresh one when storage is unavailable. */
-export function stableDeviceId(storageKey = 'zz-device-id'): string {
+/**
+ * Id of this tab for the active-game lease (takeover dialog, P0-02). Kept in sessionStorage: a reload keeps it (the
+ * game resumes without a question), while every other tab or device gets its own id (it asks to take over instead of
+ * playing the same game twice). A fresh id when storage is unavailable.
+ */
+export function stableDeviceId(storageKey = 'zz-device-id', storage: () => Storage = () => sessionStorage): string {
   try {
-    const stored = localStorage.getItem(storageKey);
+    const store = storage();
+    const stored = store.getItem(storageKey);
     if (stored) return stored;
     const id = newId();
-    localStorage.setItem(storageKey, id);
+    store.setItem(storageKey, id);
     return id;
   } catch {
     return newId();

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as fixtures from './__fixtures__';
-import { loadCatalog, loadLesson } from './index';
+import { findSkipTest, loadCatalog, loadCourseLessons, loadLesson } from './index';
 import { createLessonLoader, parseCatalog, sourcesFromGlob, type LessonSources } from './loader';
 import { lessonFilePath } from './loader';
 
@@ -187,5 +187,21 @@ describe('lesson loader (D-26)', () => {
     expect(data.courses.find((c) => c.id === 'fixture-course')?.lessonIds).toEqual(['fixture-lesson', 'fixture-lesson-2']);
     expect((await loadLesson('fixture-course', 'fixture-test', { e2e: true })).ok).toBe(true);
     warn.mockRestore();
+  });
+
+  it('the shipped content (content/lessons) loads without content errors and has a skip test', async () => {
+    const data = await loadCatalog({ e2e: false });
+    expect(data.errors).toEqual([]);
+    const available = data.courses.filter((c) => c.status === 'available');
+    expect(available.length).toBeGreaterThan(0);
+    for (const course of available) {
+      const { lessons, errors } = await loadCourseLessons(course, { e2e: false });
+      expect(errors, course.id).toEqual([]);
+      expect(lessons.map((l) => l.id), course.id).toEqual(expect.arrayContaining(course.lessonIds));
+      if (course.testLessonId) expect((await loadLesson(course.id, course.testLessonId, { e2e: false })).ok, course.testLessonId).toBe(true);
+    }
+    const skip = await findSkipTest(data, { e2e: false });
+    expect(skip).not.toBeNull();
+    expect((await loadLesson(skip!.courseId, skip!.lessonId, { e2e: false })).ok).toBe(true);
   });
 });

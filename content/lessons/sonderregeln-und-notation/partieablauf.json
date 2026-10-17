@@ -36,7 +36,7 @@
     {
       "id": "narrenmatt",
       "type": "demo",
-      "introDe": "Die kürzeste mögliche Partie: das Narrenmatt. Ergebnis 0-1.",
+      "introDe": "Das schnellste mögliche Matt: das Narrenmatt. Ergebnis 0-1.",
       "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       "orientation": "w",
       "moves": [

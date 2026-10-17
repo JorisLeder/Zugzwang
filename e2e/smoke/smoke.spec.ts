@@ -18,17 +18,21 @@ const AREAS = [
   { label: 'Profil', url: '/profile', heading: 'Profil' },
 ];
 
-/** One concrete URL per route of paths.ts with the h1 it must show. */
-const ROUTES: Array<[string, string]> = [
+/**
+ * One concrete URL per route of paths.ts with the h1 it must show (and, where the h1 is not the route name, the
+ * document title). Puzzle trainers use the side to move as their h1; unknown ids show the page's not-found state.
+ */
+const SIDE_TO_MOVE = /^(Weiß|Schwarz) am Zug$/;
+const ROUTES: Array<[string, string | RegExp, RegExp?]> = [
   [paths.home(), 'Start'],
   [paths.onboarding(), 'Willkommen bei Zugzwang'],
   [paths.login(), 'Anmelden'],
   [paths.puzzles(), 'Puzzles'],
   [paths.puzzlesRated(), 'Bewertete Puzzles'],
-  [paths.puzzlesLearn(), 'Lernmodus'],
+  [paths.puzzlesLearn(), SIDE_TO_MOVE, /^Lernmodus · Zugzwang$/],
   [paths.puzzleThemes(), 'Themen-Training'],
-  [paths.puzzleTheme('fork'), 'Themen-Training'],
-  [paths.puzzlesDemo(), 'Demo-Puzzles'],
+  [paths.puzzleTheme('fork'), SIDE_TO_MOVE, /^Themen-Training: Gabel · Zugzwang$/],
+  [paths.puzzlesDemo(), SIDE_TO_MOVE, /^Demo-Puzzles · Zugzwang$/],
   [paths.play(), 'Spielen'],
   [paths.playGame('smoke-game'), 'Partie'],
   [paths.playFromPosition(START_FEN), 'Aus Stellung spielen'],
@@ -38,7 +42,7 @@ const ROUTES: Array<[string, string]> = [
   [paths.analysis(), 'Analyse'],
   [paths.analysisImport(), 'PGN importieren'],
   [paths.analysisBoard(), 'Analysebrett'],
-  [paths.analysisGame('smoke-game'), 'Partieanalyse'],
+  [paths.analysisGame('smoke-game'), 'Partie nicht gefunden'],
   [paths.profile(), 'Profil'],
   [paths.stats(), 'Statistik'],
   [paths.settings(), 'Einstellungen'],
@@ -124,10 +128,11 @@ test.describe('app shell', () => {
 });
 
 test.describe('routes', () => {
-  for (const [url, heading] of ROUTES) {
+  for (const [url, heading, title] of ROUTES) {
     test(`renders ${url}`, async ({ page }) => {
       await page.goto(url);
       await expect(page.getByRole('heading', { level: 1, name: heading }).first()).toBeAttached();
+      if (title) await expect(page).toHaveTitle(title);
     });
   }
 
@@ -145,11 +150,13 @@ test.describe('routes', () => {
   });
 
   test('deep link /analysis/:gameId works after reload', async ({ page }) => {
+    // The review page resolves the id from the URL; this game does not exist, so it shows its not-found state.
     await page.goto(paths.analysisGame('deep-link-42'));
-    await expect(page.getByText('Partie deep-link-42')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Partie nicht gefunden' })).toBeVisible();
     await page.reload();
-    await expect(page.getByRole('heading', { level: 1, name: 'Partieanalyse' })).toBeVisible();
-    await expect(page.getByText('Partie deep-link-42')).toBeVisible();
+    await expect(page).toHaveURL(/\/analysis\/deep-link-42$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Partie nicht gefunden' })).toBeVisible();
+    await expect(page.getByText('Diese Partie gibt es auf diesem Gerät nicht (mehr).')).toBeVisible();
   });
 });
 

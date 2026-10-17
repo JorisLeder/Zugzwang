@@ -22,7 +22,7 @@
     {
       "id": "start",
       "type": "explanation",
-      "textDe": "Du kennst die Schachregeln schon? Dann zeig es hier. Löst du mindestens vier von fünf Aufgaben im ersten Versuch, startest du direkt in Stufe 1.",
+      "textDe": "Du kennst die Schachregeln schon? Dann zeig es hier. Löst du mindestens acht der neun Aufgaben im ersten Versuch, startest du direkt in Stufe 1.",
       "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       "orientation": "w"
     },
@@ -76,7 +76,7 @@
       "questionDe": "Der schwarze Läufer greift den Turm h1 an. Darf Weiß trotzdem kurz rochieren?",
       "fen": "r3k2r/8/8/8/8/5b2/8/R3K2R w KQkq - 0 1",
       "options": [
-        { "id": "ja", "textDe": "Ja. Nur der König darf nicht im Schach stehen und nicht über angegriffene Felder ziehen.", "correct": true, "feedbackDe": "Richtig. Dass der Turm angegriffen ist, verhindert die Rochade nicht." },
+        { "id": "ja", "textDe": "Ja. Nur der König darf nicht im Schach stehen und kein angegriffenes Feld überqueren oder betreten.", "correct": true, "feedbackDe": "Richtig. Dass der Turm angegriffen ist, verhindert die Rochade nicht." },
         { "id": "nein", "textDe": "Nein, weil der Turm angegriffen ist.", "correct": false, "feedbackDe": "Für den Turm gibt es diese Regel nicht. Es zählen nur die Felder des Königs." }
       ],
       "asserts": [{ "kind": "isLegalMove", "fen": "r3k2r/8/8/8/8/5b2/8/R3K2R w KQkq - 0 1", "move": "e1g1", "expect": true }]
@@ -109,7 +109,7 @@
       "questionDe": "Dieselbe Stellung entsteht zum dritten Mal. Was gilt?",
       "options": [
         { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig: Remis durch dreimalige Stellungswiederholung. Es muss beansprucht werden." },
-        { "id": "automatisch", "textDe": "Die Partie ist automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst bei der fünften Wiederholung." },
+        { "id": "automatisch", "textDe": "Die Partie ist automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst, wenn die Stellung zum fünften Mal vorkommt." },
         { "id": "verloren", "textDe": "Wer wiederholt, verliert.", "correct": false, "feedbackDe": "Wiederholen ist erlaubt. Es führt zum Remis, nicht zur Niederlage." }
       ]
     },

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { AppConfig } from '@/core/services';
 import { createDataServices } from '.';
-import type { DexieDataServices } from './services';
+import { stableDeviceId, type DexieDataServices } from './services';
 
 const local: AppConfig = { mode: 'local', cloudEvalEnabled: false, e2e: false };
 const g = globalThis as { indexedDB?: unknown; IDBKeyRange?: unknown };
@@ -64,5 +64,36 @@ describe('createDataServices', () => {
     expect(data.sync.state()).toMatchObject({ mode: 'cloud', status: 'synced', pending: 0 });
     data.close();
     vi.doUnmock('@supabase/supabase-js');
+  });
+});
+
+describe('stableDeviceId', () => {
+  function memoryStorage(): Storage {
+    const m = new Map<string, string>();
+    return {
+      get length() {
+        return m.size;
+      },
+      clear: () => m.clear(),
+      getItem: (k) => m.get(k) ?? null,
+      key: (i) => [...m.keys()][i] ?? null,
+      removeItem: (k) => void m.delete(k),
+      setItem: (k, v) => void m.set(k, v),
+    };
+  }
+
+  it('is stable within one tab (reload) and different in another tab', () => {
+    const tab = memoryStorage();
+    const id = stableDeviceId('zz-device-id', () => tab);
+    expect(stableDeviceId('zz-device-id', () => tab)).toBe(id);
+    expect(tab.getItem('zz-device-id')).toBe(id);
+    expect(stableDeviceId('zz-device-id', () => memoryStorage())).not.toBe(id);
+  });
+
+  it('falls back to a fresh id when storage is unavailable', () => {
+    const blocked = () => {
+      throw new Error('SecurityError');
+    };
+    expect(stableDeviceId('zz-device-id', blocked)).not.toBe(stableDeviceId('zz-device-id', blocked));
   });
 });
