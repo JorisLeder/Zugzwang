@@ -96,7 +96,7 @@ export {
   type FindMoveVerdict,
 } from './findMove';
 export { judgePlayOut, movesLeft, type PlayOutPly, type PlayOutReason, type PlayOutVerdict } from './playOut';
-export { playOutBot, practiceBot } from './practice';
+export { MAX_PLAY_OUT_ELO, playOutBot, practiceBot } from './practice';
 export { LESSONS_DE } from './strings.de';
 export type { DemoStep, ExplanationStep, FindMoveStep, PlayOutStep, QuizStep } from './types';
 

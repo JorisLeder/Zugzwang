@@ -20,6 +20,7 @@ export { explainContext, LLM_TIMEOUT_MS, requestLlmExplanation, type LlmOutcome 
 export { factMoves, MAX_EXPLANATION_CHARS, splitMarkers, validateExplanationSegments, type ValidationResult } from './validate';
 export { assemble, countSentences, normalizeSegments, plainText, type Sentence } from './segments';
 export { bestLineOf, replayFactLines, replaySan, type FactLines } from './lines';
+export { capitalize, pieceNp, piecePronoun, type Case, type Determiner } from './grammar';
 
 /** localStorage key of the e2e test endpoint (read only when `config.e2e`). */
 export const E2E_EXPLAIN_URL_KEY = 'zz-e2e-explain-url';

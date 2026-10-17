@@ -101,15 +101,26 @@ describe('find_move – move tree', () => {
     expect(submitFindMove(createFindMove(MATE_IN_TWO), 'a1h8').verdict).toBeNull();
   });
 
-  it('compares moves by their canonical UCI (castling given as king takes rook)', () => {
-    const step: FindMoveStep = {
+  it('compares moves by their canonical UCI (castling entered as SAN, promotion letters)', () => {
+    const castle: FindMoveStep = {
       ...TWO_MATES,
       fen: 'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1',
-      solution: [{ move: 'e1h1', children: [] }],
+      solution: [{ move: 'e1g1', children: [] }],
       acceptAnyMate: false,
       claim: { kind: 'rule' },
     };
-    expect(submitFindMove(createFindMove(step), 'e1g1').verdict).toBe('correct');
+    expect(submitFindMove(createFindMove(castle), 'O-O').verdict).toBe('correct');
+    expect(submitFindMove(createFindMove(castle), 'e1c1').verdict).toBe('wrong');
+    const promote: FindMoveStep = {
+      ...TWO_MATES,
+      fen: '8/4P3/8/8/8/2k5/8/2K5 w - - 0 1',
+      solution: [{ move: 'e7e8q', children: [] }],
+      acceptAnyMate: false,
+      claim: { kind: 'rule' },
+    };
+    expect(submitFindMove(createFindMove(promote), 'e7e8q').verdict).toBe('correct');
+    // Underpromotion is a different move (FIDE 2023 Art. 3.7.5: the player chooses the piece).
+    expect(submitFindMove(createFindMove(promote), 'e7e8n').verdict).toBe('wrong');
   });
 });
 

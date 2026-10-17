@@ -3,12 +3,13 @@
  * still current, player names, result and date labels, arrows and key-moment navigation.
  */
 import { ANALYSIS_VERSION } from '@/analysis';
-import type { AnalysedMove, GameAnalysis, MoveClassification } from '@/core/analysis';
+import { MOVE_CLASSIFICATIONS, type AnalysedMove, type GameAnalysis, type MoveClassification } from '@/core/analysis';
 import type { BotProfile } from '@/core/bots';
-import type { Arrow, Color, Fen, MoveRecord, Uci } from '@/core/chess';
+import type { Arrow, Color, Fen, MoveRecord, San, Square, Uci } from '@/core/chess';
 import type { Score } from '@/core/engine';
 import { movesFromEvents, type Game, type GameMoveEvent } from '@/core/games';
-import { ChessGame, ChessRulesError, parseUci } from '@/lib/chess';
+import { formatPercent } from '@/i18n';
+import { ChessGame, ChessRulesError, parseUci, uciLineToSan } from '@/lib/chess';
 import { STRINGS_DE } from './strings.de';
 
 /**
@@ -156,4 +157,52 @@ export function openingOf(analysis: GameAnalysis | null): { eco: string; name: s
   let found: { eco: string; name: string } | null = null;
   for (const m of analysis?.moves ?? []) if (m.opening) found = m.opening;
   return found;
+}
+
+/**
+ * Key moments shown in the summary (PRD: 3–5): the analysis' key moments (the ≤ 5 largest losses ≥ 0.10), filled up
+ * to 3 with the next largest losses of the game (> 0, book moves excluded). Sorted by ply.
+ */
+export function displayKeyMoments(analysis: GameAnalysis | null, min = 3, max = 5): number[] {
+  if (!analysis) return [];
+  const chosen = new Set(analysis.keyMoments.filter((p) => analysis.moves.some((m) => m.ply === p)).slice(0, max));
+  if (chosen.size < min) {
+    const rest = analysis.moves
+      .filter((m) => !chosen.has(m.ply) && m.classification !== 'book' && m.expectedPointsLoss > 0)
+      .sort((a, b) => b.expectedPointsLoss - a.expectedPointsLoss || a.ply - b.ply);
+    for (const m of rest) {
+      if (chosen.size >= min) break;
+      chosen.add(m.ply);
+    }
+  }
+  return [...chosen].sort((a, b) => a - b);
+}
+
+/** Accuracy for display: 0–100 with one decimal ("87,4 %"). */
+export function accuracyText(value: number): string {
+  const v = Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
+  return formatPercent(Math.round(v * 10) / 10, 1);
+}
+
+/** Engine line of a move in English SAN: the best line from `fenBefore`, the played line likewise. */
+export function lineSan(fen: Fen, line: readonly Uci[], maxPlies = 8): San[] {
+  return uciLineToSan(fen, line.slice(0, maxPlies));
+}
+
+/** Square of the classification symbol on the board: the destination square of the move. */
+export function annotationFor(m: AnalysedMove | undefined): Array<{ square: Square; classification: MoveClassification }> {
+  if (!m) return [];
+  const mv = parseUci(m.uci);
+  return mv ? [{ square: mv.to, classification: m.classification }] : [];
+}
+
+/** Classifications whose counts the summary lists (book and the rare `brilliant`/`great` only when they occur). */
+export function summaryCategories(analysis: GameAnalysis): MoveClassification[] {
+  const always: ReadonlySet<MoveClassification> = new Set(['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'miss', 'blunder']);
+  return MOVE_CLASSIFICATIONS.filter((c) => always.has(c) || analysis.counts.w[c] > 0 || analysis.counts.b[c] > 0);
+}
+
+/** Win percentage of White at a ply from the eval graph (50 when unknown). */
+export function winPctWhiteAt(analysis: GameAnalysis | null, ply: number): number {
+  return analysis?.evalGraph.find((p) => p.ply === ply)?.winPctWhite ?? 50;
 }

@@ -4,8 +4,9 @@
  *
  * - `checkmate`: success when the learner checkmates within `maxMoves` own moves; fail on any other game end or when
  *   the last allowed own move did not mate.
- * - `promote`: success when one of the learner's moves promotes a pawn (or the learner checkmates); fail on another
- *   game end or when the moves are used up.
+ * - `promote`: success when one of the learner's moves promotes a pawn (or the learner checkmates), also when the
+ *   promotion leaves a dead position (K+N vs K); fail when the promotion stalemates, on another game end or when the
+ *   moves are used up.
  * - `draw`: success when the game ends in a draw, a draw can be claimed (threefold repetition / 50-move rule), the
  *   learner wins, or the learner made `maxMoves` moves and the bot's reply did not checkmate; fail when the learner
  *   is checkmated.
@@ -41,6 +42,10 @@ export function judgePlayOut(step: Pick<PlayOutStep, 'goal' | 'maxMoves' | 'user
     if (status.reason === 'checkmate') {
       // The side to move is checkmated.
       return status.turn === user ? { outcome: 'fail', reason: 'user_was_mated' } : { outcome: 'success', reason: 'user_mated' };
+    }
+    // A promotion that leaves a dead position (e.g. K+N vs K) still reaches the goal; a stalemating one does not.
+    if (step.goal === 'promote' && ply.mover === 'user' && ply.move?.promotion && status.reason !== 'stalemate') {
+      return { outcome: 'success', reason: 'promoted' };
     }
     const drawReason: PlayOutReason = status.reason === 'stalemate' ? 'stalemate' : 'drawn';
     if (DRAW_END_REASONS.has(status.reason) || status.result === '1/2-1/2') {

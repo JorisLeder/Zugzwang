@@ -40,11 +40,22 @@ export function practiceBot(roster: readonly BotProfile[], botRating: number | n
 }
 
 /**
- * Bot profile for an "Ausspielen" step with a numeric `botElo`: the roster bot nearest to that Elo (its engine type
- * and personality), with the exact Elo of the step and no opening repertoire (the step starts from its own FEN).
- * `null` for an empty roster.
+ * Elo used for `botElo: 'max'` ("full engine strength"): with the Elo model's offset this asks Stockfish for its
+ * highest `UCI_Elo` (3190).
  */
-export function playOutBot(roster: readonly BotProfile[], botElo: number): BotProfile | null {
+export const MAX_PLAY_OUT_ELO = 2790;
+
+/**
+ * Bot profile for an "Ausspielen" step: the roster bot nearest to the step's `botElo` (its engine type and
+ * personality), with the exact Elo of the step and no opening repertoire (the step starts from its own FEN).
+ * `botElo: 'max'` takes the strongest roster bot on the Elo model at `MAX_PLAY_OUT_ELO`. `null` for an empty roster.
+ */
+export function playOutBot(roster: readonly BotProfile[], botElo: number | 'max'): BotProfile | null {
+  if (botElo === 'max') {
+    const strongest = roster.reduce<BotProfile | null>((best, b) => (!best || b.elo > best.elo ? b : best), null);
+    if (!strongest) return null;
+    return { ...strongest, engine: 'stockfish-elo', elo: Math.max(strongest.elo, MAX_PLAY_OUT_ELO), repertoire: { white: [], black: [] } };
+  }
   const base = nearest(roster, (b) => Math.abs(b.elo - botElo));
   if (!base) return null;
   return { ...base, elo: botElo, repertoire: { white: [], black: [] } };
