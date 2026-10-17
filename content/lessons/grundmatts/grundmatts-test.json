@@ -1,0 +1,103 @@
+{
+  "id": "grundmatts-test",
+  "courseId": "grundmatts",
+  "order": 6,
+  "version": 1,
+  "kind": "course_test",
+  "titleDe": "Kurstest: Grundmatts und Mattbilder",
+  "summaryDe": "Grundreihenmatt, Matt mit Dame und Turm, Mattbilder und Matt in 2.",
+  "practiceThemes": ["mateIn1", "mateIn2", "backRankMate"],
+  "passThreshold": 0.8,
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 5.1.1 (Gewinn durch Schachmatt)",
+    "FIDE-Schachregeln 2023, Art. 5.2.1 (Patt)"
+  ],
+  "steps": [
+    {
+      "id": "start",
+      "type": "explanation",
+      "textDe": "Sechs Aufgaben rund ums Mattsetzen. Prüfe bei jedem Schach alle Fluchtfelder."
+    },
+    {
+      "id": "grundreihe",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "6k1/5ppp/8/8/8/1Q6/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b3b8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Grundreihe ist ungeschützt."],
+      "explanationDe": "Db8#: Grundreihenmatt.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1", "backRankMate"] }
+    },
+    {
+      "id": "dame-koenig",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "8/8/8/8/8/5K1k/8/6Q1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "g1g3", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Dame braucht den Schutz deines Königs."],
+      "explanationDe": "Dg3#: Die Dame wird vom König gedeckt. Auch Dh1# ist möglich.",
+      "puzzle": { "rating": 250, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "quiz-patt",
+      "type": "quiz",
+      "questionDe": "Was ist beim Mattsetzen mit König und Dame die größte Gefahr?",
+      "options": [
+        { "id": "patt", "textDe": "Ein Patt", "correct": true, "feedbackDe": "Richtig. Lass dem König immer ein Feld, bis du mattsetzen kannst." },
+        { "id": "dame", "textDe": "Dass der König die Dame schlägt", "correct": false, "feedbackDe": "Das passiert nur, wenn die Dame ungedeckt neben ihm steht – leicht zu vermeiden." },
+        { "id": "zeit", "textDe": "Dass es zu schnell geht", "correct": false, "feedbackDe": "Schnelligkeit ist kein Problem. Gefährlich ist das Patt." }
+      ]
+    },
+    {
+      "id": "turm-koenig",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "7R/8/8/8/8/8/2K5/k7 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "h8a8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Dein König deckt b1 und b2."],
+      "explanationDe": "Ta8#: Schach auf der a-Linie.",
+      "puzzle": { "rating": 250, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "mattbild",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "k7/8/2N5/8/8/8/6PP/1R4K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b1b8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Springer deckt a7 und b8."],
+      "explanationDe": "Tb8#: Der Springer deckt den Turm und das Feld a7.",
+      "puzzle": { "rating": 400, "themes": ["mateIn1", "arabianMate"] }
+    },
+    {
+      "id": "matt-in-2",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze in zwei Zügen matt.",
+      "fen": "3qr1k1/5ppp/8/8/8/8/4QPPP/4R1K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "e2e8",
+          "comment": "Die Dame schlägt den Turm mit Schach.",
+          "children": [{ "move": "d8e8", "children": [{ "move": "e1e8", "comment": "Grundreihenmatt.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 2 },
+      "hintsDe": ["Auf der e-Linie stehen Dame und Turm hintereinander."],
+      "explanationDe": "Dxe8+ Dxe8 Txe8#: Nach dem Tausch auf e8 setzt der Turm matt.",
+      "puzzle": { "rating": 500, "themes": ["mateIn2", "backRankMate"] }
+    }
+  ]
+}

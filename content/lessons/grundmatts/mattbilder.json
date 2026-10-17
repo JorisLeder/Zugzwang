@@ -1,0 +1,87 @@
+{
+  "id": "mattbilder",
+  "courseId": "grundmatts",
+  "order": 4,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Typische Mattbilder",
+  "summaryDe": "Viele Matts sehen sich ähnlich. Wer die Mattbilder kennt, findet sie in der Partie schneller.",
+  "practiceThemes": ["smotheredMate", "anastasiaMate", "arabianMate", "mateIn1"],
+  "sources": ["FIDE-Schachregeln 2023, Art. 5.1.1 (Gewinn durch Schachmatt)", "FIDE-Schachregeln 2023, Art. 5.2.1 (Patt)"],
+  "steps": [
+    {
+      "id": "bilder",
+      "type": "explanation",
+      "textDe": "Viele Matts wiederholen sich. Die Figuren stehen fast gleich, nur an anderer Stelle auf dem Brett. Präge dir die Bilder ein, dann erkennst du sie in deinen Partien wieder."
+    },
+    {
+      "id": "dame-und-springer",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt. Die Dame braucht einen Helfer.",
+      "fen": "5rk1/5p2/6pQ/6N1/8/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "h6h7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Springer g5 deckt h7."],
+      "explanationDe": "Dh7#: Die Dame steht direkt vor dem König und wird vom Springer gedeckt.",
+      "puzzle": { "rating": 300, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "ersticktes-matt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze mit dem Springer matt.",
+      "fen": "6rk/6pp/3N4/8/8/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d6f7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der König ist von eigenen Figuren eingesperrt."],
+      "explanationDe": "Sf7#: das erstickte Matt. Eigene Figuren nehmen dem König alle Felder.",
+      "puzzle": { "rating": 300, "themes": ["mateIn1", "smotheredMate"] }
+    },
+    {
+      "id": "quiz-name",
+      "type": "quiz",
+      "questionDe": "Wie heißt dieses Matt?",
+      "fen": "6rk/5Npp/8/8/8/8/8/6K1 b - - 1 1",
+      "options": [
+        { "id": "erstickt", "textDe": "Ersticktes Matt", "correct": true, "feedbackDe": "Richtig. Der Springer setzt matt, weil der König eingesperrt ist." },
+        { "id": "grundreihe", "textDe": "Grundreihenmatt", "correct": false, "feedbackDe": "Beim Grundreihenmatt gibt ein Turm oder eine Dame auf der Grundreihe Schach." },
+        { "id": "patt", "textDe": "Patt", "correct": false, "feedbackDe": "Der König steht im Schach. Das ist Matt, kein Patt." }
+      ],
+      "asserts": [{ "kind": "isCheckmate", "fen": "6rk/5Npp/8/8/8/8/8/6K1 b - - 1 1", "expect": true }]
+    },
+    {
+      "id": "springer-turm",
+      "type": "explanation",
+      "textDe": "Springer und Turm sind ein starkes Paar. Der Springer deckt Felder, die der Turm nicht erreicht. Zwei bekannte Bilder sind Anastasias Matt und das arabische Matt."
+    },
+    {
+      "id": "anastasia",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "r7/pp2N1pk/8/3R4/8/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "d5h5", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Springer e7 deckt g6 und g8.", "Die h-Linie ist offen."],
+      "explanationDe": "Th5#: Anastasias Matt. Der Springer deckt g6 und g8, der eigene Bauer g7 sperrt.",
+      "puzzle": { "rating": 400, "themes": ["mateIn1", "anastasiaMate"] }
+    },
+    {
+      "id": "arabisch",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "r6k/1R6/5N2/p7/8/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b7h7", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Springer f6 deckt h7 und g8."],
+      "explanationDe": "Th7#: das arabische Matt. Der Springer deckt den Turm und das Feld g8.",
+      "puzzle": { "rating": 400, "themes": ["mateIn1", "arabianMate"] }
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "matt-in-2",
+  "courseId": "grundmatts",
+  "order": 5,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Matt in 2",
+  "summaryDe": "Zwei Züge bis zum Matt: Oft zwingt der erste Zug den Gegner, und der zweite setzt matt.",
+  "practiceThemes": ["mateIn2"],
+  "steps": [
+    {
+      "id": "zwei-zuege",
+      "type": "explanation",
+      "textDe": "Bei einem Matt in 2 brauchst du zwei Züge. Oft ist der erste Zug ein Schach oder ein Opfer, das den Gegner zwingt. Manchmal ist es ein stiller Zug, der dem König Felder wegnimmt."
+    },
+    {
+      "id": "stiller-zug-demo",
+      "type": "demo",
+      "introDe": "Ein stiller Zug, dann das Matt.",
+      "startFen": "6k1/8/8/8/8/8/8/RR4K1 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "b1b7", "commentDe": "Tb7! Kein Schach – aber der Turm sperrt die 7. Reihe." },
+        { "uci": "g8h8", "commentDe": "Der König kann nur auf der 8. Reihe hin und her." },
+        { "uci": "a1a8", "commentDe": "Ta8# – Matt im zweiten Zug." }
+      ]
+    },
+    {
+      "id": "opfer-grundreihe",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze in zwei Zügen matt.",
+      "fen": "2r3k1/pb3ppp/8/8/8/8/3R1PPP/3Q2K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "d2d8",
+          "comment": "Der Turm opfert sich mit Schach.",
+          "children": [{ "move": "c8d8", "children": [{ "move": "d1d8", "comment": "Grundreihenmatt.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 2 },
+      "hintsDe": ["Der Turm c8 ist der einzige Verteidiger der Grundreihe.", "Lenke ihn mit einem Schach ab."],
+      "explanationDe": "Td8+ Txd8 Dxd8#: Der Verteidiger wird weggelockt.",
+      "puzzle": { "rating": 500, "themes": ["mateIn2", "backRankMate"] }
+    },
+    {
+      "id": "quiz-erster-zug",
+      "type": "quiz",
+      "questionDe": "Welche ersten Züge prüfst du bei einem Matt in 2 zuerst?",
+      "options": [
+        { "id": "zwingend", "textDe": "Schachs und Opfer, die den Gegner zwingen", "correct": true, "feedbackDe": "Richtig. Danach hat der Gegner nur wenige Antworten." },
+        { "id": "bauern", "textDe": "Bauernzüge am Rand", "correct": false, "feedbackDe": "Die führen selten schnell zum Matt." },
+        { "id": "koenig", "textDe": "Züge des eigenen Königs", "correct": false, "feedbackDe": "Manchmal hilft der König – aber zuerst prüfst du die zwingenden Züge." }
+      ]
+    },
+    {
+      "id": "ersticktes-matt-in-2",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze in zwei Zügen matt.",
+      "fen": "3r3k/pp4pp/7N/8/2Q5/8/5PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "c4g8",
+          "comment": "Das Damenopfer zwingt den Turm nach g8.",
+          "children": [{ "move": "d8g8", "children": [{ "move": "h6f7", "comment": "Ersticktes Matt.", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 2 },
+      "hintsDe": ["Der König darf die Dame auf g8 nicht schlagen – der Springer deckt das Feld.", "Danach ist der König eingesperrt."],
+      "explanationDe": "Dg8+ Txg8 Sf7#: Die Dame opfert sich, dann setzt der Springer erstickt matt.",
+      "puzzle": { "rating": 500, "themes": ["mateIn2", "smotheredMate"] }
+    },
+    {
+      "id": "turm-und-koenig",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze in zwei Zügen matt.",
+      "fen": "k7/8/2K5/8/8/8/8/7R w - - 0 1",
+      "orientation": "w",
+      "solution": [
+        {
+          "move": "c6b6",
+          "comment": "Der König nimmt a7 und b7.",
+          "children": [{ "move": "a8b8", "children": [{ "move": "h1h8", "children": [] }] }]
+        },
+        {
+          "move": "c6c7",
+          "comment": "Der König nimmt b7 und b8.",
+          "children": [{ "move": "a8a7", "children": [{ "move": "h1a1", "children": [] }] }]
+        }
+      ],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 2 },
+      "hintsDe": ["Ein sofortiges Schach hilft nicht.", "Bring zuerst deinen König näher."],
+      "explanationDe": "Kb6 oder Kc7: Erst nimmt dein König Felder weg, dann setzt der Turm am Rand matt."
+    }
+  ]
+}

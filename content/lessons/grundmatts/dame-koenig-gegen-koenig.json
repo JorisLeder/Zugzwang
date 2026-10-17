@@ -1,0 +1,102 @@
+{
+  "id": "dame-koenig-gegen-koenig",
+  "courseId": "grundmatts",
+  "order": 2,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Dame und König gegen König",
+  "summaryDe": "Mit Dame und König setzt du einen einzelnen König immer matt – wenn du das Patt vermeidest.",
+  "practiceThemes": ["mateIn1", "endgame"],
+  "sources": [
+    "FIDE-Schachregeln 2023, Art. 5.1.1 (Gewinn durch Schachmatt)",
+    "FIDE-Schachregeln 2023, Art. 5.2.1 (Patt)"
+  ],
+  "steps": [
+    {
+      "id": "technik",
+      "type": "explanation",
+      "textDe": "Mit Dame und König setzt du einen einzelnen König immer matt. Die Dame sperrt den König ein, am besten einen Springerzug entfernt. So drängst du ihn an den Rand. Dann kommt dein König zur Hilfe.",
+      "fen": "8/8/8/4k3/8/8/8/3QK3 w - - 0 1",
+      "orientation": "w"
+    },
+    {
+      "id": "matt-demo",
+      "type": "demo",
+      "introDe": "Der schwarze König ist schon am Rand. Jetzt kommt der weiße König.",
+      "startFen": "7k/Q7/8/4K3/8/8/8/8 w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "e5f6", "commentDe": "Kf6: Der König kommt näher. Schwarz bleibt nur g8." },
+        { "uci": "h8g8" },
+        { "uci": "a7g7", "commentDe": "Dg7#: Die Dame wird vom König gedeckt." }
+      ]
+    },
+    {
+      "id": "quiz-patt",
+      "type": "quiz",
+      "questionDe": "Schwarz ist am Zug. Was ist passiert?",
+      "fen": "7k/8/6QK/8/8/8/8/8 b - - 0 1",
+      "options": [
+        { "id": "patt", "textDe": "Patt – Remis, der Sieg ist verschenkt.", "correct": true, "feedbackDe": "Leider ja. Schwarz hat keinen Zug und steht nicht im Schach." },
+        { "id": "matt", "textDe": "Schachmatt", "correct": false, "feedbackDe": "Der König steht nicht im Schach. Darum ist es kein Matt." }
+      ],
+      "asserts": [{ "kind": "isStalemate", "fen": "7k/8/6QK/8/8/8/8/8 b - - 0 1", "expect": true }]
+    },
+    {
+      "id": "matt-ecke",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "k7/8/1K6/8/8/8/7Q/8 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "h2h8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Dein König deckt schon a7 und b7."],
+      "explanationDe": "Dh8#: Schach auf der 8. Reihe. Vorsicht: Dc7? wäre Patt gewesen.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "patt-achtung",
+      "type": "explanation",
+      "textDe": "Achtung, Patt! Hat der König keinen Zug und steht nicht im Schach, ist es Remis. Lass ihm deshalb ein Feld, bis dein König da ist. Erst dann setzt du matt."
+    },
+    {
+      "id": "kd-gegen-k",
+      "type": "play_out",
+      "promptDe": "Setze mit Dame und König matt. Dräng den König an den Rand und hol deinen König dazu.",
+      "fen": "8/8/8/4k3/8/8/8/3QK3 w - - 0 1",
+      "userColor": "w",
+      "goal": "checkmate",
+      "maxMoves": 25,
+      "botElo": "max",
+      "successDe": "Schachmatt mit Dame und König!",
+      "failDe": "Noch kein Matt. Sperr den König mit der Dame ein, hol deinen König heran und achte auf Patt."
+    },
+    {
+      "id": "matt-rand",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "6k1/8/6K1/8/8/8/8/Q7 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "a1a8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Dein König deckt die Felder der 7. Reihe."],
+      "explanationDe": "Da8#: Die Dame gibt auf der 8. Reihe Schach.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "matt-nicht-patt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt – Vorsicht, manche Züge sind Patt.",
+      "fen": "8/8/8/8/8/6K1/4Q3/7k w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "e2f1", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Gib Schach. Dein König deckt g2 und h2."],
+      "explanationDe": "Df1#: Schach auf der 1. Reihe. Df2? wäre Patt gewesen.",
+      "puzzle": { "rating": 250, "themes": ["mateIn1"] }
+    }
+  ]
+}

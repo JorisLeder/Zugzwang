@@ -1,0 +1,86 @@
+{
+  "id": "grundreihenmatt",
+  "courseId": "grundmatts",
+  "order": 1,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Das Grundreihenmatt",
+  "summaryDe": "Ein König hinter seinen eigenen Bauern ist auf der Grundreihe in Gefahr. Du lernst angreifen und vorbeugen.",
+  "practiceThemes": ["backRankMate", "mateIn1"],
+  "steps": [
+    {
+      "id": "grundreihe",
+      "type": "explanation",
+      "textDe": "Der schwarze König steht hinter seinen eigenen Bauern. Die Bauern schützen ihn, nehmen ihm aber auch die Fluchtfelder. Ein Schach auf der Grundreihe ist dann oft Matt.",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1",
+      "orientation": "w",
+      "arrows": [{ "from": "d1", "to": "d8", "kind": "hint" }],
+      "marks": [{ "square": "g8", "kind": "danger" }]
+    },
+    {
+      "id": "grundreihe-demo",
+      "type": "demo",
+      "introDe": "Der Turm c8 bewacht die Grundreihe. Was passiert, wenn er sie verlässt?",
+      "startFen": "2r3k1/5ppp/8/8/8/8/5PPP/3R2K1 b - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "c8c2", "commentDe": "Tc2? Der Turm verlässt die Grundreihe." },
+        { "uci": "d1d8", "commentDe": "Td8# – Grundreihenmatt.", "arrows": [{ "from": "d1", "to": "d8", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "dame-grundreihe",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "1r4k1/5ppp/8/8/8/8/1Q3PPP/6K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "b2b8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der Turm b8 ist ungedeckt."],
+      "explanationDe": "Dxb8#: Die Dame schlägt den Turm und setzt auf der Grundreihe matt.",
+      "puzzle": { "rating": 250, "themes": ["mateIn1", "backRankMate"] }
+    },
+    {
+      "id": "quiz-luft",
+      "type": "quiz",
+      "questionDe": "Weiß am Zug. Schwarz droht Td1#. Welcher Zug verhindert das Matt?",
+      "fen": "3r2k1/ppp2pp1/7p/8/8/1P6/PBP2PPP/6K1 w - - 0 1",
+      "options": [
+        { "id": "h3", "textDe": "h3 – der König bekommt ein Fluchtfeld.", "correct": true, "feedbackDe": "Richtig. So ein Fluchtfeld nennt man auch Luftloch." },
+        { "id": "a3", "textDe": "a3", "correct": false, "feedbackDe": "Nach a3 folgt Td1#. Der König hat noch kein Fluchtfeld." },
+        { "id": "c4", "textDe": "c4", "correct": false, "feedbackDe": "c4 ändert nichts an der Grundreihe: Td1# bleibt Matt." }
+      ],
+      "asserts": [
+        { "kind": "isCheckmate", "fen": "6k1/ppp2pp1/7p/8/8/PP6/1BP2PPP/3r2K1 w - - 1 2", "expect": true },
+        { "kind": "isCheckmate", "fen": "6k1/ppp2pp1/7p/8/8/1P5P/PBP2PP1/3r2K1 w - - 1 2", "expect": false }
+      ]
+    },
+    {
+      "id": "schwarz-setzt-matt",
+      "type": "find_move",
+      "promptDe": "Schwarz am Zug. Setze matt.",
+      "fen": "4r1k1/5ppp/8/8/8/R7/5PPP/6K1 b - - 0 1",
+      "orientation": "b",
+      "solution": [{ "move": "e8e1", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Auch der weiße König hat kein Luftloch."],
+      "explanationDe": "Te1#: Grundreihenmatt gegen Weiß.",
+      "puzzle": { "rating": 250, "themes": ["mateIn1", "backRankMate"] }
+    },
+    {
+      "id": "turm-schlaegt",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "2r3k1/5ppp/8/8/8/8/1Q3PPP/2R3K1 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "c1c8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Der schwarze Turm c8 ist der einzige Verteidiger der Grundreihe."],
+      "explanationDe": "Txc8#: Der Verteidiger der Grundreihe wird geschlagen – mit Matt.",
+      "puzzle": { "rating": 280, "themes": ["mateIn1", "backRankMate"] }
+    }
+  ]
+}

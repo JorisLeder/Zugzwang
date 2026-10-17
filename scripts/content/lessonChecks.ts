@@ -16,7 +16,7 @@ import type { EngineLine, EngineService } from '@/core/engine';
 import type { CourseMeta, Lesson, LessonStep, MoveTreeNode, QuizAssert } from '@/core/lessons';
 import { PUZZLE_THEMES } from '@/core/puzzles';
 import { lessonCatalogSchema, lessonSchema } from '@/core/schemas';
-import { ChessGame, fenTurn, pieceCounts, uciToSan, validateFen } from '@/lib/chess';
+import { ChessGame, fenTurn, formatSan, pieceCounts, uciToSan, validateFen } from '@/lib/chess';
 import {
   citedArticles,
   FIDE_SOURCE_RE,
@@ -233,8 +233,15 @@ export function immediateMates(fen: Fen): Uci[] {
   return out;
 }
 
+/** German SAN of a UCI move (messages are read by German content authors). */
 function san(fen: Fen, uci: string): string {
-  return uciToSan(fen, uci) ?? uci;
+  const s = uciToSan(fen, uci);
+  return s ? formatSan(s, 'de') : uci;
+}
+
+/** German SAN of a played move record. */
+function de(rec: { san: string }): string {
+  return formatSan(rec.san, 'de');
 }
 
 /** Material signature like `KQ-K` (side with more material first). */
@@ -274,9 +281,9 @@ export function walkTree(
         report(`Zug ${[...path, node.move].join(' ')} ist nicht regelgemäß.`);
         continue;
       }
-      if (seen.has(rec.uci)) report(`Zug ${rec.san} steht doppelt im Zugbaum.`);
+      if (seen.has(rec.uci)) report(`Zug ${de(rec)} steht doppelt im Zugbaum.`);
       seen.add(rec.uci);
-      const p = [...path, rec.san];
+      const p = [...path, de(rec)];
       if (rec.isCheckmate || node.children.length === 0) {
         if (rec.isCheckmate && node.children.length > 0) report(`Nach ${p.join(' ')} ist die Partie vorbei, der Zugbaum geht aber weiter.`);
         leaves.push({ fen: rec.fenAfter, path: p, userPly: userPly + 1, endsWith: 'user', mate: rec.isCheckmate });
@@ -289,9 +296,9 @@ export function walkTree(
           report(`Antwort ${[...p, reply.move].join(' ')} ist nicht regelgemäß.`);
           continue;
         }
-        if (replySeen.has(r.uci)) report(`Antwort ${r.san} steht doppelt im Zugbaum.`);
+        if (replySeen.has(r.uci)) report(`Antwort ${de(r)} steht doppelt im Zugbaum.`);
         replySeen.add(r.uci);
-        const rp = [...p, r.san];
+        const rp = [...p, de(r)];
         if (r.isCheckmate || reply.children.length === 0) {
           if (r.isCheckmate && reply.children.length > 0) report(`Nach ${rp.join(' ')} ist die Partie vorbei, der Zugbaum geht aber weiter.`);
           leaves.push({ fen: r.fenAfter, path: rp, userPly: userPly + 1, endsWith: 'reply', mate: r.isCheckmate });
@@ -490,7 +497,7 @@ export function checkStepStatic(step: LessonStep): LessonFindings {
           if (p.userPly === 0 && mates.size === 0) err(`Kein Matt in 1 – behauptet ist Matt in ${n}.`);
           for (const node of p.nodes) {
             const rec = play(p.fen, node.move);
-            if (rec && !rec.isCheckmate) err(`${rec.san}${where} setzt nicht matt.`);
+            if (rec && !rec.isCheckmate) err(`${de(rec)}${where} setzt nicht matt.`);
           }
           for (const m of mates) if (!accepted.has(m)) err(`Alternatives Matt ${san(p.fen, m)}${where} wird nicht akzeptiert (Lösung ergänzen oder acceptAnyMate).`);
         }
@@ -709,13 +716,13 @@ async function checkBestPoint(
     if (!rec) continue;
     const line = lines.find((l) => l.pv[0] === rec.uci);
     if (!line) {
-      err(`${rec.san}${where} ist schlechter als ${san(p.fen, other.pv[0]!)} (nicht unter den besten ${lines.length} Zügen).`);
+      err(`${de(rec)}${where} ist schlechter als ${san(p.fen, other.pv[0]!)} (nicht unter den besten ${lines.length} Zügen).`);
       continue;
     }
     const margin = ep(line, turn) - ep(other, turn);
     if (margin < BEST_MARGIN_EP) {
       err(
-        `${rec.san}${where} ist nicht eindeutig: ${san(p.fen, other.pv[0]!)} (${fmtScore(other, turn)}) ist nur ${margin.toFixed(3)} erwartete Punkte schlechter als ${rec.san} (${fmtScore(line, turn)}), mindestens ${BEST_MARGIN_EP}.`,
+        `${de(rec)}${where} ist nicht eindeutig: ${san(p.fen, other.pv[0]!)} (${fmtScore(other, turn)}) ist nur ${margin.toFixed(3)} erwartete Punkte schlechter als ${de(rec)} (${fmtScore(line, turn)}), mindestens ${BEST_MARGIN_EP}.`,
       );
     }
   }
@@ -744,7 +751,7 @@ async function checkMatePoint(
     const rec = play(p.fen, node.move);
     if (!rec) continue;
     const m = mateOf.get(rec.uci);
-    if (m === undefined || m === null || m > remaining) err(`${rec.san}${where} setzt nicht in ${remaining} Zügen matt.`);
+    if (m === undefined || m === null || m > remaining) err(`${de(rec)}${where} setzt nicht in ${remaining} Zügen matt.`);
   }
   for (const [uci, m] of mateOf) {
     if (m !== null && m <= remaining && !accepted.has(uci)) {

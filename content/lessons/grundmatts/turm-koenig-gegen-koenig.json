@@ -1,0 +1,93 @@
+{
+  "id": "turm-koenig-gegen-koenig",
+  "courseId": "grundmatts",
+  "order": 3,
+  "version": 1,
+  "kind": "lesson",
+  "titleDe": "Turm und König gegen König",
+  "summaryDe": "Auch mit einem Turm setzt du matt. Turm und König arbeiten dabei eng zusammen.",
+  "practiceThemes": ["mateIn1", "rookEndgame"],
+  "steps": [
+    {
+      "id": "technik",
+      "type": "explanation",
+      "textDe": "Mit Turm und König geht es auch, es dauert nur länger. Der Turm schneidet den König ab und schiebt ihn Reihe für Reihe an den Rand. Stehen sich die Könige gegenüber, gibt der Turm am Rand Schach – Matt.",
+      "fen": "8/8/8/4k3/8/8/8/R3K3 w - - 0 1",
+      "orientation": "w"
+    },
+    {
+      "id": "matt-demo",
+      "type": "demo",
+      "introDe": "Der Turm wartet, bis die Könige sich gegenüberstehen.",
+      "startFen": "4k3/8/3K4/8/8/8/8/7R w - - 0 1",
+      "orientation": "w",
+      "moves": [
+        { "uci": "h1h7", "commentDe": "Th7: Der Turm sperrt die 7. Reihe." },
+        { "uci": "e8d8", "commentDe": "Kd8: Jetzt stehen sich die Könige direkt gegenüber." },
+        { "uci": "h7h8", "commentDe": "Th8# – Matt am Rand.", "arrows": [{ "from": "h7", "to": "h8", "kind": "played" }] }
+      ]
+    },
+    {
+      "id": "matt-gegenueber",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "3k4/8/3K4/8/8/8/8/R7 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "a1a8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Die Könige stehen sich gegenüber."],
+      "explanationDe": "Ta8#: Dein König deckt c7, d7 und e7.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "quiz-kein-matt",
+      "type": "quiz",
+      "questionDe": "Weiß hat Th8+ gespielt. Ist das Matt?",
+      "fen": "4k2R/8/2K5/8/8/8/8/8 b - - 1 1",
+      "options": [
+        { "id": "nein", "textDe": "Nein – der König entkommt auf die 7. Reihe.", "correct": true, "feedbackDe": "Richtig. Der weiße König steht nicht gegenüber und deckt e7 und f7 nicht." },
+        { "id": "ja", "textDe": "Ja, das ist Matt.", "correct": false, "feedbackDe": "Prüfe d7, e7 und f7: Dort ist der König sicher." }
+      ],
+      "asserts": [
+        { "kind": "isCheck", "fen": "4k2R/8/2K5/8/8/8/8/8 b - - 1 1", "expect": true },
+        { "kind": "isCheckmate", "fen": "4k2R/8/2K5/8/8/8/8/8 b - - 1 1", "expect": false }
+      ]
+    },
+    {
+      "id": "kt-gegen-k",
+      "type": "play_out",
+      "promptDe": "Setze mit Turm und König matt. Schneide den König mit dem Turm ab und bring deinen König dazu.",
+      "fen": "8/8/8/4k3/8/8/8/R3K3 w - - 0 1",
+      "userColor": "w",
+      "goal": "checkmate",
+      "maxMoves": 40,
+      "botElo": "max",
+      "successDe": "Schachmatt mit Turm und König!",
+      "failDe": "Noch kein Matt. Der Turm sperrt, der König kommt näher – und Schach gibt es erst, wenn sich die Könige gegenüberstehen."
+    },
+    {
+      "id": "matt-ecke",
+      "type": "find_move",
+      "promptDe": "Weiß am Zug. Setze matt.",
+      "fen": "7k/8/6K1/8/8/8/8/R7 w - - 0 1",
+      "orientation": "w",
+      "solution": [{ "move": "a1a8", "children": [] }],
+      "acceptAnyMate": true,
+      "claim": { "kind": "mate", "mateIn": 1 },
+      "hintsDe": ["Dein König deckt g7 und h7."],
+      "explanationDe": "Ta8#: Matt in der Ecke.",
+      "puzzle": { "rating": 200, "themes": ["mateIn1"] }
+    },
+    {
+      "id": "quiz-wann",
+      "type": "quiz",
+      "questionDe": "Wann gibt der Turm am Rand das Matt?",
+      "options": [
+        { "id": "gegenueber", "textDe": "Wenn sich die Könige gegenüberstehen", "correct": true, "feedbackDe": "Richtig. Dann deckt dein König alle Fluchtfelder vor dem Rand." },
+        { "id": "immer", "textDe": "Immer, sobald der König am Rand steht", "correct": false, "feedbackDe": "Ohne den eigenen König entkommt der gegnerische König." },
+        { "id": "nie", "textDe": "Mit einem Turm geht kein Matt.", "correct": false, "feedbackDe": "Doch – König und Turm setzen immer matt." }
+      ]
+    }
+  ]
+}
