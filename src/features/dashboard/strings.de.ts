@@ -1,4 +1,78 @@
-/** German strings of this feature (D-35). PLACEHOLDER (WP-00) – owned by WP-09. */
+/** German strings of the dashboard (D-35). */
 export const STRINGS_DE = {
   home: 'Start',
+  subtitle: 'Dein Training auf einen Blick.',
+  greeting: (name: string) => `Hallo ${name}! Dein Training auf einen Blick.`,
+  loading: 'Wird geladen …',
+  overviewLabel: 'Deine Werte',
+
+  puzzleRating: 'Puzzle-Rating',
+  botRating: 'Bot-Rating',
+  noRatingYet: 'noch keine Wertung',
+  puzzleRatingNew: 'Startwert nach deiner Selbsteinschätzung',
+  puzzleRatingCount: (n: number) => (n === 1 ? '1 bewertetes Puzzle' : `${n} bewertete Puzzles`),
+  puzzleRatingNone: 'Löse bewertete Puzzles, um ein Rating zu bekommen.',
+  botRatingCount: (n: number) => (n === 1 ? '1 gewertete Partie' : `${n} gewertete Partien`),
+  botRatingNone: 'Spiel eine Partie im Modus Wettkampf.',
+  provisional: 'vorläufig',
+
+  streak: 'Serie',
+  streakLongest: (n: number) => `Längste Serie: ${n} ${n === 1 ? 'Tag' : 'Tage'}`,
+  streakNone: 'Trainiere heute, um deine Serie zu starten.',
+
+  dailyGoal: 'Tagesziel',
+  dailyGoalRing: (m: number, g: number) => `Tagesziel: ${m} von ${g} Minuten`,
+  dailyGoalText: (m: number, g: number) => `${m} von ${g} Min. heute`,
+  dailyGoalReached: 'Geschafft! Tagesziel erreicht.',
+  dailyGoalRemaining: (n: number) => `Noch ${n} Min.`,
+  dailyGoalEdit: 'Tagesziel ändern',
+  minutesShort: 'Min.',
+
+  resumeTitle: 'Weiter, wo du aufgehört hast',
+  resumeGame: (bot: string) => `Partie gegen ${bot}`,
+  resumeGameUnknownBot: 'Laufende Partie',
+  resumeGameMeta: (plies: number) => (plies === 0 ? 'Noch kein Zug gespielt' : plies === 1 ? '1 Halbzug gespielt' : `${plies} Halbzüge gespielt`),
+  resumeGameAction: 'Partie fortsetzen',
+  resumeLessonAction: 'Lektion fortsetzen',
+  resumeLessonMeta: (course: string, step: number, total: number) => `${course} · Weiter bei Schritt ${step} von ${total}`,
+  resumeLessonMetaShort: (course: string) => `${course} · angefangen`,
+  resumePuzzlesAction: 'Weiter trainieren',
+  resumeAlso: 'Außerdem offen',
+  puzzleModes: {
+    rated: 'Bewertete Puzzles',
+    learning: 'Lernmodus',
+    theme: 'Themen-Training',
+    hub: 'Puzzles',
+  },
+  puzzleThemeMode: (theme: string) => `Themen-Training: ${theme}`,
+  resumePuzzlesMeta: 'Zuletzt trainiert',
+  resumeEmptyTitle: 'Noch nichts angefangen',
+  resumeEmptyText: 'Starte mit ein paar bewerteten Puzzles – sie passen sich deinem Rating an.',
+  resumeEmptyAction: 'Puzzles starten',
+
+  nextLessonTitle: 'Nächste Lektion',
+  nextLessonStart: 'Lektion starten',
+  nextLessonContinue: 'Weitermachen',
+  nextLessonTest: 'Kurstest starten',
+  nextLessonAllDone: 'Alle offenen Lektionen sind erledigt. Neue Kurse sind in Vorbereitung.',
+  nextLessonNone: 'Lektionen sind in Vorbereitung.',
+  toLearnPath: 'Zum Lernpfad',
+
+  trainTitle: 'Als Nächstes trainieren',
+  trainWeakTheme: (theme: string, rate: string, attempts: number) =>
+    `${theme}: ${rate} gelöst in ${attempts} Versuchen. Hier lohnt sich Übung.`,
+  trainGameMotif: (motif: string, count: number) =>
+    count === 1 ? `In deinen Partien ist dir einmal „${motif}“ passiert.` : `In deinen Partien ist dir ${count}-mal „${motif}“ passiert.`,
+  trainThemeAction: (theme: string) => `${theme} trainieren`,
+  trainLesson: 'Lerne mit der nächsten Lektion weiter.',
+  trainBot: (bot: string, elo: number) => `Spiel eine Partie gegen ${bot} (${elo} Elo).`,
+  trainNothing: 'Löse ein paar Puzzles – danach empfehlen wir dir, was du üben solltest.',
+  trainPuzzlesAction: 'Puzzles starten',
+
+  botTitle: 'Passender Gegner',
+  botMeta: (elo: number, style: string) => `${elo} Elo · ${style}`,
+  botAction: 'Gegen Bot spielen',
+  botAvatarAlt: (name: string) => `Avatar von ${name}`,
+
+  error: 'Deine Daten konnten nicht geladen werden.',
 } as const;

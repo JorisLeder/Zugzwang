@@ -1,4 +1,22 @@
-/** German strings of this feature (D-35). PLACEHOLDER (WP-00) – owned by WP-09. */
+/** German strings of the onboarding (D-35). */
 export const STRINGS_DE = {
   onboarding: 'Willkommen bei Zugzwang',
+  subtitle: 'Zwei kurze Fragen, dann geht es los.',
+  assessmentTitle: 'Wie gut kennst du dich aus?',
+  assessmentHint: 'Danach richten sich dein erstes Puzzle-Rating, der passende Bot und die Stufe im Lernpfad. Du kannst später alles ändern.',
+  assessmentLabel: 'Selbsteinschätzung',
+  goalTitle: 'Wie viel Zeit möchtest du am Tag trainieren?',
+  goalHint: 'Dein Tagesziel. Wir zählen nur aktive Minuten.',
+  goalLabel: 'Tagesziel',
+  goalOption: (minutes: number) => `${minutes} Min.`,
+  goalOptionDescription: (minutes: number) => `${minutes} Minuten am Tag`,
+  submit: 'Los geht’s',
+  saving: 'Wird gespeichert …',
+  chooseFirst: 'Wähle zuerst aus, wie gut du dich auskennst.',
+  failed: 'Das Speichern hat nicht geklappt. Versuch es nochmal.',
+  doneTitle: 'Du bist schon eingerichtet',
+  doneText: 'Deine Selbsteinschätzung und dein Tagesziel sind gespeichert. Das Tagesziel kannst du im Profil ändern.',
+  toDashboard: 'Zur Startseite',
+  toProfile: 'Zum Profil',
+  loading: 'Wird geladen …',
 } as const;
