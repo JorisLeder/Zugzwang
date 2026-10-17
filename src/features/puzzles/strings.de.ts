@@ -1,4 +1,4 @@
-/** German strings of this feature (D-35). PLACEHOLDER (WP-00) – owned by WP-03. */
+/** German strings of the puzzle pages (D-35, DESIGN §9.2). Task and hint texts come from `@/puzzles`. */
 export const STRINGS_DE = {
   puzzles: 'Puzzles',
   puzzlesRated: 'Bewertete Puzzles',
@@ -6,4 +6,96 @@ export const STRINGS_DE = {
   puzzleThemes: 'Themen-Training',
   puzzleTheme: 'Themen-Training',
   puzzlesDemo: 'Demo-Puzzles',
+
+  // Hub
+  hubSubtitle: 'Löse Aufgaben, die zu dir passen – mit Hinweisen und Erklärungen.',
+  hubRatedMeta: (rating: string) => `Dein Puzzle-Rating: ${rating}`,
+  hubRatedMetaNew: 'Starte mit einer kurzen Einschätzung.',
+  hubRatedText: 'Puzzles passend zu deinem Rating. Jeder Versuch zählt.',
+  hubLearnText: 'Ohne Rating und ohne Zeit. Mit Hinweisen, Lösung und Erklärung.',
+  hubThemesText: 'Übe gezielt ein Motiv: Gabel, Fesselung, Grundreihenmatt …',
+
+  // Bank and loading
+  bankLoading: 'Puzzles werden geladen …',
+  bankError: 'Die Puzzles konnten nicht geladen werden. Prüfe deine Verbindung und versuch es nochmal.',
+  noPuzzles: 'Es gibt noch keine Puzzles.',
+
+  // Self-assessment (D-10)
+  selfAssessmentTitle: 'Wie gut spielst du schon?',
+  selfAssessmentText: 'Damit die ersten Puzzles zu dir passen, schätz dich kurz ein. Dein Rating passt sich danach schnell an.',
+  selfAssessmentLabel: 'Selbsteinschätzung',
+  selfAssessmentStart: 'Los geht’s',
+  selfAssessmentStartValue: (rating: number) => `Start-Rating ${rating}`,
+
+  // Trainer panel
+  ratingChip: (rating: string) => `Dein Rating ${rating}`,
+  puzzleRating: (rating: string) => `Puzzle-Rating ${rating}`,
+  puzzleDifficulty: (rating: string) => `Schwierigkeit dieses Puzzles: ${rating}`,
+  provisional: 'vorläufig',
+  correct: 'Richtig! Weiter so.',
+  wrongLearning: 'Nicht ganz. Versuch es nochmal.',
+  wrongRated: 'Leider falsch – das Puzzle zählt als nicht gelöst. Du kannst weiter probieren.',
+  ratedHintWarning: 'Ein Hinweis zählt das Puzzle als nicht gelöst.',
+  ratedFailed: 'Dieses Puzzle zählt als nicht gelöst.',
+  solutionPlaying: 'Hier ist die Lösung.',
+  solved: 'Gelöst!',
+  solvedWithRating: (rating: string) => `Gelöst! Puzzle-Rating ${rating}`,
+  failedWithRating: (rating: string) => `Nicht gelöst. Puzzle-Rating ${rating}`,
+  finishedAfterFail: 'Zu Ende gelöst – für dein Rating zählt es als nicht gelöst.',
+  solutionShown: 'So geht die Lösung.',
+  ratingUpdating: 'Dein Rating wird aktualisiert …',
+  ratingAnnouncement: (rating: string, delta: string) => `Rating ${rating}, ${delta}.`,
+  windowNotice: 'In deinem Bereich gibt es gerade kein neues Puzzle – dieses liegt etwas weiter weg von deinem Rating.',
+  exhaustedTitle: 'Alle bewerteten Puzzles gelöst',
+  exhaustedText: 'Du hast jedes bewertete Puzzle schon einmal gespielt. Im Lernmodus kannst du weiter üben.',
+  toLearning: 'Zum Lernmodus',
+  motifs: 'Motive',
+  explanation: 'Erklärung',
+  replaySolution: 'Lösung nachspielen',
+  replayPosition: (n: number, total: number) => `Stellung ${n} von ${total}`,
+  playVsBot: 'Gegen Bot ausspielen',
+  next: 'Nächstes Puzzle',
+  hint: 'Hinweis',
+  hintMore: 'Noch ein Hinweis',
+  showSolution: 'Lösung zeigen',
+  hintStage: (n: number) => `Hinweis ${n} von 3`,
+  leaveTitle: 'Puzzle verlassen?',
+  leaveText: 'Es zählt dann als nicht gelöst.',
+  leave: 'Verlassen',
+  stay: 'Weiterlösen',
+  coachName: 'Coach',
+
+  // Learning mode
+  learnSubtitle: 'Ohne Rating – nimm dir Zeit.',
+
+  // Themes
+  themesSubtitle: 'Wähle ein Motiv und eine Schwierigkeit. Themen-Training zählt nicht für dein Rating.',
+  difficulty: 'Schwierigkeit',
+  difficultyEasy: 'Leicht',
+  difficultyMedium: 'Mittel',
+  difficultyHard: 'Schwer',
+  difficultyAll: 'Alle',
+  difficultyEasyText: 'Etwas leichter als dein Rating.',
+  difficultyMediumText: 'Ungefähr auf deinem Niveau.',
+  difficultyHardText: 'Etwas schwerer als dein Rating.',
+  difficultyAllText: 'Alle Puzzles zu diesem Motiv.',
+  themeCount: (n: number) => (n === 1 ? '1 Puzzle' : `${n} Puzzles`),
+  themeNoPuzzles: 'Noch keine Puzzles',
+  themeSuccess: (pct: string) => `${pct} gelöst`,
+  themeNotTrained: 'Noch nicht trainiert',
+  themeListLabel: 'Motive',
+  opening: 'Eröffnung',
+  allOpenings: 'Alle Eröffnungen',
+  filterEmptyTitle: 'Keine Puzzles für diesen Filter',
+  filterEmptyText: 'Wähle eine andere Schwierigkeit oder ein anderes Motiv.',
+  filterReset: 'Filter zurücksetzen',
+  unknownTheme: 'Dieses Motiv gibt es nicht.',
+  toThemes: 'Zur Themenübersicht',
+  themeTitle: (label: string) => `Themen-Training: ${label}`,
+
+  // Demo (P0-01)
+  demoProgress: (n: number) => `Demo-Puzzle ${n} von 5`,
+  demoNotice: 'Demo: Nichts wird gespeichert.',
+  demoDone: 'Das waren deine 5 Demo-Puzzles. Melde dich an, damit dein Fortschritt gespeichert wird.',
+  demoCta: 'Anmelden, um Fortschritt zu speichern',
 } as const;

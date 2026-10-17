@@ -297,7 +297,9 @@ export class GameController {
       console.error('GameController: takeover failed', e);
     }
     if (session !== this.session) return;
-    this.set({ phase: 'active' });
+    // The bot greets at the start of a new game (PRD "kurze Chat-Sprüche").
+    const greeting = this.chess!.ply() === 0 ? chatLine(bot, 'greeting', this.random) : undefined;
+    this.set({ phase: 'active', botChat: greeting ?? null });
     this.startHeartbeat();
     this.observe();
     this.continuePlay();

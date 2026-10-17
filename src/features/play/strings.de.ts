@@ -99,6 +99,7 @@ export const STRINGS_DE = {
   warningLead: 'Bist du sicher?',
   warningRethink: 'Nochmal überlegen',
   warningPlayAnyway: 'Trotzdem ziehen',
+  bestLineLabel: 'Besser ist zum Beispiel:',
   threatLead: 'Achtung:',
   praiseLead: 'Starker Zug!',
   coachReady: 'Coach bereit',

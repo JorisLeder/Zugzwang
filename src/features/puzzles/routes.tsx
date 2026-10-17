@@ -1,6 +1,6 @@
 /**
- * Routes of this feature (D-03). PLACEHOLDER written by WP-00 – owned by WP-03 from its wave.
- * Pages are lazy-loaded; the root router imports this array statically. Public routes carry `handle.public`.
+ * Routes of the puzzle feature (D-03, WP-03). Pages are lazy-loaded; the root router imports this array statically.
+ * The demo is public (P0-01: without login only the 5-puzzle demo is available in cloud mode).
  */
 import type { RouteObject } from 'react-router';
 import { ROUTE_PATTERNS } from '@/app/paths';

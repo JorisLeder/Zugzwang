@@ -213,6 +213,13 @@ export function GameScreen({ controller, view }: GameScreenProps) {
           name={STRINGS_DE.coachName}
           avatarSrc={COACH_AVATAR}
           tone="danger"
+          details={
+            view.warning.assessment.facts.bestLine.length > 0 ? (
+              <p className="text-body-sm text-muted">
+                {STRINGS_DE.bestLineLabel} {view.warning.assessment.facts.bestLine.slice(0, 4).map((san) => formatSan(san, notation)).join(' ')}
+              </p>
+            ) : undefined
+          }
           actions={
             <>
               <Button ref={rethinkRef} onClick={() => controller.answerWarning(false)}>

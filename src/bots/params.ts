@@ -36,14 +36,14 @@ export interface SkillParams {
   plausibilityTemperature: number;
 }
 
-/** Skill parameters by Elo (100 → very weak … 790 → weak). Gross errors fall geometrically from 70 % to 26 %. */
+/** Skill parameters by Elo (100 → very weak … 790 → weak). Gross errors fall geometrically from 85 % to 24 %. */
 export function skillParams(elo: number): SkillParams {
   const t = clamp((elo - 100) / 600, 0, 1);
   return {
     skillLevel: clamp(Math.round(lerp(0, 3, t)), 0, 3),
     depth: clamp(Math.round(lerp(1, 6, t)), 1, 6),
     movetimeMs: 300,
-    grossErrorRate: Number((0.7 * Math.pow(0.26 / 0.7, t)).toFixed(3)),
+    grossErrorRate: Number((0.85 * Math.pow(0.24 / 0.85, t)).toFixed(3)),
     plausibilityTemperature: Number(lerp(1.6, 1.0, t).toFixed(3)),
   };
 }
@@ -58,7 +58,7 @@ export interface HumanParams {
   movetimeMs: number;
   /** Loss scale of the selection kernel (EP units, 0–1): a move losing this much has weight e⁻¹. Lower = stronger. */
   temperature: number;
-  /** Exponent of the kernel `exp(−(loss / temperature)^sharpness)`; 2 = bell-shaped (big losses become rare fast). */
+  /** Exponent of the kernel `exp(−(loss / temperature)^sharpness)`; > 1 = flat for small losses, then a steep fall. */
   sharpness: number;
   /** Probability that the bot judges the position "blind" to the opponent's replies (shallow search only). */
   blindness: number;
@@ -74,19 +74,19 @@ export function humanParams(elo: number, style?: BotProfile['style']): HumanPara
   const aggressive = style === 'aggressive' || style === 'tactical' || style === 'gambit';
   const quiet = style === 'solid' || style === 'positional' || style === 'cautious';
   return {
-    depth: clamp(Math.round(lerp(7, 12, t)), 3, 14),
+    depth: clamp(Math.round(lerp(6, 12, t)), 3, 14),
     multiPv: clamp(Math.round(lerp(12, 8, t)), 8, 12),
     movetimeMs: 700,
-    temperature: Number((0.16 * Math.pow(0.06 / 0.16, t)).toFixed(4)),
-    sharpness: 2,
-    blindness: Number(lerp(0.2, 0.03, t).toFixed(3)),
-    shallowDepth: clamp(Math.round(lerp(2, 5, t)), 1, 6),
+    temperature: Number((0.22 * Math.pow(0.07 / 0.22, t)).toFixed(4)),
+    sharpness: 3,
+    blindness: Number((0.3 * Math.pow(0.03 / 0.3, t)).toFixed(3)),
+    shallowDepth: clamp(Math.round(lerp(1, 4, t)), 1, 6),
     natural: {
-      recapture: 1,
-      check: aggressive ? 0.5 : 0.25,
-      capture: aggressive ? 0.3 : 0.15,
-      development: quiet ? 0.4 : 0.25,
-      castle: quiet ? 0.5 : 0.3,
+      recapture: 0.8,
+      check: aggressive ? 0.35 : 0.2,
+      capture: aggressive ? 0.2 : 0.1,
+      development: quiet ? 0.3 : 0.2,
+      castle: quiet ? 0.4 : 0.25,
     },
   };
 }
