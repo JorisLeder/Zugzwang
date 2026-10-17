@@ -352,7 +352,9 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
           pending = n;
           publish();
         },
-        error: (e: unknown) => console.warn('Sync: outbox count failed', e),
+        error: (e: unknown) => {
+          if ((e as { name?: string } | null)?.name !== 'DatabaseClosedError') console.warn('Sync: outbox count failed', e);
+        },
       });
       unsubs.push(() => sub.unsubscribe());
       void engine.flush();

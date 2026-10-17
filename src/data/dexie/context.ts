@@ -27,9 +27,15 @@ export interface DataContext {
   enqueued(): void;
 }
 
+/** Errors of a live query: a closed database (deleted in another tab, page unloading) is expected and silent. */
+function onLiveError(e: unknown): void {
+  if ((e as { name?: string } | null)?.name === 'DatabaseClosedError') return;
+  console.warn('Daten: live query failed', e);
+}
+
 /** Live query adapted to `Subscribable`. */
 export function live<T>(query: () => Promise<T>): Subscribable<T> {
-  return fromObservable(liveQuery(query));
+  return fromObservable(liveQuery(query), onLiveError);
 }
 
 /** Upsert tables whose pending entry for the same row is replaced instead of queueing another one (heartbeats). */

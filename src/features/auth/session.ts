@@ -13,16 +13,26 @@ export function rememberNextPath(path: string): void {
   }
 }
 
-/** The remembered page (once), or `fallback`. Only same-origin paths are accepted. */
-export function takeNextPath(fallback: string): string {
+/** The remembered page without consuming it (safe during render), or `fallback`. Only same-origin paths. */
+export function peekNextPath(fallback: string): string {
   try {
     const next = sessionStorage.getItem(NEXT_KEY);
-    sessionStorage.removeItem(NEXT_KEY);
     if (next && next.startsWith('/') && !next.startsWith('//')) return next;
   } catch {
     // ignore
   }
   return fallback;
+}
+
+/** The remembered page (once), or `fallback`. */
+export function takeNextPath(fallback: string): string {
+  const next = peekNextPath(fallback);
+  try {
+    sessionStorage.removeItem(NEXT_KEY);
+  } catch {
+    // ignore
+  }
+  return next;
 }
 
 /** German message of an auth failure. */

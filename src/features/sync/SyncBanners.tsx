@@ -24,12 +24,12 @@ export function SyncBanners() {
 
   const failing = state.status === 'error';
   useEffect(() => {
-    if (!failing) {
-      setErrorVisible(false);
-      return undefined;
-    }
+    if (!failing) return undefined;
     const t = setTimeout(() => setErrorVisible(true), ERROR_BANNER_DELAY_MS);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      setErrorVisible(false); // the next failure waits again
+    };
   }, [failing]);
 
   const showLocal = state.mode === 'local' && !dismissed;

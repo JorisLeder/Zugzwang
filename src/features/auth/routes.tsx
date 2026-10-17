@@ -1,6 +1,6 @@
 /**
- * Auth routes (D-03): `/login` and `/auth/callback` are public and rendered without the shell (`handle.bare`).
- * PLACEHOLDER written by WP-00 – owned by WP-08 from wave 1.
+ * Auth routes (D-03): `/login` (e-mail link, Google; local mode: notice) and `/auth/callback` (completes the
+ * redirect) are public and rendered without the shell (`handle.bare`).
  */
 import type { RouteObject } from 'react-router';
 import { ROUTE_PATTERNS } from '@/app/paths';

@@ -29,7 +29,7 @@ async function fill(data: DexieDataServices): Promise<void> {
     status: 'finished',
     result: '*',
     endReason: null,
-    origin: { type: 'pgn-import' },
+    origin: { type: 'new' },
     activeDeviceId: null,
     activeHeartbeatAt: null,
     ratingBefore: null,
