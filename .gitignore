@@ -12,3 +12,7 @@ test-results/
 .cache/
 public/engine/
 *.tsbuildinfo
+# Supabase: generated content seed (npm run supabase:seed-content) and CLI state (supabase link)
+supabase/seed.sql
+supabase/.temp/
+supabase/.branches/

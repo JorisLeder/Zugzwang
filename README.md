@@ -49,7 +49,7 @@ npm run dev       # copies the Stockfish engine to public/engine/ and starts Vit
 | `npm run puzzles:import-lichess` | Import the official Lichess puzzle CSV (CC0, needs access to database.lichess.org; `-- --help` lists options) |
 | `npm run bots:calibrate` | Bot calibration report (written to `.cache/bot-calibration.md`) |
 | `npm run puzzles:generate` | Generate the puzzle bank with Stockfish (WP-10) |
-| `npm run supabase:seed-content` | SQL seed for static content (WP-11) |
+| `npm run supabase:seed-content` | Writes `supabase/seed.sql` (bots, courses, lessons, puzzle bank + demo puzzles; idempotent) and test-applies it to the migrations in PGlite; `-- --no-verify` skips that |
 | `npm run lighthouse` | Lighthouse mobile performance (WP-12) |
 
 Scripts owned by later packages print `not implemented yet (WP-xx)` until they are delivered.
@@ -71,8 +71,8 @@ The same content is shown in the app (help dialog behind the "Lokal"/sync status
   time. Only these public values belong in the client, never a `service_role` key; the Claude API key lives only in
   the `explain` edge function. Login is then required.
 - In Supabase, enable e-mail (magic link) and Google login, set the redirect URL `<origin>/auth/callback`, and limit
-  the session to 30 days. Setting up the project itself (migrations with Row Level Security, edge functions, secrets)
-  will be described here once the backend package is done.
+  the session to 30 days. Step-by-step setup (project, migrations, seed, secret, edge functions, auth):
+  [Cloud-Sync einrichten (Supabase)](#cloud-sync-einrichten-supabase).
 - **What syncs**: profile and settings, ratings, puzzle attempts, games with all moves, analyses, lesson progress,
   daily activity and streak, theme stats, review items, explanation feedback.
 - **Not synced**: the puzzle bank, the bots and the lesson content (they ship with the app).
@@ -82,9 +82,70 @@ The same content is shown in the app (help dialog behind the "Lokal"/sync status
   keep the last change; the server computes ratings, streak and stats. A game running on another device can be taken
   over.
 - The first login on a device that ran in local mode moves its local progress into the account once.
-- Account deletion in cloud mode needs the `delete-account` edge function (WP-11).
+- Account deletion in cloud mode uses the `delete-account` edge function.
 - `VITE_CLOUD_EVAL=true` optionally uses the Lichess cloud evaluation to speed up analysis; the local engine is
   always the fallback.
+
+## Cloud-Sync einrichten (Supabase)
+
+Ohne diese Schritte läuft die App im lokalen Modus. Du brauchst ein Supabase-Konto; die Supabase CLI startest du mit
+`npx supabase …`.
+
+1. **Projekt anlegen:** Im Supabase-Dashboard ein neues Projekt in einer EU-Region erstellen (z. B. Frankfurt,
+   `eu-central-1`) und das Datenbank-Passwort notieren. Dann das Repository verbinden:
+   ```bash
+   npx supabase login
+   npx supabase link --project-ref <ref>   # <ref> aus https://<ref>.supabase.co
+   ```
+2. **Datenbank einrichten:** Migrationen und statische Inhalte einspielen:
+   ```bash
+   npm run supabase:seed-content           # schreibt supabase/seed.sql: Bots, Kurse, Lektionen, Puzzle-Bank, 5 Demo-Puzzles
+   npx supabase db push --include-seed     # Migrationen aus supabase/migrations/, danach der Seed
+   ```
+   Die Migrationen legen alle Tabellen mit Row Level Security an, dazu die Server-Berechnung von Rating, Serie und
+   Statistik und die Realtime-Freigabe. Das Seed-Skript prüft die Inhalte und spielt den Seed zur Probe gegen die
+   Migrationen ein (PGlite). Der Seed ist idempotent: Nach Inhaltsänderungen neu erzeugen und z. B. mit
+   `psql -1 -v ON_ERROR_STOP=1 -f supabase/seed.sql "<Connection-String>"` einspielen (Dashboard → Connect).
+3. **Claude-API-Schlüssel** nur als Secret der Funktion `explain` hinterlegen, nie in `.env.local`:
+   ```bash
+   npx supabase secrets set ANTHROPIC_API_KEY=sk-ant-…
+   ```
+   Ohne Schlüssel bleibt es bei den regelbasierten Erklärungen; mit Schlüssel gibt es bis zu 200 KI-Erklärungen pro
+   Person und Tag.
+4. **Die drei Funktionen deployen:**
+   ```bash
+   npx supabase functions deploy explain          # Erklärungen mit Claude
+   npx supabase functions deploy games-import     # PGN-Import ohne Duplikate
+   npx supabase functions deploy delete-account   # Konto samt Daten löschen
+   ```
+   Jede Funktion lädt gemeinsamen Code aus `src/` über ihre `deno.json`; `SUPABASE_URL` und die Projektschlüssel setzt
+   Supabase selbst. Die Funktionen prüfen das Anmelde-Token selbst. Scheitern Aufrufe trotz Anmeldung mit 401 (etwa
+   mit den neuen JWT-Signaturschlüsseln), deploye mit `--no-verify-jwt`.
+5. **Anmeldung** im Dashboard unter *Authentication*:
+   - *Sign In / Providers:* „Email“ aktiv lassen – die App meldet per Magic Link an.
+   - *Google (optional):* In der Google Cloud Console einen OAuth-Client vom Typ „Webanwendung“ mit der
+     Weiterleitungs-URI `https://<ref>.supabase.co/auth/v1/callback` anlegen, Client-ID und Secret beim Provider
+     „Google“ eintragen.
+   - *URL Configuration:* „Site URL“ ist die Adresse der App (z. B. `https://schach.example.org`); unter „Redirect URLs“
+     `https://schach.example.org/auth/callback` und für die Entwicklung `http://localhost:5173/auth/callback` eintragen.
+   - *Sessions (optional, je nach Tarif):* Sitzungsdauer auf 30 Tage begrenzen.
+   - Der eingebaute E-Mail-Versand schickt nur wenige Mails pro Stunde und nur an Mitglieder deines Supabase-Teams.
+     Für weitere Personen trägst du unter *SMTP Settings* einen eigenen SMTP-Server ein.
+6. **App verbinden:** `.env.example` nach `.env.local` kopieren und die Werte aus *Project Settings → API Keys*
+   eintragen:
+   ```bash
+   VITE_SUPABASE_URL=https://<ref>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<anon- bzw. publishable-Schlüssel>
+   ```
+   Die Werte werden beim Build eingebaut, also `npm run dev` bzw. `npm run build` neu starten. In den Client gehören
+   nur diese öffentlichen Werte, nie der `service_role`- bzw. Secret-Schlüssel.
+
+**Was dann synchronisiert wird:** Nach der Anmeldung liegen Profil und Einstellungen, Ratings, Puzzle-Versuche,
+Partien mit allen Zügen, Analysen, Lektionsfortschritt, Tagesaktivität und Serie, Motiv-Statistik, Wiederholungen und
+dein Feedback zu Erklärungen in deinem Konto. Andere angemeldete Geräte zeigen Änderungen per Realtime ohne Neuladen,
+und eine laufende Partie kannst du auf einem anderen Gerät übernehmen. Was ein Gerät vorher lokal gespeichert hat,
+wird bei der ersten Anmeldung einmalig übernommen. Puzzle-Bank, Bots und Lektionen kommen mit der App; der Seed legt
+sie nur zusätzlich auf dem Server ab. Mehr dazu unter [Speichern & Synchronisieren](#speichern--synchronisieren).
 
 ## Structure (short)
 
@@ -98,7 +159,7 @@ src/engine, src/analysis, src/bots, src/explain, src/data, src/puzzles, src/less
 scripts/       engine copy, content validation, generators, importers
 e2e/           Playwright tests (support/ helpers, smoke/, one folder per area)
 content/       lesson content (JSON)
-supabase/      migrations, edge functions, tests
+supabase/      config.toml, migrations, edge functions, seed/ (puzzle CSV), tests
 ```
 
 Licences of third-party code, data and fonts: `THIRD_PARTY_NOTICES.md` (Stockfish is GPL-3.0).
