@@ -25,7 +25,8 @@ export function RadioGroup<T extends string>({ value, onValueChange, options, la
   const base = useId();
   return (
     <RadixRadioGroup.Root
-      value={value}
+      // Always controlled: '' = nothing chosen yet (`undefined` would switch Radix from uncontrolled to controlled).
+      value={value ?? ''}
       onValueChange={(v) => onValueChange(v as T)}
       aria-label={label}
       className={cn('flex flex-col gap-2', className)}
