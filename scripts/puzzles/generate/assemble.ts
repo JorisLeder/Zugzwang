@@ -3,12 +3,13 @@
  *
  * The explanation is generated once with the rule-based templates (`explainRuleBased({ kind: 'puzzle', … })` on the
  * facts of `buildFacts`) and stored with the puzzle (PRD P0-05, data model `puzzles`): 1–3 sentences, "du", moves only
- * from the solution line. The generator rejects a puzzle whose explanation fails the validator's structure checks.
+ * from the solution line; tactical motifs are mentioned only when the tagger confirmed them with the line. The
+ * generator rejects a puzzle whose explanation fails the validator's structure checks.
  */
 import { createHash } from 'node:crypto';
 import type { Fen, Uci } from '@/core/chess';
 import type { Score } from '@/core/engine';
-import type { ExplanationText } from '@/core/explain';
+import type { ExplanationText, MotifId } from '@/core/explain';
 import { RATING_DEFAULTS } from '@/core/rating';
 import type { Puzzle, PuzzleThemeId } from '@/core/puzzles';
 import { buildFacts } from '@/analysis';
@@ -30,6 +31,18 @@ export function solverStart(fen: Fen, moves: readonly Uci[]): Fen {
 }
 
 /**
+ * Tactical motifs that the explanation may only mention when the tagger confirmed them with the line (a pin that a
+ * capture creates by accident is not what the puzzle is about).
+ */
+const MOTIF_NEEDS_THEME: Partial<Record<MotifId, PuzzleThemeId>> = {
+  fork: 'fork',
+  pin: 'pin',
+  skewer: 'skewer',
+  discovered_attack: 'discoveredAttack',
+  trapped_piece: 'trappedPiece',
+};
+
+/**
  * Stored German explanation of a puzzle line.
  * @param firstScore White-POV score of the best line at the first solver ply (mate lines: derived from `mateIn`).
  */
@@ -38,6 +51,10 @@ export function explainPuzzle(fen: Fen, moves: readonly Uci[], themes: readonly 
   const solver = fenTurn(start);
   const bestScore: Score | undefined = mateIn !== null ? { type: 'mate', value: solver === 'w' ? mateIn : -mateIn } : firstScore;
   const facts = buildFacts('puzzle', { fenBefore: start, bestLine: moves.slice(1), ...(bestScore ? { bestScore } : {}), themes: [...themes] });
+  facts.motifs = facts.motifs.filter((m) => {
+    const theme = MOTIF_NEEDS_THEME[m.id];
+    return theme === undefined || themes.includes(theme);
+  });
   return explainRuleBased(facts);
 }
 

@@ -101,6 +101,7 @@ describe('profile page', () => {
     expect(await screen.findByLabelText('Anzeigename')).toHaveValue('Mia');
     await waitFor(() => expect(screen.getByTestId('profile-puzzle-rating')).toHaveTextContent('1.000'), WAIT);
     expect(screen.getByTestId('profile-puzzle-rating')).toHaveTextContent('Startwert');
+    expect(screen.getByTestId('profile-bot-rating')).toHaveTextContent('noch keine Wertung');
     expect(screen.getByTestId('profile-ratings')).toHaveTextContent('Clubspieler');
     await waitFor(() => expect(screen.getByTestId('profile-streak')).toHaveTextContent(/1/), WAIT);
     expect(screen.getByTestId('profile-goal')).toHaveTextContent('Heute: 7 von 20 Minuten');

@@ -3,9 +3,10 @@
  * Glicko-2 deviation stays at the default 80 – ratings of puzzles never change, D-09).
  *
  * rating = base + depth + choice + firstMove + extras + jitter, clamped to 150–2400, where
- * - base by line type: mate in 1 → 250; one move that wins a hanging piece → 300; any other one-move win → 480;
- *   mate in n ≥ 2 → 250 + 330·(n − 1) (mate in 2 = 580 … mate in 5 = 1240 + 330 = 1570);
- *   advantage line of u ≥ 2 solver moves → 560 + 280·(u − 1);
+ * - base by line type (`MATE_BASE`, `LINE_BASE`; the steps follow the differences between the average Lichess ratings
+ *   of mateIn1 … mateIn5 and oneMove … veryLong, shifted so that a mate in 1 is 250): mate in 1 → 250, 2 → 700,
+ *   3 → 1100, 4 → 1400, 5 → 1600; one move that wins a hanging piece → 300; any other line of 1 … 5 solver moves →
+ *   500, 850, 1150, 1400, 1600;
  * - depth: + 30 per ply of the depth at which Stockfish first kept the solution move, beyond 3 (max + 360) – moves
  *   the engine finds late are harder for humans too;
  * - choice: + 3 per legal move beyond 25, − 3 per legal move below 25 (clamped to −45 … +75);
@@ -39,6 +40,11 @@ export interface RatingFeatures {
   themes: readonly PuzzleThemeId[];
 }
 
+/** Base rating of a forced mate in 1 … 5 (relative steps as between Lichess' mateIn1 … mateIn5 averages). */
+export const MATE_BASE = [250, 700, 1100, 1400, 1600] as const;
+/** Base rating of an advantage line with 1 … 5 solver moves (non-hanging one-movers; hanging pieces: 300). */
+export const LINE_BASE = [500, 850, 1150, 1400, 1600] as const;
+
 /** Rating limits. */
 export const RATING_LIMITS = { min: 150, max: 2400, easyMin: 200, easyMax: 600 } as const;
 
@@ -71,9 +77,9 @@ export function ratingParts(f: RatingFeatures): Record<'base' | 'depth' | 'choic
   const u = f.solverMoves;
   let base: number;
   if (f.mateIn === 1 && u === 1) base = 250;
-  else if (u === 1) base = f.themes.includes('hangingPiece') ? 300 : 480;
-  else if (f.mateIn !== null) base = 250 + 330 * (f.mateIn - 1);
-  else base = 560 + 280 * (u - 1);
+  else if (u === 1) base = f.themes.includes('hangingPiece') ? 300 : 500;
+  else if (f.mateIn !== null) base = MATE_BASE[Math.min(f.mateIn, 5) - 1]!;
+  else base = LINE_BASE[Math.min(u, 5) - 1]!;
   const depth = 30 * clamp(f.findDepth - 3, 0, 12);
   const choice = 3 * clamp(f.legalMoves - 25, -15, 25);
   let firstMove = f.firstMove === 'check' ? -50 : f.firstMove === 'capture' ? -30 : f.firstMove === 'quiet' ? 150 : 0;

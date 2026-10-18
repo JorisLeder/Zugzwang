@@ -185,7 +185,7 @@ test.describe('profile', () => {
     await completeOnboarding(page, 'Fortgeschritten', 20);
     await page.goto(paths.profile());
     await expect(page.getByTestId('profile-puzzle-rating')).toContainText('1.500');
-    await expect(page.getByTestId('profile-bot-rating')).toContainText('1.600');
+    await expect(page.getByTestId('profile-bot-rating')).toContainText('noch keine Wertung');
     await expect(page.getByTestId('profile-ratings')).toContainText('Fortgeschritten');
     await expect(page.getByTestId('profile-sync')).toHaveAttribute('data-mode', 'local');
     await expect(page.getByTestId('profile-sync')).toContainText('Lokaler Modus');

@@ -7,8 +7,9 @@
  *   and lesson-content chunk (so opened courses work offline), the engine (`engine/*.js` + `.wasm`), the puzzle bank
  *   (`data/puzzles/*.json` – the bank is also kept in IndexedDB) and the bot avatars. Navigations fall back to
  *   `index.html` (SPA routes offline).
- * - Registration happens in the app (`src/features/pwa/`, `injectRegister: false`) with `registerType: 'prompt'`:
- *   a new version waits until the learner accepts "Neue Version verfügbar". The service worker is never active in
+ * - Registration happens in the app (`src/features/pwa/registerSW.ts` with workbox-window, `injectRegister: false`)
+ *   with `registerType: 'prompt'`: a new version waits until the learner accepts "Neue Version verfügbar" (the
+ *   generated worker skips waiting on the `SKIP_WAITING` message). The service worker is never active in
  *   the dev server (`devOptions.enabled: false`), so it cannot interfere with development or dev-server e2e runs.
  */
 import { readFileSync } from 'node:fs';

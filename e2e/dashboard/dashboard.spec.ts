@@ -9,7 +9,7 @@ import { paths } from '../../src/app/paths';
 import { recommendBot } from '../../src/bots/recommend';
 import { board, clickMove, readFen } from '../support/board';
 import { expect, test } from '../support/fixtures';
-import { completeOnboarding, navigateInApp, rating, seed, storedProfile, todayKey, visible } from './helpers';
+import { completeOnboarding, navigateInApp, rating, readStore, seed, storedProfile, todayKey, visible } from './helpers';
 
 /** Back to the dashboard without a reload (board screens hide the tab bar on phones). */
 async function goHome(page: Page) {
@@ -126,6 +126,11 @@ test.describe('dashboard (AC2)', () => {
     await expect(page.getByTestId('game-status')).toHaveText(/Du bist am Zug/, { timeout: 15_000 });
     const gameUrl = page.url();
     const fen = await readFen(page);
+    // Moves are written asynchronously – wait until both are stored before leaving the page with a full load.
+    const gameId = decodeURIComponent(gameUrl.split('/').pop()!);
+    await expect
+      .poll(async () => (await readStore<{ gameId: string }>(page, 'gameMoves')).filter((e) => e.gameId === gameId).length)
+      .toBe(2);
 
     // The running game comes first; the lesson is listed below.
     await page.goto('/');

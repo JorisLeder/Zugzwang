@@ -117,7 +117,8 @@ function NameCard({ profile }: { profile: Profile | null }) {
   );
 }
 
-function RatingRow({ label, rating, testId }: { label: string; rating: RatingRecord | null | undefined; testId: string }) {
+/** One rating. `hideStartValue`: show "noch keine Wertung" until the first rated game (Bot-Rating, as on the dashboard). */
+function RatingRow({ label, rating, testId, hideStartValue = false }: { label: string; rating: RatingRecord | null | undefined; testId: string; hideStartValue?: boolean }) {
   const rated = !!rating && rating.gamesCount > 0;
   return (
     <div className="flex min-w-0 items-baseline justify-between gap-3" data-testid={testId}>
@@ -125,7 +126,7 @@ function RatingRow({ label, rating, testId }: { label: string; rating: RatingRec
       <span className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-right">
         {rating === undefined ? (
           <Spinner size={16} />
-        ) : rating === null ? (
+        ) : rating === null || (hideStartValue && !rated) ? (
           <span className="text-body text-text">{STRINGS_DE.noRatingYet}</span>
         ) : (
           <>
@@ -150,7 +151,7 @@ function RatingsCard({ profile }: { profile: Profile | null }) {
     <Card className="flex flex-col gap-3" data-testid="profile-ratings">
       <h2 className="text-h2 text-text">{STRINGS_DE.ratingsTitle}</h2>
       <RatingRow label={STRINGS_DE.puzzleRating} rating={puzzle} testId="profile-puzzle-rating" />
-      <RatingRow label={STRINGS_DE.botRating} rating={bot} testId="profile-bot-rating" />
+      <RatingRow label={STRINGS_DE.botRating} rating={bot} testId="profile-bot-rating" hideStartValue />
       <div className="flex min-w-0 items-center justify-between gap-3" data-testid="profile-streak">
         <span className="text-body text-muted">{STRINGS_DE.streakTitle}</span>
         {streak ? (
