@@ -3,27 +3,13 @@
  * IndexedDB seeding of the real Dexie database `zugzwang` (followed by a reload, because live queries only see writes
  * made through Dexie) and reads of the stored profile.
  */
-import { expect, type Locator, type Page } from '@playwright/test';
-import { freshStart } from '../support/app';
+import type { Locator, Page } from '@playwright/test';
 
-/** Self-assessment labels of the onboarding. */
-export type Assessment = 'Neuling' | 'Einsteiger' | 'Clubspieler' | 'Fortgeschritten';
+export { completeOnboarding, type Assessment } from '../support/app';
 
 /** The visible instance of an element that may exist twice (phone vs desktop layout). */
 export function visible(locator: Locator): Locator {
   return locator.filter({ visible: true }).first();
-}
-
-/** Fresh app → redirected to the onboarding → self-assessment and daily goal → dashboard. */
-export async function completeOnboarding(page: Page, choice: Assessment = 'Clubspieler', goal = 20): Promise<void> {
-  await freshStart(page, '/');
-  await expect(page).toHaveURL(/\/onboarding$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Willkommen bei Zugzwang' })).toBeVisible();
-  await page.getByRole('radio', { name: new RegExp(`^${choice}`) }).click();
-  await page.getByRole('radiogroup', { name: 'Tagesziel in Minuten' }).getByRole('radio', { name: String(goal), exact: true }).click();
-  await page.getByRole('button', { name: 'Los geht’s' }).click();
-  await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Start' })).toBeVisible();
 }
 
 /** Today's `YYYY-MM-DD` in the browser's time zone (Playwright: Europe/Berlin). */

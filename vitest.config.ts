@@ -7,6 +7,11 @@ import { defineConfig } from 'vitest/config';
  * - `node`: every `*.test.ts` in src, scripts and supabase (pure logic, engine, scripts).
  * - `dom`:  every `src/**\/*.test.tsx` (React components, jsdom + jest-dom matchers).
  */
+// Tests run in the time zone of the fakes (`createFakeAppServices`/`createMemoryDataServices` default to
+// Europe/Berlin): pages compute "today" in the browser's zone, the memory data layer in its own – on a UTC machine
+// the two disagree for one to two hours after midnight in Berlin. Set before the workers start, so they inherit it.
+process.env.TZ = 'Europe/Berlin';
+
 export default defineConfig({
   plugins: [react()],
   resolve: {

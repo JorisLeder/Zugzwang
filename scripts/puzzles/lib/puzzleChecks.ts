@@ -75,14 +75,11 @@ export function replayLine(fen: Fen, moves: readonly string[]): { records: MoveR
 
 /** SAN of every legal move in `fen` that mates immediately. */
 export function matingMoves(fen: Fen): string[] {
-  const game = ChessGame.fromFen(fen);
-  const out: string[] = [];
-  for (const m of game.legalMoves()) {
-    const g = ChessGame.fromFen(fen);
-    const r = g.move({ from: m.from, to: m.to, ...(m.promotion ? { promotion: m.promotion } : {}) });
-    if (r?.isCheckmate) out.push(r.san);
-  }
-  return out;
+  // `legalSans` marks exactly the mating moves with "#"; it replaces replaying every legal move, which made the
+  // structural check of the whole bank take ~30 s.
+  return ChessGame.fromFen(fen)
+    .legalSans()
+    .filter((san) => san.endsWith('#'));
 }
 
 /** Structural checks (no engine). `isFixture` relaxes nothing; it only labels messages. */
@@ -110,11 +107,13 @@ export function checkPuzzleStructure(raw: unknown): PuzzleCheckResult & { puzzle
   }
   const solver: Color = fenTurn(p.fen) === 'w' ? 'b' : 'w';
   if (records[1] && records[1].color !== solver) errors.push({ id, message: 'Nach moves[0] ist nicht der Lösende am Zug.' });
-  // No game end before the last move.
+  // No game end before the last move (one incremental replay; the moves are known to be legal).
+  const replay = ChessGame.fromFen(p.fen);
   for (let i = 0; i < records.length - 1; i++) {
-    const g = ChessGame.fromMoves(p.fen, p.moves.slice(0, i + 1));
-    if (g.status().isOver) {
-      errors.push({ id, message: `Die Partie ist nach Zug ${i + 1} schon beendet (${g.status().reason}).` });
+    replay.move(p.moves[i]!);
+    const status = replay.status();
+    if (status.isOver) {
+      errors.push({ id, message: `Die Partie ist nach Zug ${i + 1} schon beendet (${status.reason}).` });
       break;
     }
   }

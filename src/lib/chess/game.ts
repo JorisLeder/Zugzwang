@@ -177,6 +177,17 @@ export class ChessGame {
   }
 
   /**
+   * SAN of all legal moves, as in `legalMoves()` (same disambiguation; "+" marks check, "#" exactly the moves that
+   * checkmate). Much cheaper than `legalMoves()` (no per-move objects, FENs or repeated move generation) – for bulk
+   * checks over many positions. Empty when the game is over. No square filter on purpose: chess.js would then
+   * disambiguate only among that square's moves.
+   */
+  legalSans(): San[] {
+    if (this.status().isOver) return [];
+    return this.chess.moves();
+  }
+
+  /**
    * Plays a move given as UCI (`e7e8q`), SAN (`Nf3`, `O-O`, also `0-0`) or `MoveInput`. Returns the record, or `null`
    * if the move is illegal, malformed, lacks the promotion piece (no auto-queen), names a promotion for a
    * non-promotion move, or the game is already over. Never throws.

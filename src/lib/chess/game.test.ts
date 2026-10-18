@@ -189,6 +189,28 @@ describe('ChessGame – moves', () => {
     expect(king.filter((m) => m.isCastle).map((m) => m.uci).sort()).toEqual(['e1c1', 'e1g1']);
   });
 
+  it('legalSans lists the same SAN as legalMoves, "#" exactly for the mating moves', () => {
+    const fens = [
+      START_FEN,
+      'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1',
+      '6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1', // back-rank mate Ra8#
+      '4k3/8/8/8/8/8/8/1N1K1N2 w - - 0 1', // Nbd2 / Nfd2 need disambiguation
+      '7k/P7/8/8/8/8/8/K5R1 w - - 0 1', // promotions, Rh1+ check
+    ];
+    for (const fen of fens) {
+      const g = ChessGame.fromFen(fen);
+      const verbose = g.legalMoves();
+      expect(g.legalSans().sort()).toEqual(verbose.map((m) => m.san).sort());
+      for (const m of verbose) {
+        const r = ChessGame.fromFen(fen).move(m.uci);
+        expect(m.san.endsWith('#')).toBe(r!.isCheckmate);
+      }
+    }
+    expect(ChessGame.fromFen('6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1').legalSans()).toContain('Ra8#');
+    expect(ChessGame.fromFen('4k3/8/8/8/8/8/8/1N1K1N2 w - - 0 1').legalSans()).toEqual(expect.arrayContaining(['Nbd2', 'Nfd2']));
+    expect(ChessGame.fromMoves(START_FEN, ['f2f3', 'e7e5', 'g2g4', 'd8h4']).legalSans()).toEqual([]);
+  });
+
   it('en passant is only allowed immediately (3.7.4.2)', () => {
     const now = ChessGame.fromMoves(START_FEN, ['e2e4', 'a7a6', 'e4e5', 'd7d5']);
     expect(now.legalMoves('e5').map((m) => m.san)).toContain('exd6');

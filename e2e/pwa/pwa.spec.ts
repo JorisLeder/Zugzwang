@@ -131,6 +131,12 @@ test.describe('installable PWA (AC5, production build)', () => {
       expect(img.ok()).toBe(true);
       expect(img.headers()['content-type']).toContain('image/png');
     }
+    // iOS home screen icon (Safari ignores the manifest icons).
+    const touchIcon = await page.locator('link[rel="apple-touch-icon"]').getAttribute('href');
+    expect(touchIcon).toBe('/icons/apple-touch-icon-180.png');
+    const touch = await page.request.get(touchIcon!);
+    expect(touch.ok()).toBe(true);
+    expect(touch.headers()['content-type']).toContain('image/png');
 
     const sw = await page.evaluate(async () => {
       const reg = await navigator.serviceWorker.ready;

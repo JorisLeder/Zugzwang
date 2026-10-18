@@ -4,7 +4,7 @@
  */
 import { readFile } from 'node:fs/promises';
 import type { Page } from '@playwright/test';
-import { freshStart, hasHorizontalScroll } from '../support/app';
+import { completeOnboarding, finishOnboarding, freshStart, hasHorizontalScroll } from '../support/app';
 import { expect, test } from '../support/fixtures';
 
 const LOCAL_BANNER = 'Lokaler Modus – Fortschritt nur auf diesem Gerät';
@@ -50,6 +50,10 @@ test.describe('local mode', () => {
       await expect(status).toContainText('Lokal');
     }
     await expect.poll(async () => (await storedProfile(page))?.id ?? null).not.toBeNull();
+    const created = (await storedProfile(page))!;
+    // The start page asks for the onboarding first; it completes the same local profile.
+    await finishOnboarding(page);
+    expect((await storedProfile(page))!.id).toBe(created.id);
 
     await page.goto('/login');
     await expect(page.getByRole('heading', { level: 1, name: 'Anmelden' })).toBeVisible();
@@ -86,7 +90,7 @@ test.describe('local mode', () => {
   });
 
   test('local-mode banner: help explains the modes; dismissed for the rest of the session', async ({ page }) => {
-    await freshStart(page, '/');
+    await completeOnboarding(page);
     const banner = page.getByRole('status').filter({ hasText: LOCAL_BANNER });
     await expect(banner).toBeVisible();
     await banner.getByRole('button', { name: 'Mehr erfahren' }).click();
@@ -107,7 +111,7 @@ test.describe('local mode', () => {
 
   test('the sync status opens the help (desktop sidebar)', async ({ page, isMobile }) => {
     test.skip(isMobile, 'the sidebar is hidden below 768 px');
-    await freshStart(page, '/');
+    await completeOnboarding(page);
     await page.getByTestId('sync-status').click();
     const dialog = page.getByRole('dialog', { name: 'Speichern und Synchronisieren' });
     await expect(dialog).toBeVisible();

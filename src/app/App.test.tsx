@@ -6,7 +6,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS } from '@/core/profile';
-import { createFakeAppServices } from '@/core/testing';
+import { createFakeAppServices, createMemoryDataServices } from '@/core/testing';
 import { App } from './App';
 import { useSettingsStore } from './services';
 
@@ -14,7 +14,9 @@ const LABELS = ['Start', 'Puzzles', 'Spielen', 'Lernen', 'Analyse', 'Profil'];
 
 function renderAt(path: string) {
   window.history.pushState({}, '', path);
-  return render(<App services={createFakeAppServices()} />);
+  // A completed onboarding: otherwise the start page redirects to /onboarding (no profile yet).
+  const data = createMemoryDataServices({ profile: { onboardingCompleted: true } });
+  return render(<App services={createFakeAppServices({ data })} />);
 }
 
 beforeEach(() => {

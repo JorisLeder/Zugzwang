@@ -1,11 +1,12 @@
 /**
  * Smoke tests (BACKLOG 2.9/2.11): app shell, six areas, every route, 404, deep link, minimal board.
- * Runs on the `desktop` (1440×900) and `mobile` (390×844, touch) projects.
+ * Runs on the `desktop` (1440×900) and `mobile` (390×844, touch) projects. Tests that need the start page complete
+ * the onboarding first (a fresh device is redirected from `/` to `/onboarding`).
  */
 import type { Page } from '@playwright/test';
 import { START_FEN } from '../../src/core/chess';
 import { paths } from '../../src/app/paths';
-import { freshStart, hasHorizontalScroll } from '../support/app';
+import { completeOnboarding, hasHorizontalScroll } from '../support/app';
 import { board, clickMove, dragMove, pieceOn, readFen, waitForFenChange } from '../support/board';
 import { expect, test } from '../support/fixtures';
 
@@ -54,7 +55,7 @@ function mainNav(page: Page) {
 
 test.describe('app shell', () => {
   test('loads with the six areas, dark theme by default', async ({ page }) => {
-    await freshStart(page);
+    await completeOnboarding(page);
     await expect(page.getByRole('heading', { level: 1, name: 'Start' })).toBeVisible();
     const nav = mainNav(page);
     await expect(nav).toBeVisible();
@@ -65,7 +66,7 @@ test.describe('app shell', () => {
   });
 
   test('every area is one click away', async ({ page }) => {
-    await page.goto('/');
+    await completeOnboarding(page);
     for (const a of [...AREAS].reverse()) {
       await mainNav(page).getByRole('link', { name: a.label, exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`${a.url === '/' ? '/$' : `${a.url}$`}`));
@@ -76,7 +77,8 @@ test.describe('app shell', () => {
 
   test('skip link is the first focusable element and moves focus to the content', async ({ page, isMobile }) => {
     test.skip(isMobile, 'keyboard navigation is checked on desktop');
-    await page.goto('/');
+    await completeOnboarding(page);
+    await page.goto('/'); // fresh document: focus starts at the top
     await expect(page.getByRole('heading', { level: 1, name: 'Start' })).toBeVisible();
     await page.keyboard.press('Tab');
     const skip = page.getByRole('link', { name: 'Zum Inhalt springen' });
@@ -90,6 +92,7 @@ test.describe('app shell', () => {
 
   test('no horizontal scroll at 360 px; tab bar labels visible', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 640 });
+    await completeOnboarding(page);
     for (const url of ['/', '/settings', paths.analysisBoard()]) {
       await page.goto(url);
       await expect(page.locator('h1').first()).toBeVisible();
@@ -100,7 +103,7 @@ test.describe('app shell', () => {
   });
 
   test('breakpoints: tab bar below 768 px, rail 768–1279 px, labelled sidebar from 1280 px', async ({ page }) => {
-    await page.goto('/');
+    await completeOnboarding(page);
     const nav = mainNav(page);
     const sizes: Array<[number, 'tabbar' | 'rail' | 'sidebar']> = [
       [767, 'tabbar'],
@@ -130,6 +133,7 @@ test.describe('app shell', () => {
 test.describe('routes', () => {
   for (const [url, heading, title] of ROUTES) {
     test(`renders ${url}`, async ({ page }) => {
+      if (url === paths.home()) await completeOnboarding(page);
       await page.goto(url);
       await expect(page.getByRole('heading', { level: 1, name: heading }).first()).toBeAttached();
       if (title) await expect(page).toHaveTitle(title);
@@ -137,12 +141,14 @@ test.describe('routes', () => {
   }
 
   test('auth callback redirects to the start page in local mode', async ({ page }) => {
+    await completeOnboarding(page);
     await page.goto(paths.authCallback());
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Start' })).toBeVisible();
   });
 
   test('unknown paths show the 404 page', async ({ page }) => {
+    await completeOnboarding(page);
     await page.goto('/gibt-es-nicht/42');
     await expect(page.getByRole('heading', { level: 1, name: 'Seite nicht gefunden' })).toBeVisible();
     await page.getByRole('link', { name: 'Zur Startseite' }).click();
