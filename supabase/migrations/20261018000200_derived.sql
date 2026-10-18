@@ -8,7 +8,7 @@
 -- - Bot rating: finished `competition` bot games only; opponent = the bot's Elo from the game headers, RD 50.
 -- - Daily activity (days in Europe/Berlin): +1 puzzle per attempt, +1 game per finished bot game, + completed
 --   lesson steps; active minutes via `upsert_daily_minutes` (greatest value wins).
--- - Lesson progress: furthest progress wins (`upsert_lesson_progress`).
+-- - Lesson progress: furthest progress wins (trigger on every update; RPC `upsert_lesson_progress`).
 -- - Profile: last writer wins – settings by `settings.updatedAt`, the other fields by `updated_at`.
 -- - Games: newer `updated_at` wins, a finished game never becomes active again, the device fields win by the newer
 --   heartbeat; `rating_before/after` are always the server's values.
@@ -444,8 +444,9 @@ begin
     merged := old;
   end if;
   merged.id := old.id;
-  -- … except the settings, which win by their own `updatedAt` (`mergeSettings`, ties: incoming).
-  if coalesce(new.settings ->> 'updatedAt', '') >= coalesce(old.settings ->> 'updatedAt', '') then
+  -- … except the settings, which win by their own `updatedAt` (`mergeSettings`, ties: incoming). Compared as text in
+  -- the "C" collation, i.e. code unit by code unit like the JavaScript string comparison of the client.
+  if coalesce(new.settings ->> 'updatedAt', '') collate "C" >= coalesce(old.settings ->> 'updatedAt', '') collate "C" then
     merged.settings := new.settings;
   else
     merged.settings := old.settings;
@@ -464,8 +465,40 @@ create trigger profiles_before_update
 -- RPCs called by the client (outbox entries `rpc`)
 -- ---------------------------------------------------------------------------------------------------------------
 
--- Furthest progress wins (`mergeLessonProgress`); completed steps gained count for the daily activity
--- (`lessonStepsGained`). Idempotent: resending the same progress changes nothing.
+-- Furthest progress wins (`mergeLessonProgress`) for every write of a lesson progress row – the RPC and a direct
+-- upsert alike, so no client can move progress back: the further version (completed beats not completed, then the
+-- higher step; ties: incoming) supplies the other fields; step and stars are the maxima, `completed` is OR-ed, the
+-- first `completed_at` and the newer `updated_at` stay.
+create function public.zz_lesson_progress_before_update() returns trigger
+language plpgsql set search_path = ''
+as $$
+declare
+  merged public.lesson_progress;
+begin
+  if (new.completed and not old.completed)
+     or (new.completed = old.completed and new.current_step >= old.current_step) then
+    merged := new;
+  else
+    merged := old;
+  end if;
+  merged.user_id := old.user_id;
+  merged.lesson_id := old.lesson_id;
+  merged.lesson_version := greatest(old.lesson_version, new.lesson_version);
+  merged.current_step := greatest(old.current_step, new.current_step);
+  merged.completed := old.completed or new.completed;
+  merged.stars := greatest(old.stars, new.stars);
+  merged.completed_at := coalesce(old.completed_at, new.completed_at);
+  merged.updated_at := greatest(old.updated_at, new.updated_at);
+  return merged;
+end;
+$$;
+
+create trigger lesson_progress_before_update
+  before update on public.lesson_progress
+  for each row execute function public.zz_lesson_progress_before_update();
+
+-- Upserts the caller's progress of one lesson (merged by the trigger above); completed steps gained count for the
+-- daily activity (`lessonStepsGained`). Idempotent: resending the same progress changes nothing.
 create function public.upsert_lesson_progress(
   p_lesson_id text,
   p_lesson_version integer,
@@ -484,7 +517,7 @@ declare
   uid uuid := auth.uid();
   updated timestamptz := coalesce(p_updated_at, now());
   prev public.lesson_progress;
-  incoming public.lesson_progress;
+  had_prev boolean;
   merged public.lesson_progress;
   steps integer;
 begin
@@ -496,45 +529,15 @@ begin
   end if;
   perform public.zz_lock_user(uid);
 
-  incoming.user_id := uid;
-  incoming.lesson_id := p_lesson_id;
-  incoming.lesson_version := coalesce(p_lesson_version, 1);
-  incoming.current_step := p_current_step;
-  incoming.completed := coalesce(p_completed, false);
-  incoming.stars := p_stars;
-  incoming.mistakes := coalesce(p_mistakes, 0);
-  incoming.hints_used := coalesce(p_hints_used, 0);
-  incoming.score := p_score;
-  incoming.updated_at := updated;
-  incoming.completed_at := p_completed_at;
-
   select * into prev from public.lesson_progress lp where lp.user_id = uid and lp.lesson_id = p_lesson_id for update;
-  if not found then
-    merged := incoming;
-    steps := merged.current_step + (case when merged.completed then 1 else 0 end);
-  else
-    if (incoming.completed and not prev.completed)
-       or (incoming.completed = prev.completed and incoming.current_step >= prev.current_step) then
-      merged := incoming;
-    else
-      merged := prev;
-    end if;
-    merged.lesson_version := greatest(prev.lesson_version, incoming.lesson_version);
-    merged.current_step := greatest(prev.current_step, incoming.current_step);
-    merged.completed := prev.completed or incoming.completed;
-    merged.stars := greatest(prev.stars, incoming.stars);
-    merged.completed_at := coalesce(prev.completed_at, incoming.completed_at);
-    merged.updated_at := greatest(prev.updated_at, incoming.updated_at);
-    steps := greatest(0, merged.current_step - prev.current_step)
-             + (case when merged.completed and not prev.completed then 1 else 0 end);
-  end if;
+  had_prev := found;
 
   insert into public.lesson_progress as lp (
     user_id, lesson_id, lesson_version, current_step, completed, stars, mistakes, hints_used, score, updated_at,
     completed_at
   ) values (
-    uid, merged.lesson_id, merged.lesson_version, merged.current_step, merged.completed, merged.stars,
-    merged.mistakes, merged.hints_used, merged.score, merged.updated_at, merged.completed_at
+    uid, p_lesson_id, coalesce(p_lesson_version, 1), p_current_step, coalesce(p_completed, false), p_stars,
+    coalesce(p_mistakes, 0), coalesce(p_hints_used, 0), p_score, updated, p_completed_at
   )
   on conflict (user_id, lesson_id) do update
     set lesson_version = excluded.lesson_version,
@@ -548,6 +551,12 @@ begin
         completed_at = excluded.completed_at
   returning * into merged;
 
+  if had_prev then
+    steps := greatest(0, merged.current_step - prev.current_step)
+             + (case when merged.completed and not prev.completed then 1 else 0 end);
+  else
+    steps := merged.current_step + (case when merged.completed then 1 else 0 end);
+  end if;
   if steps > 0 then
     perform public.zz_bump_daily(uid, public.zz_local_day(updated), p_lessons => steps);
   end if;
@@ -604,6 +613,7 @@ revoke execute on function
   public.zz_game_moves_after_insert(),
   public.zz_skip_duplicate_id(),
   public.zz_profiles_before_update(),
+  public.zz_lesson_progress_before_update(),
   public.upsert_lesson_progress(text, integer, integer, boolean, integer, integer, integer, double precision, timestamptz, timestamptz),
   public.upsert_daily_minutes(date, integer)
 from public, anon, authenticated;

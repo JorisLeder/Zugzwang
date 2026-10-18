@@ -3,7 +3,7 @@
  *
  * - A stub of the Supabase `auth` schema: `auth.users` and `auth.uid()`, which reads the user id from the session
  *   setting `request.jwt.claim.sub` (as PostgREST sets it from the JWT).
- * - The roles `anon`, `authenticated` and `service_role` (BYPASSRLS) – like on Supabase.
+ * - The roles `anon`, `authenticated` and `service_role` (BYPASSRLS) and the default privileges – like on Supabase.
  * - All files of `supabase/migrations` applied in name order.
  * - `as(role, userId, fn)` runs statements in one transaction with that role and user (rolled back on error), and
  *   `upsert()` builds the statements PostgREST sends for `from(table).upsert(rows, { onConflict, ignoreDuplicates })`.
@@ -11,7 +11,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PGlite, type Transaction } from '@electric-sql/pglite';
+import { PGlite, types, type ParserOptions, type Transaction } from '@electric-sql/pglite';
 
 /** Repository root. */
 export const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -27,11 +27,17 @@ export type Queryable = Pick<Transaction, 'query' | 'exec'>;
 
 type Row = Record<string, unknown>;
 
-/** Stub of the Supabase `auth` schema and the API roles. */
+/**
+ * Stub of the Supabase `auth` schema and the API roles, including Supabase's default privileges in `public` (every
+ * new table and function is granted to all API roles) – so a migration that forgets a `revoke` fails the tests.
+ */
 export const AUTH_STUB_SQL = `
   create role anon nologin;
   create role authenticated nologin;
   create role service_role nologin bypassrls;
+  alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+  alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+  alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
   create schema auth;
   grant usage on schema auth to anon, authenticated, service_role;
   create table auth.users (
@@ -47,6 +53,15 @@ export const AUTH_STUB_SQL = `
   $$;
   grant execute on function auth.uid() to anon, authenticated, service_role;
 `;
+
+/**
+ * Values as PostgREST returns them in JSON (and the client mappers of `@/core/tables` expect): dates as `YYYY-MM-DD`,
+ * timestamps as ISO strings (normalised to `Date#toISOString`, so they compare with the client's values).
+ */
+export const POSTGREST_PARSERS: ParserOptions = {
+  [types.DATE]: (v: string) => v,
+  [types.TIMESTAMPTZ]: (v: string) => new Date(v.replace(' ', 'T').replace(/([+-]\d\d)$/, '$1:00')).toISOString(),
+};
 
 /** Migration files in apply order (file names). */
 export function migrationFiles(dir: string = MIGRATIONS_DIR): string[] {
@@ -85,8 +100,9 @@ export interface TestDb {
 
 /** Creates a fresh in-memory database with the auth stub and all migrations. */
 export async function createTestDb(opts: TestDbOptions = {}): Promise<TestDb> {
-  const pg = new PGlite();
+  const pg = new PGlite({ parsers: POSTGREST_PARSERS });
   await pg.waitReady;
+  await pg.exec(`set timezone = 'UTC'`); // as on Supabase
   await pg.exec(AUTH_STUB_SQL);
   if (opts.realtimePublication) await pg.exec('create publication supabase_realtime');
   for (const file of migrationFiles()) {
@@ -156,7 +172,7 @@ export function upsertSql(table: string, columns: readonly string[], opts: Upser
 }
 
 /** Inserts/upserts JSON rows like PostgREST and returns the `returning` rows. */
-export async function upsert<T = Row>(q: Queryable, table: string, rows: readonly Row[], opts: UpsertOptions = {}): Promise<T[]> {
+export async function upsert<T = Row>(q: Queryable, table: string, rows: readonly object[], opts: UpsertOptions = {}): Promise<T[]> {
   if (rows.length === 0) return [];
   const columns = Object.keys(rows[0]!);
   const res = await q.query<T>(upsertSql(table, columns, opts), [JSON.stringify(rows)]);

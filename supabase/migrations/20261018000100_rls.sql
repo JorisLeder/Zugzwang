@@ -6,7 +6,8 @@
 -- - User tables: the owner column (`profiles.id`, otherwise `user_id`) must equal `auth.uid()`.
 --   - `profiles`, `games`, `game_analyses`, `review_queue`, `lesson_progress`: select / insert / update.
 --   - Append-only (`puzzle_attempts`, `game_moves`, `explanation_feedback`): select / insert, no update, no delete.
---   - Derived values: `ratings` select / insert (initial rating only – updates are computed by the server);
+--   - Derived values: `ratings` select / insert (initial rating only: `games_count = 0`; updates are computed by
+--     the server);
 --     `daily_activity`, `theme_stats`: select only (written by triggers and RPCs).
 --   - `explanation_usage`: select only (written by the `explain` function with the service role).
 -- - No delete policies at all: accounts are deleted by the `delete-account` function (service role).
@@ -140,8 +141,9 @@ create policy explanation_feedback_insert on public.explanation_feedback for ins
 
 create policy ratings_select on public.ratings for select to authenticated
   using (user_id = (select auth.uid()));
+-- Only a starting value (no rated results yet); an existing rating is never replaced (`on conflict do nothing`).
 create policy ratings_insert on public.ratings for insert to authenticated
-  with check (user_id = (select auth.uid()));
+  with check (user_id = (select auth.uid()) and games_count = 0);
 
 create policy daily_activity_select on public.daily_activity for select to authenticated
   using (user_id = (select auth.uid()));
