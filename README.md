@@ -54,6 +54,11 @@ npm run dev       # copies the Stockfish engine to public/engine/ and starts Vit
 
 Scripts owned by later packages print `not implemented yet (WP-xx)` until they are delivered.
 
+**Puzzle bank:** `public/data/puzzles/` ships with the app (offline): the seed chunk, `lessons.json` (flagged lesson exercises)
+and `generated-NN.json`, listed with sha256 in `manifest.json`; `supabase/seed/puzzles.csv` holds the same rows for the backend.
+`npm run puzzles:generate -- --seed 1 --target 700` rebuilds it deterministically from Stockfish self-play (cache `.cache/puzzles-generate/`),
+then `npm run validate:content -- --only puzzles` re-checks every solver move at depth 18. Method, rating heuristic, options and licences: header of `scripts/puzzles/generate/index.ts`.
+
 ## Speichern & Synchronisieren
 
 The same content is shown in the app (help dialog behind the "Lokal"/sync status and the local-mode banner).

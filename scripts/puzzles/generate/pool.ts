@@ -128,8 +128,8 @@ export interface RunOptions {
   maxGames: number;
   /** Cache directory (`null` disables the cache). */
   cache: string | null;
-  /** Called for every game in index order; return `true` to stop. */
-  consume(result: GameResult): boolean;
+  /** Called for every game in index order (awaited before the next one); return `true` to stop. */
+  consume(result: GameResult): boolean | Promise<boolean>;
 }
 
 /** Plays games 0, 1, 2 … until `consume` returns `true` or `maxGames` is reached; returns the number consumed. */
@@ -154,7 +154,7 @@ export async function runGamesInOrder(opts: RunOptions): Promise<number> {
     }
     const result = await pending.get(cursor)!;
     pending.delete(cursor);
-    if (opts.consume(result)) return cursor + 1;
+    if (await opts.consume(result)) return cursor + 1;
   }
   return opts.maxGames;
 }

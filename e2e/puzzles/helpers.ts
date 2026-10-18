@@ -1,5 +1,6 @@
 /**
- * Helpers for the puzzle e2e tests (WP-03): the seed bank and demo puzzles read from the repository, positions along
+ * Helpers for the puzzle e2e tests (WP-03): the bank (every chunk of the manifest), the seed chunk and the demo
+ * puzzles read from the repository, positions along
  * a puzzle line (via the rules layer) and board/panel waits. Generic board helpers: `e2e/support/board.ts`.
  */
 import { readFileSync } from 'node:fs';
@@ -13,6 +14,11 @@ const root = join(import.meta.dirname, '..', '..');
 
 /** The wave-1 seed bank (`public/data/puzzles/seed.json`). */
 export const SEED: Puzzle[] = JSON.parse(readFileSync(join(root, 'public/data/puzzles/seed.json'), 'utf8')) as Puzzle[];
+
+/** The whole local bank: every chunk listed in `public/data/puzzles/manifest.json` (seed, lessons, generated). */
+export const BANK: Puzzle[] = (
+  JSON.parse(readFileSync(join(root, 'public/data/puzzles/manifest.json'), 'utf8')) as { chunks: Array<{ file: string }> }
+).chunks.flatMap((c) => JSON.parse(readFileSync(join(root, 'public/data/puzzles', c.file), 'utf8')) as Puzzle[]);
 
 /** The 5 demo puzzles (`src/puzzles/demoPuzzles.json`). */
 export const DEMO: Puzzle[] = JSON.parse(readFileSync(join(root, 'src/puzzles/demoPuzzles.json'), 'utf8')) as Puzzle[];
@@ -61,7 +67,7 @@ export function panel(page: Page) {
 }
 
 /** Id of the puzzle on screen once the learner is to move. */
-export async function currentPuzzle(page: Page, pool: Puzzle[] = SEED): Promise<Puzzle> {
+export async function currentPuzzle(page: Page, pool: Puzzle[] = BANK): Promise<Puzzle> {
   await expect(panel(page)).toHaveAttribute('data-phase', 'user', { timeout: 10_000 });
   const id = await panel(page).getAttribute('data-puzzle-id');
   const p = pool.find((x) => x.id === id);

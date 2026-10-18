@@ -10,6 +10,8 @@
  * Options: `--seed <n>` (default 1), `--target <n>` generated puzzles (default 700), `--workers <n>` worker processes
  * (default min(3, CPUs − 1); 0 = in-process), `--max-games <n>` (default 6000), `--no-cache` (replay every game
  * instead of reusing `.cache/puzzles-generate/`), `--dry-run`.
+ * Run time on 4 cores: about 50 min for ~900 games from scratch, a few minutes with a warm cache; the validator run
+ * afterwards takes about 40 min for ~1200 new puzzles (single engine, cached per puzzle).
  *
  * Output: `public/data/puzzles/` (the WP-03 seed chunk `seed.json` is kept; `lessons.json`, `generated-NN.json` and
  * `manifest.json` are rewritten) and `supabase/seed/puzzles.csv` (all bank puzzles as rows of the `puzzles` table).
@@ -28,6 +30,9 @@
  *    Lichess format: `fen` is the position before the opponent's mistake, `moves[0]` is that mistake.
  * 4. Second opinion: the exact validator check (`checkPuzzleWithEngine`, depth 18) on a separate engine; failures
  *    are dropped.
+ * 4b. Mate check (`mateCheck.ts`, main process): every line with a forced mate in ≥ 2 is searched again at each
+ *    solver ply with MultiPV 4 (depth 18, hash cleared): the solution must be the only fastest mate. MultiPV 2 misses
+ *    equally fast alternative mates that the validator finds with a warm hash; verdicts are cached per line.
  * 5. Themes (`tagger.ts`): WP-02 motif detectors confirmed by the line, mate distance and mate patterns, length,
  *    phase (Lichess divider) and endgame type by material; opening tags (Lichess style) for puzzles before ply 40.
  * 6. Rating (`rating.ts`): heuristic from solution length, mate distance, the depth at which Stockfish first keeps
@@ -58,6 +63,7 @@ import { checkPuzzleStructure, checkPuzzleWithEngine } from '../lib/puzzleChecks
 import { solverStart, toGeneratedPuzzle } from './assemble';
 import { createGeneratorEngine } from './engine';
 import { isSkip, lessonPuzzle, readLessonExercises } from './lessons';
+import { createMateChecker } from './mateCheck';
 import { bankStats, formatStats, meetsTargets, MIN_TRAINABLE_THEMES, SEED_CHUNK, writePuzzleBank, writePuzzlesCsv, type BankStats } from './output';
 import { cacheDir, createInProcessRunner, createWorkerPool, runGamesInOrder } from './pool';
 import { DEFAULT_GENERATOR_CONFIG, type GameResult, type GeneratorConfig } from './selfplay';
@@ -68,6 +74,8 @@ const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 /** Repo-relative outputs. */
 export const BANK_DIR = 'public/data/puzzles';
 export const CSV_FILE = 'supabase/seed/puzzles.csv';
+/** Verdicts of the mate check (`mateCheck.ts`), shared by all seeds. */
+export const MATE_CHECK_CACHE = '.cache/puzzles-generate/mate-check';
 
 /** Parsed command line. */
 export interface CliOptions {
@@ -211,6 +219,7 @@ async function main(): Promise<void> {
   const acc = createAccumulator(opts.target, [...seed, ...lessons.puzzles]);
   const book = await loadOpeningBook();
   const runner = opts.workers > 0 ? createWorkerPool(opts.workers, opts.seed, config) : createInProcessRunner(opts.seed, config, book);
+  const mateChecker = createMateChecker(opts.cache ? join(rootDir, MATE_CHECK_CACHE) : null);
   let done = false;
   let games: number;
   try {
@@ -219,8 +228,8 @@ async function main(): Promise<void> {
       window: Math.max(1, opts.workers) * 3,
       maxGames: opts.maxGames,
       cache: opts.cache ? cacheDir(rootDir, opts.seed, config) : null,
-      consume(result) {
-        done = acc.add(result);
+      async consume(result) {
+        done = acc.add(await mateChecker.refine(result));
         if (acc.counters.games % 50 === 0 || done) {
           const bands = acc.stats().bands.map((b) => `${b.id}:${b.count}`).join(' ');
           const minutes = ((Date.now() - t0) / 60000).toFixed(1);
@@ -231,6 +240,7 @@ async function main(): Promise<void> {
     });
   } finally {
     runner.close();
+    mateChecker.dispose();
   }
   const c = acc.counters;
   console.log(`Games: ${games}, plies ${c.plies}, mistakes ${c.mistakes}, candidates ${c.candidates}, confirmed ${c.confirmed}`);

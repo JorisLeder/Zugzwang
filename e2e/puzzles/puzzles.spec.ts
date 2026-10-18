@@ -10,6 +10,7 @@ import { hasHorizontalScroll } from '../support/app';
 import { board } from '../support/board';
 import { expect, test } from '../support/fixtures';
 import {
+  BANK,
   chooseSelfAssessment,
   currentPuzzle,
   DEMO,
@@ -176,11 +177,14 @@ test.describe('Themen-Training (P0-06)', () => {
     await expect(cards.first()).toBeVisible({ timeout: 10_000 });
     expect(await cards.count()).toBeGreaterThanOrEqual(20);
     const hanging = page.locator('[data-testid="theme-card"][data-theme="hangingPiece"]');
-    await expect(hanging).toContainText('11 Puzzles');
+    const hangingAll = BANK.filter((x) => x.themes.includes('hangingPiece'));
+    const hangingEasy = hangingAll.filter((x) => x.rating >= 300 && x.rating <= 500); // Leicht = 300–500 around 600
+    expect(hangingEasy.length).toBeLessThan(hangingAll.length);
+    await expect(hanging).toContainText(`${hangingAll.length} Puzzles`);
     await expect(hanging).toContainText('Noch nicht trainiert');
     await page.getByRole('radio', { name: 'Leicht' }).click();
     await expect(page).toHaveURL(/\?d=easy$/);
-    await expect(hanging).not.toContainText('11 Puzzles'); // Leicht = 300–500 around the start value 600
+    await expect(hanging).toContainText(`${hangingEasy.length} Puzzles`);
     await expect(hanging).toHaveAttribute('href', '/puzzles/themes/hangingPiece?d=easy');
     expect(await hasHorizontalScroll(page)).toBe(false);
     await hanging.click();

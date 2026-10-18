@@ -1,11 +1,53 @@
 {
-  "version": "seed-f60b813b0ddb",
+  "version": "bank-e8be819548c7",
   "chunks": [
     {
       "file": "seed.json",
       "count": 44,
       "source": "seed",
       "sha256": "52d8d1093e2e033a6d55e434f75c122261b16a26c03dfc3763f25ef957c0110d"
+    },
+    {
+      "file": "lessons.json",
+      "count": 63,
+      "source": "lesson",
+      "sha256": "6a56232059565e534db9d58c70d0d6c8e55e40ed290885164be7134e2027f6d5"
+    },
+    {
+      "file": "generated-01.json",
+      "count": 250,
+      "source": "generated",
+      "sha256": "0a29a2a92b8ecec03c7b7fd4468be892f5228f90f3dc4e074d1d1aa4b96289a4"
+    },
+    {
+      "file": "generated-02.json",
+      "count": 250,
+      "source": "generated",
+      "sha256": "862d158dc9423457e6a6dd9694197576b2a0381ec9017b0dab73e4907b714747"
+    },
+    {
+      "file": "generated-03.json",
+      "count": 250,
+      "source": "generated",
+      "sha256": "3c50c4abc7e8b88ebe8869df48f62232c3fb8525654b32cbd70db1f44a57ab02"
+    },
+    {
+      "file": "generated-04.json",
+      "count": 250,
+      "source": "generated",
+      "sha256": "710e3e483ca3494bd3efd20a074813bf0e3aa4dbd69c7d12e9d25edb84a4def3"
+    },
+    {
+      "file": "generated-05.json",
+      "count": 250,
+      "source": "generated",
+      "sha256": "abfec0cd6905c4c81268e075bd59f74f535d222342c711fda5457a6de0fac310"
+    },
+    {
+      "file": "generated-06.json",
+      "count": 37,
+      "source": "generated",
+      "sha256": "633b3a857dab21297051c9728391f8fe2c4aacdb20100686f3fdb1c8ac14a86d"
     }
   ]
 }
