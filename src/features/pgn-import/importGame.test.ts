@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { AppServices } from '@/core/services';
 import { createFakeAppServices, createMemoryDataServices, FIXTURE_GAME, type MemoryDataServices } from '@/core/testing';
-import { parsePgnWithDiagnostics, pgnExternalId, type PgnGame } from '@/pgn';
+import { parsePgnWithDiagnostics, pgnExternalId, pgnWithOwnTags, type PgnGame } from '@/pgn';
 import { gameSummary, gamesImportUrl, importPgnGame } from './importGame';
 
 function parse(text: string): PgnGame[] {
@@ -54,7 +54,7 @@ describe('importPgnGame', () => {
     const headers = calls[0]!.init.headers as Record<string, string>;
     expect(headers.Authorization).toBe('Bearer jwt');
     expect(headers.apikey).toBe('anon');
-    expect(JSON.parse(calls[0]!.init.body as string)).toEqual({ pgn: game!.pgn });
+    expect(JSON.parse(calls[0]!.init.body as string)).toEqual({ pgn: pgnWithOwnTags(game!) });
     expect(await data.repos.games.list()).toHaveLength(0);
   });
 

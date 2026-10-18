@@ -10,7 +10,7 @@
 import type { GameImportRequest, GameImportResponse } from '@/core/games';
 import { gameImportResponseSchema } from '@/core/schemas';
 import type { AppServices } from '@/core/services';
-import { importedGameRecord, pgnExternalId, type PgnGame } from '@/pgn';
+import { importedGameRecord, pgnExternalId, pgnWithOwnTags, type PgnGame } from '@/pgn';
 import { STRINGS_DE } from './strings.de';
 
 /** Outcome of an import. */
@@ -54,7 +54,8 @@ async function importViaFunction(services: AppServices, game: PgnGame, fetchFn: 
   const { config, data } = services;
   const token = await data.auth.accessToken().catch(() => null);
   if (!config.supabaseUrl || !token) return { kind: 'unreachable' };
-  const body: GameImportRequest = { pgn: game.pgn };
+  // Exactly the game's own tags, so the server's external id equals `pgnExternalId(game)`.
+  const body: GameImportRequest = { pgn: pgnWithOwnTags(game) };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), IMPORT_TIMEOUT_MS);
   let res: Response;

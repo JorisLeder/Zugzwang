@@ -33,6 +33,36 @@ export function normalizedGameText(game: Pick<PgnGame, 'headers' | 'startFen' | 
   return `${tags.join('\n')}\n\n${movetext}`;
 }
 
+const escapeTagValue = (v: string) => v.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+/** Movetext of the main line with move numbers ("1. e4 e5 2. Nf3", "12... Kg7 13. Qd2") and the result. */
+function movetext(game: Pick<PgnGame, 'startFen' | 'moves' | 'result'>): string {
+  const fields = game.startFen.split(' ');
+  let moveNumber = Number(fields[5]) || 1;
+  let white = fields[1] !== 'b';
+  const out: string[] = [];
+  game.moves.forEach((m, i) => {
+    out.push(white ? `${moveNumber}. ${m.san}` : i === 0 ? `${moveNumber}... ${m.san}` : m.san);
+    if (!white) moveNumber += 1;
+    white = !white;
+  });
+  out.push(game.result);
+  return out.join(' ');
+}
+
+/**
+ * PGN of a parsed game with exactly its own tag pairs and its main line – the text the app sends to `games-import`.
+ * `game.pgn` cannot be used for that: its writer adds Seven Tag Roster placeholders (`[Site "?"]`, …) the original
+ * did not have, so parsing it again would give another `normalizedGameText`. Parsing this text gives the same one.
+ */
+export function pgnWithOwnTags(game: Pick<PgnGame, 'headers' | 'startFen' | 'moves' | 'result'>): string {
+  const tags = Object.entries(game.headers)
+    .filter(([name]) => name !== 'FEN' && name !== 'SetUp')
+    .map(([name, value]) => `[${name} "${escapeTagValue(value)}"]`);
+  if (game.startFen !== START_FEN) tags.push('[SetUp "1"]', `[FEN "${game.startFen}"]`);
+  return tags.length > 0 ? `${tags.join('\n')}\n\n${movetext(game)}\n` : `${movetext(game)}\n`;
+}
+
 /** External id of an imported game: lowercase hex SHA-256 of `normalizedGameText`. */
 export function pgnExternalId(game: Pick<PgnGame, 'headers' | 'startFen' | 'moves' | 'result'>): string {
   return sha256Hex(normalizedGameText(game));

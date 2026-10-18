@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "@/": "../../../src/",
+    "@anthropic-ai/sdk": "npm:@anthropic-ai/sdk@0.135.0",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.118.0",
+    "chess.js": "npm:chess.js@1.4.0",
+    "zod": "npm:zod@4.6.7"
+  },
+  "unstable": ["sloppy-imports"]
+}

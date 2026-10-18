@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { importedGameRecord, normalizedGameText, pgnExternalId } from './normalize';
+import { importedGameRecord, normalizedGameText, pgnExternalId, pgnWithOwnTags } from './normalize';
 import { parsePgnWithDiagnostics, type PgnGame } from './parser';
 import { sha256Hex } from './sha256';
 
@@ -83,5 +83,37 @@ describe('importedGameRecord', () => {
     const fen = importedGameRecord(first(read('05-fen-black-to-move.pgn')), '2026-10-17T10:00:00.000Z');
     expect(fen.origin).toEqual({ type: 'fen' });
     expect(fen.startFen).toBe('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2');
+  });
+});
+
+describe('pgnWithOwnTags (request text of games-import)', () => {
+  it('parses again to the same normal form and external id for every fixture game – game.pgn does not', () => {
+    let games = 0;
+    let differs = 0;
+    for (const name of readdirSync(join(__dirname, '__fixtures__')).filter((f) => f.endsWith('.pgn'))) {
+      const r = parsePgnWithDiagnostics(read(name));
+      if (!r.ok) continue;
+      for (const g of r.games) {
+        const again = first(pgnWithOwnTags(g));
+        expect(normalizedGameText(again), name).toBe(normalizedGameText(g));
+        expect(pgnExternalId(again), name).toBe(pgnExternalId(g));
+        expect(again.pgn, name).toBe(g.pgn);
+        if (pgnExternalId(first(g.pgn)) !== pgnExternalId(g)) differs += 1;
+        games += 1;
+      }
+    }
+    expect(games).toBeGreaterThanOrEqual(20);
+    // The clean PGN adds Seven Tag Roster placeholders, so re-parsing it changes the id of games without them.
+    expect(differs).toBeGreaterThan(0);
+  });
+
+  it('escapes quotes and backslashes and writes a non-standard start as SetUp + normalised FEN', () => {
+    const g = first('[Event "Das \\"Turnier\\" in A\\\\B"]\n[FEN "4k3/8/8/8/8/8/8/4K2R w K - 0 1"]\n\n1. O-O *');
+    expect(g.headers.Event).toBe('Das "Turnier" in A\\B');
+    const text = pgnWithOwnTags(g);
+    expect(text).toBe(
+      '[Event "Das \\"Turnier\\" in A\\\\B"]\n[Result "*"]\n[SetUp "1"]\n[FEN "4k3/8/8/8/8/8/8/4K2R w K - 0 1"]\n\n1. O-O *\n',
+    );
+    expect(pgnExternalId(first(text))).toBe(pgnExternalId(g));
   });
 });
