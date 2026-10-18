@@ -14,6 +14,10 @@ const M = { top: 12, right: 16, bottom: 28, left: 48 };
 const DATE = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium' });
 const DATE_SHORT = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' });
 
+function pointText(p: { at: string; rating: number }): string {
+  return `${DATE.format(new Date(p.at))}: ${STRINGS_DE.colRating} ${formatNumber(Math.round(p.rating))}`;
+}
+
 /** Props of `RatingChart`. */
 export interface RatingChartProps {
   title: string;
@@ -95,9 +99,13 @@ export function RatingChart({ title, series, emptyText, testId }: RatingChartPro
             ref={ref}
             className="relative w-full min-w-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             tabIndex={0}
-            role="group"
+            role="slider"
             aria-label={summary}
             aria-describedby={`${id}-hint`}
+            aria-valuemin={1}
+            aria-valuemax={points.length}
+            aria-valuenow={(hover ?? points.length - 1) + 1}
+            aria-valuetext={pointText(points[hover ?? points.length - 1]!)}
             onKeyDown={onKey}
             onBlur={() => setHover(null)}
           >

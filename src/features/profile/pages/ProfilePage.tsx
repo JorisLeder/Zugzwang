@@ -203,10 +203,8 @@ function GoalCard({ profile }: { profile: Profile | null }) {
           setPending(minutes);
           setMessage(null);
           data.progress.saveProfile({ dailyGoalMinutes: minutes }).then(
-            () => {
-              setPending(null);
-              setMessage({ tone: 'ok', text: STRINGS_DE.goalSaved });
-            },
+            // The chosen value stays shown (no flicker back while the live profile catches up).
+            () => setMessage({ tone: 'ok', text: STRINGS_DE.goalSaved }),
             () => {
               setPending(null);
               setMessage({ tone: 'error', text: STRINGS_DE.saveFailed });

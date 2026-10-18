@@ -1,14 +1,47 @@
-/** German strings of the settings (D-35). PLACEHOLDER (WP-00) – owned by WP-09. */
+/** German strings of the settings (D-35). */
 export const STRINGS_DE = {
   title: 'Einstellungen',
-  subtitle: 'Weitere Einstellungen folgen.',
+  subtitle: 'Änderungen gelten sofort und bleiben gespeichert.',
+
+  appearanceTitle: 'Darstellung',
   theme: 'Design',
   themeDark: 'Dunkel',
   themeLight: 'Hell',
   board: 'Brettdesign',
   boardMoos: 'Moos',
   boardHolz: 'Holz',
+  boardPreview: (name: string) => `Vorschau Brettdesign ${name}`,
+  pieces: 'Figuren',
+  piecesDefault: 'Standard',
+  piecesHint: 'Weitere Figurensätze sind in Vorbereitung.',
+
+  boardTitle: 'Brett und Züge',
+  coordinates: 'Koordinaten anzeigen',
+  coordinatesHint: 'Buchstaben und Zahlen am Brettrand.',
+  legalMoves: 'Mögliche Züge anzeigen',
+  legalMovesHint: 'Punkte auf den Feldern, auf die die gewählte Figur ziehen kann.',
+  moveConfirmation: 'Zugbestätigung',
+  moveConfirmationHint: 'In Partien musst du jeden Zug noch einmal bestätigen.',
+
+  soundTitle: 'Töne und Bewegung',
+  sound: 'Töne',
+  soundHint: 'Zug, Schlag, Schach, Erfolg und Fehler.',
+  animations: 'Animationen',
+  animationsHint: 'Figurenbewegungen und Übergänge. Bei „Bewegung reduzieren“ im System immer aus.',
+
+  languageTitle: 'Sprache und Notation',
   notation: 'Notation',
   notationDe: 'Deutsch (K D T L S)',
   notationEn: 'Englisch (K Q R B N)',
+  notationExample: (line: string) => `Beispiel: ${line}`,
+  language: 'Sprache',
+  languageDe: 'Deutsch',
+  languageEn: 'Englisch (in Vorbereitung)',
+  languageHint: 'Englisch ist in Vorbereitung.',
+
+  goalTitle: 'Training',
+  goal: 'Tagesziel (Minuten)',
+  goalOption: (m: number) => `${m} Min.`,
+  goalOptionDescription: (m: number) => `${m} aktive Minuten am Tag`,
+  saveFailed: 'Die Einstellung konnte nicht gespeichert werden. Versuch es nochmal.',
 } as const;
