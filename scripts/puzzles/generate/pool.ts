@@ -2,8 +2,10 @@
  * Runs self-play games on worker processes (or in-process) and hands the results to a consumer **in game-index
  * order**, so the generated bank does not depend on how fast each worker was. Finished games are cached in
  * `.cache/puzzles-generate/<key>/game-<index>.json`; the key covers the seed, the config, `GENERATOR_VERSION` and the
- * source of every file that influences a game result (so any change there replays the games). Rating, explanation
- * and output (`rating.ts`, `assemble.ts`, `output.ts`) run on the cached results and can be changed freely.
+ * source of every file that influences which lines a game yields (so any change there replays the games). Themes,
+ * rating, explanation and output (`tagger.ts`, `rating.ts`, `assemble.ts`, `output.ts`) are recomputed from the
+ * cached lines on every run and can be changed freely (the worker's engine check depends on the themes only through
+ * the `mateInN` tag, which follows from the line and the engine's mate distance).
  */
 import { fork, type ChildProcess } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -104,9 +106,7 @@ export const GAME_SOURCES = [
   'scripts/puzzles/generate/rng.ts',
   'scripts/puzzles/generate/selfplay.ts',
   'scripts/puzzles/generate/solution.ts',
-  'scripts/puzzles/generate/tagger.ts',
   'scripts/puzzles/lib/puzzleChecks.ts',
-  'src/analysis/motifs.ts',
   'src/analysis/phase.ts',
 ] as const;
 

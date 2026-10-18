@@ -20,7 +20,7 @@ export async function completeOnboarding(page: Page, choice: Assessment = 'Clubs
   await expect(page).toHaveURL(/\/onboarding$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Willkommen bei Zugzwang' })).toBeVisible();
   await page.getByRole('radio', { name: new RegExp(`^${choice}`) }).click();
-  await page.getByRole('radio', { name: `${goal} Min.`, exact: true }).click();
+  await page.getByRole('radiogroup', { name: 'Tagesziel in Minuten' }).getByRole('radio', { name: String(goal), exact: true }).click();
   await page.getByRole('button', { name: 'Los geht’s' }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Start' })).toBeVisible();

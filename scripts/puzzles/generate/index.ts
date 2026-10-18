@@ -61,6 +61,7 @@ import { isSkip, lessonPuzzle, readLessonExercises } from './lessons';
 import { bankStats, formatStats, meetsTargets, MIN_TRAINABLE_THEMES, SEED_CHUNK, writePuzzleBank, writePuzzlesCsv, type BankStats } from './output';
 import { cacheDir, createInProcessRunner, createWorkerPool, runGamesInOrder } from './pool';
 import { DEFAULT_GENERATOR_CONFIG, type GameResult, type GeneratorConfig } from './selfplay';
+import { tagPuzzle } from './tagger';
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
@@ -141,7 +142,9 @@ export function createAccumulator(target: number, fixed: readonly Puzzle[]) {
           continue;
         }
         seen.add(key);
-        const puzzle = toGeneratedPuzzle(raw);
+        // Themes are recomputed with the current tagger (cached games keep the themes of the run that played them).
+        const themes = tagPuzzle({ fen: raw.fen, moves: raw.moves, mateIn: raw.mateIn, finalCp: raw.finalCp, phase: raw.phase });
+        const puzzle = toGeneratedPuzzle({ ...raw, themes });
         if (checkPuzzleStructure(puzzle).errors.length > 0) {
           reject('structure');
           continue;

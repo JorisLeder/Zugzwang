@@ -124,10 +124,10 @@ describe('profile page', () => {
     await waitFor(async () => expect((await data.repos.profile.get())?.displayName).toBe('Jonas'));
 
     const goal = screen.getByRole('radiogroup', { name: 'Tagesziel in Minuten' });
-    fireEvent.click(within(goal).getByRole('radio', { name: '10 Min.' }));
+    fireEvent.click(within(goal).getByRole('radio', { name: '10' }));
     await waitFor(async () => expect((await data.repos.profile.get())?.dailyGoalMinutes).toBe(10));
     expect(await screen.findByText('Tagesziel gespeichert.')).toBeInTheDocument();
-    expect(within(goal).getByRole('radio', { name: '10 Min.' })).toHaveAttribute('aria-checked', 'true');
+    expect(within(goal).getByRole('radio', { name: '10' })).toHaveAttribute('aria-checked', 'true');
   });
 });
 

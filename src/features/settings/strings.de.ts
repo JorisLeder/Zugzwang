@@ -37,11 +37,10 @@ export const STRINGS_DE = {
   language: 'Sprache',
   languageDe: 'Deutsch',
   languageEn: 'Englisch (in Vorbereitung)',
-  languageHint: 'Englisch ist in Vorbereitung.',
 
   goalTitle: 'Training',
-  goal: 'Tagesziel (Minuten)',
-  goalOption: (m: number) => `${m} Min.`,
+  goal: 'Tagesziel in Minuten',
+  goalOption: (m: number) => String(m),
   goalOptionDescription: (m: number) => `${m} aktive Minuten am Tag`,
   saveFailed: 'Die Einstellung konnte nicht gespeichert werden. Versuch es nochmal.',
 } as const;

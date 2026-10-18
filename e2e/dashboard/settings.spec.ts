@@ -37,7 +37,7 @@ test.describe('settings (AC4)', () => {
     await expect(html).toHaveAttribute('data-board', 'holz');
     const switches = ['Koordinaten anzeigen', 'Mögliche Züge anzeigen', 'Töne', 'Animationen', 'Zugbestätigung'];
     for (const name of switches) await page.getByRole('switch', { name }).click();
-    await toggle(page, 'Tagesziel (Minuten)', '60 Min.').click();
+    await toggle(page, 'Tagesziel in Minuten', '60').click();
     await expect(toggle(page, 'Sprache', 'Englisch (in Vorbereitung)')).toBeDisabled();
 
     await expect.poll(async () => (await storedProfile(page))?.dailyGoalMinutes).toBe(60);
@@ -52,7 +52,7 @@ test.describe('settings (AC4)', () => {
     await expect(toggle(page, 'Brettdesign', 'Holz')).toHaveAttribute('aria-checked', 'true');
     for (const name of switches.slice(0, 4)) await expect(page.getByRole('switch', { name })).toHaveAttribute('aria-checked', 'false');
     await expect(page.getByRole('switch', { name: 'Zugbestätigung' })).toHaveAttribute('aria-checked', 'true');
-    await expect(toggle(page, 'Tagesziel (Minuten)', '60 Min.')).toHaveAttribute('aria-checked', 'true');
+    await expect(toggle(page, 'Tagesziel in Minuten', '60')).toHaveAttribute('aria-checked', 'true');
 
     // The board follows: no coordinates, no legal-move dots.
     await navigateInApp(page, paths.analysisBoard());

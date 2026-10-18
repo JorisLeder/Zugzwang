@@ -194,12 +194,12 @@ test.describe('profile', () => {
     await page.getByLabel('Anzeigename').fill('Mia');
     await page.getByTestId('profile-name').getByRole('button', { name: 'Speichern', exact: true }).click();
     await expect(page.getByText('Gespeichert.')).toBeVisible();
-    await page.getByRole('radiogroup', { name: 'Tagesziel in Minuten' }).getByRole('radio', { name: '30 Min.' }).click();
+    await page.getByRole('radiogroup', { name: 'Tagesziel in Minuten' }).getByRole('radio', { name: '30', exact: true }).click();
     await expect.poll(async () => (await storedProfile(page))?.dailyGoalMinutes).toBe(30);
 
     await page.reload();
     await expect(page.getByLabel('Anzeigename')).toHaveValue('Mia');
-    await expect(page.getByRole('radiogroup', { name: 'Tagesziel in Minuten' }).getByRole('radio', { name: '30 Min.' })).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByRole('radiogroup', { name: 'Tagesziel in Minuten' }).getByRole('radio', { name: '30', exact: true })).toHaveAttribute('aria-checked', 'true');
     await page.goto('/');
     await expect(page.getByText('Hallo Mia! Dein Training auf einen Blick.')).toBeVisible();
     await expect(page.getByTestId('dashboard-daily-goal-value')).toHaveAttribute('data-goal', '30');

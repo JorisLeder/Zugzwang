@@ -61,7 +61,9 @@ describe('settings page', () => {
     await waitFor(async () => expect((await data.repos.profile.get())?.settings.boardTheme).toBe('holz'));
     expect(screen.getByRole('img', { name: 'Vorschau Brettdesign Holz' })).toBeInTheDocument();
     const pieces = within(screen.getByRole('radiogroup', { name: 'Figuren' })).getAllByRole('radio');
-    expect(pieces.map((p) => p.textContent)).toEqual(['Standard']);
+    expect(pieces).toHaveLength(1);
+    expect(pieces[0]).toHaveAccessibleName(/^Standard/);
+    expect(pieces[0]).toHaveAttribute('aria-checked', 'true');
   });
 
   it('toggles every switch and persists it', async () => {
@@ -102,11 +104,11 @@ describe('settings page', () => {
 
   it('saves the daily goal in the profile and keeps the account section', async () => {
     const data = await setup();
-    const goal = screen.getByRole('radiogroup', { name: 'Tagesziel (Minuten)' });
-    expect(within(goal).getByRole('radio', { name: '20 Min.' })).toHaveAttribute('aria-checked', 'true');
-    fireEvent.click(within(goal).getByRole('radio', { name: '60 Min.' }));
+    const goal = screen.getByRole('radiogroup', { name: 'Tagesziel in Minuten' });
+    expect(within(goal).getByRole('radio', { name: '20' })).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(within(goal).getByRole('radio', { name: '60' }));
     await waitFor(async () => expect((await data.repos.profile.get())?.dailyGoalMinutes).toBe(60));
-    expect(within(goal).getByRole('radio', { name: '60 Min.' })).toHaveAttribute('aria-checked', 'true');
+    expect(within(goal).getByRole('radio', { name: '60' })).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByRole('button', { name: /Daten exportieren/ })).toBeInTheDocument();
   });
 });

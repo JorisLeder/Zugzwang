@@ -211,7 +211,7 @@ function GoalCard({ profile }: { profile: Profile | null }) {
             },
           );
         }}
-        options={DAILY_GOAL_OPTIONS.map((m) => ({ value: String(m), label: STRINGS_DE.goalOption(m) }))}
+        options={DAILY_GOAL_OPTIONS.map((m) => ({ value: String(m), label: STRINGS_DE.goalOption(m), description: STRINGS_DE.goalOptionDescription(m) }))}
       />
       <p className="text-body-sm text-muted">{STRINGS_DE.goalToday(Math.floor(activity?.minutes ?? 0), shown)}</p>
       {message && (

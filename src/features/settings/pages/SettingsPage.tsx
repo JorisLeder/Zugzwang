@@ -11,7 +11,7 @@ import { AccountSection } from '@/features/auth/AccountSection';
 import { useLiveProfile } from '@/features/profile/useProgressData';
 import { formatSan } from '@/lib/chess';
 import { Page } from '@/ui/layout/Page';
-import { Card, SegmentedControl, Switch } from '@/ui/primitives';
+import { Card, RadioGroup, SegmentedControl, Switch } from '@/ui/primitives';
 import { notationExample } from '../notationExample';
 import { STRINGS_DE } from '../strings.de';
 
@@ -101,12 +101,12 @@ export function Component() {
             />
             <BoardSwatch name={settings.boardTheme === 'holz' ? STRINGS_DE.boardHolz : STRINGS_DE.boardMoos} />
           </Field>
-          <Field label={STRINGS_DE.pieces} hint={STRINGS_DE.piecesHint}>
-            <SegmentedControl<Settings['pieceSet']>
+          <Field label={STRINGS_DE.pieces}>
+            <RadioGroup<Settings['pieceSet']>
               label={STRINGS_DE.pieces}
               value={settings.pieceSet}
               onValueChange={(pieceSet) => update({ pieceSet })}
-              options={[{ value: 'default', label: STRINGS_DE.piecesDefault }]}
+              options={[{ value: 'default', label: STRINGS_DE.piecesDefault, description: STRINGS_DE.piecesHint }]}
             />
           </Field>
         </Section>
@@ -148,7 +148,7 @@ export function Component() {
 
         <Section title={STRINGS_DE.languageTitle} testId="settings-language">
           <Field label={STRINGS_DE.notation}>
-            <SegmentedControl<Settings['notation']>
+            <RadioGroup<Settings['notation']>
               label={STRINGS_DE.notation}
               value={settings.notation}
               onValueChange={(notation) => update({ notation })}
@@ -161,8 +161,8 @@ export function Component() {
               {STRINGS_DE.notationExample(exampleText)}
             </p>
           </Field>
-          <Field label={STRINGS_DE.language} hint={STRINGS_DE.languageHint}>
-            <SegmentedControl<Settings['language']>
+          <Field label={STRINGS_DE.language}>
+            <RadioGroup<Settings['language']>
               label={STRINGS_DE.language}
               value="de"
               onValueChange={(language) => language === 'de' && update({ language })}

@@ -65,8 +65,8 @@ describe('first start', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Wähle zuerst aus');
 
     fireEvent.click(screen.getByRole('radio', { name: /Neuling/ }));
-    expect(screen.getByRole('radio', { name: /20 Min\./ })).toHaveAttribute('aria-checked', 'true');
-    fireEvent.click(screen.getByRole('radio', { name: /30 Min\./ }));
+    expect(screen.getByRole('radio', { name: '20' })).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(screen.getByRole('radio', { name: '30' }));
     fireEvent.click(screen.getByRole('button', { name: 'Los geht’s' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/'), WAIT);

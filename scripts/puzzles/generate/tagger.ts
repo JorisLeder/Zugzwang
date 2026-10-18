@@ -155,8 +155,21 @@ function laterSolverCapture(ctx: LineContext, i: number, squares: ReadonlySet<Sq
   });
 }
 
-function lastSolverIdx(ctx: LineContext): number {
-  return ctx.solverIdx[ctx.solverIdx.length - 1]!;
+/**
+ * The opponent piece standing on `square` after record index `i` is captured by a later solver move – also after it
+ * moved on (e.g. a pinned queen that takes the pinning bishop and is recaptured).
+ */
+function pieceCapturedLater(ctx: LineContext, i: number, square: Square): boolean {
+  let sq = square;
+  for (let j = i + 1; j < ctx.records.length; j++) {
+    const r = ctx.records[j]!;
+    if (r.color === ctx.opp) {
+      if (r.from === sq) sq = r.to;
+    } else if (r.to === sq && r.captured) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // ------------------------------------------------------------------------------------------------ tactical motifs
@@ -180,15 +193,15 @@ export function isFork(ctx: LineContext): boolean {
 }
 
 /**
- * Pin: a solver move creates a pin and the pinned piece or the piece behind it is captured later; or a piece pinned
- * to its king at the start is attacked by the first solver move and captured later.
+ * Pin: a solver move creates a pin and the pinned piece (wherever it moves) or the piece behind it is captured later;
+ * or a piece pinned to its king at the start is attacked by the first solver move and captured later.
  */
 export function isPin(ctx: LineContext): boolean {
   const created = ctx.solverIdx.slice(0, -1).some((i) =>
     ctx
       .motifsAt(i)
       .filter((m) => m.id === 'pin' && m.pieces[0]?.color === ctx.solver)
-      .some((m) => laterSolverCapture(ctx, i, new Set([m.squares[1]!, m.squares[2]!]))),
+      .some((m) => pieceCapturedLater(ctx, i, m.squares[1]!) || pieceCapturedLater(ctx, i, m.squares[2]!)),
   );
   if (created) return true;
   if (ctx.solverIdx.length < 2) return false;
@@ -197,7 +210,7 @@ export function isPin(ctx: LineContext): boolean {
     .filter((m) => m.pieces[2]?.piece === 'k')
     .some((m) => {
       const pinned = m.squares[1]!;
-      return attackersOf(first.fenAfter, pinned, ctx.solver).includes(first.to) && laterSolverCapture(ctx, 1, new Set([pinned]));
+      return attackersOf(first.fenAfter, pinned, ctx.solver).includes(first.to) && pieceCapturedLater(ctx, 1, pinned);
     });
 }
 
@@ -614,6 +627,5 @@ export function tagPuzzle(input: TagInput): PuzzleThemeId[] {
   const bm = bishopMate(ctx);
   if (bm) t.push(bm);
   if (isDovetailMate(ctx)) t.push('dovetailMate');
-  void lastSolverIdx;
   return sortThemes(t);
 }

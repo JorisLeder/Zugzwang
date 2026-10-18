@@ -33,7 +33,8 @@ export const STRINGS_DE = {
 
   goalTitle: 'Tagesziel',
   goalLabel: 'Tagesziel in Minuten',
-  goalOption: (m: number) => `${m} Min.`,
+  goalOption: (m: number) => String(m),
+  goalOptionDescription: (m: number) => `${m} aktive Minuten am Tag`,
   goalToday: (m: number, g: number) => `Heute: ${m} von ${g} Minuten`,
   goalSaved: 'Tagesziel gespeichert.',
 
