@@ -1,9 +1,10 @@
 /** Shared context of the Dexie repositories and the ProgressService. */
 import { liveQuery } from 'dexie';
 import type { Profile } from '@/core/profile';
-import { DEFAULT_DAILY_GOAL_MINUTES, DEFAULT_SETTINGS } from '@/core/profile';
+import { DEFAULT_DAILY_GOAL_MINUTES, DEFAULT_SETTINGS, DEFAULT_TIME_ZONE } from '@/core/profile';
 import type { OutboxEntry, Subscribable } from '@/core/storage';
 import { fromObservable } from '@/lib/observable';
+import { userTimeZone } from '@/lib/time';
 import type { ZugzwangDb } from '../db';
 import { isUserTable, rowKey } from '../sync/tables';
 
@@ -67,7 +68,7 @@ export async function enqueue(ctx: DataContext, ...entries: OutboxEntry[]): Prom
 }
 
 /** The default profile of a new user. */
-export function defaultProfile(id: string, at: string): Profile {
+export function defaultProfile(id: string, at: string, timeZone: string = userTimeZone()): Profile {
   return {
     id,
     displayName: 'Du',
@@ -76,6 +77,7 @@ export function defaultProfile(id: string, at: string): Profile {
     selfAssessment: null,
     onboardingCompleted: false,
     stageZeroSkipped: false,
+    timeZone,
     createdAt: at,
     updatedAt: at,
   };
@@ -83,7 +85,14 @@ export function defaultProfile(id: string, at: string): Profile {
 
 /** The stored profile (there is at most one). */
 export async function currentProfile(db: ZugzwangDb): Promise<Profile | null> {
-  return (await db.profile.toCollection().first()) ?? null;
+  const p = await db.profile.toCollection().first();
+  // Profiles stored before `timeZone` existed get the default until the next write stamps the device's time zone.
+  return p ? (p.timeZone ? p : { ...p, timeZone: DEFAULT_TIME_ZONE }) : null;
+}
+
+/** The profile stamped with this device's time zone (reported to the server with every profile write). */
+export function withTimeZone(ctx: Pick<DataContext, 'timeZone'>, p: Profile): Profile {
+  return p.timeZone === ctx.timeZone ? p : { ...p, timeZone: ctx.timeZone };
 }
 
 /** Replaces the stored profile (keeps a single row even when the id changes, e.g. local → cloud). */

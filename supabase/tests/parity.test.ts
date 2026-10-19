@@ -73,6 +73,7 @@ async function newUser(rng: Rng, kind: RatingKind, at: string): Promise<{ uid: s
     selfAssessment: 'beginner',
     onboardingCompleted: true,
     stageZeroSkipped: false,
+    timeZone: 'Europe/Berlin',
     createdAt: at,
     updatedAt: at,
   };
@@ -174,7 +175,7 @@ describe('rating floor (PR-2)', () => {
     const uid = await db.createUser();
     const profile: Profile = {
       id: uid, displayName: 'Neuling', settings: { ...DEFAULT_SETTINGS, updatedAt: at }, dailyGoalMinutes: 10, selfAssessment: 'beginner',
-      onboardingCompleted: true, stageZeroSkipped: false, createdAt: at, updatedAt: at,
+      onboardingCompleted: true, stageZeroSkipped: false, timeZone: 'Europe/Berlin', createdAt: at, updatedAt: at,
     };
     let rating: RatingRecord = { ...defaultRating('puzzle', at), rating: 400, rd: 350 };
     await db.asUser(uid, async (tx) => {
@@ -348,6 +349,7 @@ describe('profile and game upserts (10 generated sequences each)', () => {
           selfAssessment: rng.pick(['newcomer', 'beginner', 'club', null] as const),
           onboardingCompleted: rng.bool(),
           stageZeroSkipped: rng.bool(),
+          timeZone: rng.pick(['Europe/Berlin', 'America/New_York', 'Asia/Tokyo'] as const),
           createdAt: iso(),
           updatedAt: iso(),
         };

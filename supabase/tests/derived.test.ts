@@ -285,6 +285,56 @@ describe('daily activity', () => {
   });
 });
 
+describe('daily activity in the time zone of the user (DS-4)', () => {
+  const setZone = (uid: string, tz: string) =>
+    db.asUser(uid, (tx) => upsert(tx, 'profiles', [{ ...sampleRow('profiles', { owner: uid }), time_zone: tz } as Row], { onConflict: 'id' }));
+  const days = (uid: string) => db.rows(`select date, puzzles, games, lessons from public.daily_activity where user_id = $1 order by date`, [uid]);
+
+  it('a puzzle solved at 20:00 in New York counts for that local day (Berlin would already be on the next one)', async () => {
+    const uid = await db.createUser();
+    await setZone(uid, 'America/New_York');
+    // 2026-10-19 20:00 EDT = 2026-10-20 00:00 UTC = 02:00 in Berlin.
+    await insertIgnore(uid, 'puzzle_attempts', [attemptRow(uid, { created_at: '2026-10-20T00:00:00.000Z', mode: 'learning' })]);
+    expect(await days(uid)).toEqual([{ date: '2026-10-19', puzzles: 1, games: 0, lessons: 0 }]);
+  });
+
+  it('bot games and lesson steps use the time zone too', async () => {
+    const uid = await db.createUser();
+    await setZone(uid, 'Asia/Tokyo');
+    // 2026-10-18 20:00 UTC = 2026-10-19 05:00 in Tokyo.
+    const row = { ...sampleRow('games', { owner: uid }), source: 'bot', status: 'finished', result: '1-0', end_reason: 'checkmate', finished_at: '2026-10-18T20:00:00.000Z' } as Row;
+    await db.asUser(uid, (tx) => upsert(tx, 'games', [row], { onConflict: 'id' }));
+    await db.asUser(uid, (tx) =>
+      rpc(tx, 'upsert_lesson_progress', {
+        p_lesson_id: 'l1', p_lesson_version: 1, p_current_step: 2, p_completed: false, p_stars: 0, p_mistakes: 0, p_hints_used: 0,
+        p_score: null, p_updated_at: '2026-10-18T20:30:00.000Z', p_completed_at: null,
+      }),
+    );
+    expect(await days(uid)).toEqual([{ date: '2026-10-19', puzzles: 0, games: 1, lessons: 2 }]);
+  });
+
+  it('users without a profile, with the default or with an invalid time zone fall back to Europe/Berlin', async () => {
+    const day = async (uid: string) => (await db.rows<{ d: string }>(`select public.zz_local_day('2026-10-18T22:30:00Z'::timestamptz, $1)::text as d`, [uid]))[0]!.d;
+    const fresh = await db.createUser();
+    expect(await day(fresh)).toBe('2026-10-19'); // no profile
+    await setZone(fresh, 'Europe/Berlin');
+    expect(await day(fresh)).toBe('2026-10-19');
+    await setZone(fresh, 'Mars/Olympus_Mons');
+    expect(await day(fresh)).toBe('2026-10-19'); // invalid name: Berlin
+    await setZone(fresh, 'Pacific/Auckland');
+    expect(await day(fresh)).toBe('2026-10-19'); // 11:30 on the 19th there – coincides with Berlin here
+    await setZone(fresh, 'America/Los_Angeles');
+    expect(await day(fresh)).toBe('2026-10-18');
+  });
+
+  it('writes with an invalid time zone name never fail', async () => {
+    const uid = await db.createUser();
+    await setZone(uid, 'Nowhere/City');
+    await insertIgnore(uid, 'puzzle_attempts', [attemptRow(uid, { created_at: '2026-10-18T22:01:00.000Z', mode: 'learning' })]);
+    expect(await days(uid)).toEqual([{ date: '2026-10-19', puzzles: 1, games: 0, lessons: 0 }]);
+  });
+});
+
 describe('explain quota (service role)', () => {
   it('allows up to the limit per user and day', async () => {
     const [alice, bob] = [await db.createUser(), await db.createUser()];

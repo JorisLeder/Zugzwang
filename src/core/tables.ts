@@ -11,7 +11,7 @@ import type { BotProfile } from './bots';
 import type { ExplanationFeedback, ExplanationText } from './explain';
 import type { AssistanceLevel, Game, GameMoveEvent, GameOrigin, GameSource, TimeControl } from './games';
 import type { CourseMeta, Lesson, LessonProgress, LessonStep, StageId } from './lessons';
-import type { DailyActivity, Profile, ReviewQueueItem, SelfAssessment, Settings, ThemeStat } from './profile';
+import { DEFAULT_TIME_ZONE, type DailyActivity, type Profile, type ReviewQueueItem, type SelfAssessment, type Settings, type ThemeStat } from './profile';
 import type { Puzzle, PuzzleAttempt, PuzzleMode } from './puzzles';
 import type { RatingKind, RatingRecord } from './rating';
 
@@ -106,6 +106,8 @@ export interface ProfileRow {
   self_assessment: SelfAssessment | null;
   onboarding_completed: boolean;
   stage_zero_skipped: boolean;
+  /** IANA time zone; the server buckets daily activity by it (invalid names fall back to Europe/Berlin). */
+  time_zone: string;
   created_at: string;
   updated_at: string;
 }
@@ -360,6 +362,7 @@ export const toRow = {
     self_assessment: p.selfAssessment,
     onboarding_completed: p.onboardingCompleted,
     stage_zero_skipped: p.stageZeroSkipped,
+    time_zone: p.timeZone || DEFAULT_TIME_ZONE,
     created_at: p.createdAt,
     updated_at: p.updatedAt,
   }),
@@ -548,6 +551,7 @@ export const fromRow = {
     selfAssessment: r.self_assessment,
     onboardingCompleted: r.onboarding_completed,
     stageZeroSkipped: r.stage_zero_skipped,
+    timeZone: r.time_zone || DEFAULT_TIME_ZONE,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   }),

@@ -142,7 +142,7 @@ export function createDexieDataServices(opts: DexieDataOptions): DexieDataServic
   async function ensureLocalProfile(d: ZugzwangDb): Promise<void> {
     const profile = await currentProfile(d);
     const id = profile?.id ?? owner.id ?? newId();
-    if (!profile) await d.profile.put(defaultProfile(id, nowIso()));
+    if (!profile) await d.profile.put(defaultProfile(id, nowIso(), timeZone));
     const kind = owner.kind ?? 'local';
     if (owner.id !== id || owner.kind === null) {
       await d.meta.bulkPut([
@@ -198,6 +198,21 @@ export function createDexieDataServices(opts: DexieDataOptions): DexieDataServic
     owner.kind = 'cloud';
   }
 
+  /** The server buckets daily activity by the profile's time zone: report this device's one when it differs. */
+  async function stampTimeZone(): Promise<void> {
+    const cur = await currentProfile(db);
+    if (!cur || cur.timeZone === timeZone) return;
+    await db.transaction('rw', db.profile, db.outbox, async () => {
+      const p = await currentProfile(db);
+      if (!p || p.timeZone === timeZone) return;
+      const at = nowIso();
+      const next = { ...p, timeZone, updatedAt: at };
+      await putProfile(db, next);
+      await enqueue(ctx, outbox.profile(next, at));
+    });
+    engine.notifyEnqueued();
+  }
+
   /** After login: realtime first (nothing is missed during the pull), flush, full pull, profile. */
   async function afterLogin(uid: string): Promise<void> {
     stopRealtime = engine.subscribeRealtime();
@@ -209,9 +224,10 @@ export function createDexieDataServices(opts: DexieDataOptions): DexieDataServic
     } catch (e) {
       console.warn('Sync: full pull after login failed', e);
     }
+    if (pulled && syncUserId === uid) await stampTimeZone();
     if (syncUserId !== uid || (await currentProfile(db))) return;
     // No profile on the server either: a placeholder with an epoch timestamp, so any server value wins the merge.
-    const placeholder = { ...defaultProfile(uid, nowIso()), updatedAt: EPOCH };
+    const placeholder = { ...defaultProfile(uid, nowIso(), timeZone), updatedAt: EPOCH };
     await db.transaction('rw', db.profile, db.outbox, async () => {
       if (await currentProfile(db)) return;
       await putProfile(db, placeholder);

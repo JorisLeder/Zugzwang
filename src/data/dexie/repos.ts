@@ -9,7 +9,7 @@ import type { Puzzle, PuzzleQuery } from '@/core/puzzles';
 import type { GameListQuery, Repositories } from '@/core/storage';
 import { META } from '../db';
 import { outbox } from '../outbox';
-import { currentProfile, defaultProfile, enqueue, live, putProfile, type DataContext } from './context';
+import { currentProfile, defaultProfile, enqueue, live, putProfile, withTimeZone, type DataContext } from './context';
 
 /** A heartbeat younger than this keeps another device active (only `takeOver` may then switch devices). */
 export const ACTIVE_HEARTBEAT_MS = 30_000;
@@ -46,15 +46,16 @@ export function createRepositories(ctx: DataContext, random: () => number = Math
       observe: () => live(() => currentProfile(db)),
       save: (p) =>
         db.transaction('rw', db.profile, db.outbox, async () => {
-          await putProfile(db, p);
-          await enqueue(ctx, outbox.profile(p, ctx.nowIso()));
+          const stamped = withTimeZone(ctx, p);
+          await putProfile(db, stamped);
+          await enqueue(ctx, outbox.profile(stamped, ctx.nowIso()));
         }).then(ctx.enqueued),
       updateSettings: async (patch) => {
         const settings = await db.transaction('rw', db.profile, db.outbox, async () => {
           const ts = ctx.nowIso();
           const current = (await currentProfile(db)) ?? defaultProfile(ctx.userId(), ts);
           const next: Settings = { ...current.settings, ...patch, updatedAt: ts };
-          const profile = { ...current, settings: next, updatedAt: ts };
+          const profile = withTimeZone(ctx, { ...current, settings: next, updatedAt: ts });
           await putProfile(db, profile);
           await enqueue(ctx, outbox.profile(profile, ts));
           return next;

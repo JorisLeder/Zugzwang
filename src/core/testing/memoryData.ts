@@ -13,7 +13,7 @@ import type { ExplanationFeedback } from '../explain';
 import type { Game, GameMoveEvent } from '../games';
 import type { LessonProgress } from '../lessons';
 import type { DailyActivity, Profile, ReviewQueueItem, Settings, ThemeStat } from '../profile';
-import { DEFAULT_DAILY_GOAL_MINUTES, DEFAULT_SETTINGS, SELF_ASSESSMENT_OPTIONS } from '../profile';
+import { DEFAULT_DAILY_GOAL_MINUTES, DEFAULT_SETTINGS, DEFAULT_TIME_ZONE, SELF_ASSESSMENT_OPTIONS } from '../profile';
 import type { Puzzle, PuzzleAttempt, PuzzleQuery } from '../puzzles';
 import type { RatingKind, RatingRecord } from '../rating';
 import { MIN_PUZZLE_RATING, RATING_DEFAULTS } from '../rating';
@@ -115,6 +115,7 @@ export function createMemoryDataServices(opts: MemoryDataOptions = {}): MemoryDa
       selfAssessment: null,
       onboardingCompleted: false,
       stageZeroSkipped: false,
+      timeZone: DEFAULT_TIME_ZONE,
       createdAt: ts,
       updatedAt: ts,
       ...(opts.profile ?? {}),

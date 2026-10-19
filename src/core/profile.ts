@@ -52,6 +52,9 @@ export const DEFAULT_SETTINGS: Settings = {
 /** Default daily goal in minutes (Tagesziel). */
 export const DEFAULT_DAILY_GOAL_MINUTES = 20;
 
+/** Time zone assumed when none is known (matches the server default of `profiles.time_zone`). */
+export const DEFAULT_TIME_ZONE = 'Europe/Berlin';
+
 /** Daily goal choices in onboarding/profile (minutes). */
 export const DAILY_GOAL_OPTIONS: readonly number[] = [10, 20, 30, 60];
 
@@ -118,6 +121,8 @@ export interface Profile {
   onboardingCompleted: boolean;
   /** The Stufe-0 skip test was passed (D-38). */
   stageZeroSkipped: boolean;
+  /** IANA time zone of the user (day buckets of the server's daily activity; `DEFAULT_TIME_ZONE` if unknown). */
+  timeZone: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -113,7 +113,7 @@ describe('merge rules', () => {
     const newer = { ...DEFAULT_SETTINGS, notation: 'en' as const, updatedAt: '2026-10-16T11:00:00.000Z' };
     expect(mergeSettings(older, newer)).toEqual(newer);
     expect(mergeSettings(newer, older)).toEqual(newer);
-    const p: Profile = { id: 'u', displayName: 'A', settings: older, dailyGoalMinutes: 10, selfAssessment: null, onboardingCompleted: false, stageZeroSkipped: false, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-10-16T12:00:00.000Z' };
+    const p: Profile = { id: 'u', displayName: 'A', settings: older, dailyGoalMinutes: 10, selfAssessment: null, onboardingCompleted: false, stageZeroSkipped: false, timeZone: 'Europe/Berlin', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-10-16T12:00:00.000Z' };
     const q: Profile = { ...p, displayName: 'B', settings: newer, createdAt: '2026-02-01T00:00:00.000Z', updatedAt: '2026-10-16T09:00:00.000Z' };
     expect(mergeProfile(p, q)).toMatchObject({ displayName: 'A', settings: newer, createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-10-16T12:00:00.000Z' });
     expect(mergeProfile(null, q)).toEqual(q);

@@ -46,6 +46,7 @@ export function sampleRow<T extends TableName>(table: T, refs: SampleRefs): Tabl
       self_assessment: 'beginner',
       onboarding_completed: true,
       stage_zero_skipped: false,
+      time_zone: 'Europe/Berlin',
       created_at: NOW,
       updated_at: NOW,
     }),

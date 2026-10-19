@@ -27,7 +27,7 @@ import {
   ratePuzzleAttempt,
   type DailyDelta,
 } from '../progress';
-import { currentProfile, defaultProfile, enqueue, putProfile, type DataContext } from './context';
+import { currentProfile, defaultProfile, enqueue, putProfile, withTimeZone, type DataContext } from './context';
 
 /** Internal write helpers shared with the ActivityTracker. */
 export interface ProgressInternals {
@@ -79,7 +79,7 @@ export function createProgressService(ctx: DataContext): ProgressService & Progr
           entries.push(outbox.rating(r, ctx.userId(), ts));
         }
         const current = (await currentProfile(db)) ?? defaultProfile(ctx.userId(), ts);
-        const profile: Profile = { ...current, selfAssessment: choice, updatedAt: ts };
+        const profile: Profile = withTimeZone(ctx, { ...current, selfAssessment: choice, updatedAt: ts });
         await putProfile(db, profile);
         entries.push(outbox.profile(profile, ts));
         await enqueue(ctx, ...entries);
@@ -233,7 +233,7 @@ export function createProgressService(ctx: DataContext): ProgressService & Progr
         const current = (await currentProfile(db)) ?? defaultProfile(ctx.userId(), ts);
         // Settings: last writer wins – a stale settings object in the patch does not overwrite newer ones.
         const settings = patch.settings ? mergeProfile(current, { ...current, settings: patch.settings }).settings : current.settings;
-        const next: Profile = { ...current, ...patch, settings, id: current.id, updatedAt: ts };
+        const next: Profile = withTimeZone(ctx, { ...current, ...patch, settings, id: current.id, updatedAt: ts });
         await putProfile(db, next);
         await enqueue(ctx, outbox.profile(next, ts));
         return next;
