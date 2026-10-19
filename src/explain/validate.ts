@@ -62,10 +62,11 @@ export function splitMarkers(segments: readonly ExplanationSegment[]): Explanati
 
 /**
  * Move-like tokens in prose: piece moves with English or German letters ("Nf3", "Sxe5", "Dh5+", "Tad1"), pawn
- * captures ("exd5") and castling ("O-O", "0-0-0"). Plain squares ("e4", "auf c4") are allowed.
+ * captures ("exd5"), pawn promotions ("e8=T", "e8D+"), long algebraic moves ("e7-e8", "e2xe4"), castling
+ * ("O-O", "0-0-0") and chess figurines (U+2654-U+265F). Plain squares ("e4", "auf c4") are allowed.
  */
 const MOVE_LIKE =
-  /(?<![\p{L}\d])(?:[KQRBNDTLS][a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[a-h]x[a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[O0]-[O0](?:-[O0])?[+#]?)(?![\p{L}\d])/u;
+  /[\u2654-\u265F]|(?<![\p{L}\d])(?:[KQRBNDTLS][a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[a-h]x[a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[a-h][18]=?[QRBNDTLS][+#]?|[a-h][1-8][-x][a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[O0]-[O0](?:-[O0])?[+#]?)(?![\p{L}\d])/u;
 
 /** Validates LLM segments against the facts (see the file header). */
 export function validateExplanationSegments(segments: readonly ExplanationSegment[], facts: ExplanationFacts): ValidationResult {

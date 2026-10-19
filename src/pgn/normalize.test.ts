@@ -3,6 +3,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { importedGameRecord, normalizedGameText, pgnExternalId, pgnWithOwnTags } from './normalize';
+import { ChessGame } from '@/lib/chess';
+import { loadGameLine } from '@/features/review/review';
 import { parsePgnWithDiagnostics, type PgnGame } from './parser';
 import { sha256Hex } from './sha256';
 
@@ -115,5 +117,30 @@ describe('pgnWithOwnTags (request text of games-import)', () => {
       '[Event "Das \\"Turnier\\" in A\\\\B"]\n[Result "*"]\n[SetUp "1"]\n[FEN "4k3/8/8/8/8/8/8/4K2R w K - 0 1"]\n\n1. O-O *\n',
     );
     expect(pgnExternalId(first(text))).toBe(pgnExternalId(g));
+  });
+});
+
+describe('tag values with quotes and backslashes survive the import round trip', () => {
+  const values = [
+    'A "quoted" event',
+    'back\\slash \\ and \\"both\\"',
+    'braces { } semicolon ; (parens) [brackets]',
+    '',
+  ];
+  it.each(values)('keeps %j', (value) => {
+    const escaped = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const g = first(`[Event "${escaped}"]\n[White "W"]\n[Black "B"]\n\n1. e4 e5 2. Nf3 *\n`);
+    expect(g.headers.Event).toBe(value);
+    const record = importedGameRecord(g, '2026-01-01T00:00:00Z');
+    expect(record.headers.Event).toBe(value);
+    const line = loadGameLine({ ...record, id: 'g1', createdAt: '', updatedAt: '' }, []);
+    expect(line.ok).toBe(true);
+    if (line.ok) expect(line.moves.map((m) => m.san)).toEqual(['e4', 'e5', 'Nf3']);
+    const loaded = ChessGame.fromPgn(record.pgn);
+    expect(loaded.headers().Event).toBe(value);
+    expect(loaded.history().map((m) => m.san)).toEqual(['e4', 'e5', 'Nf3']);
+    // Writing again does not escape twice.
+    expect(ChessGame.fromPgn(loaded.pgn()).headers().Event).toBe(value);
+    expect(first(pgnWithOwnTags(g)).headers.Event).toBe(value);
   });
 });

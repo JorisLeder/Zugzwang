@@ -261,4 +261,16 @@ describe('ChessGame – FEN entry points and PGN', () => {
   it('fromPgn reports unreadable PGN as ChessRulesError', () => {
     expect(() => ChessGame.fromPgn('1. e4 e5 2. Ke3 Ke6 3. Qx9')).toThrow(ChessRulesError);
   });
+
+  it('pgn() escapes quotes and backslashes in tags once and fromPgn reads them back', () => {
+    const g = ChessGame.fromMoves(START_FEN, ['e2e4', 'e7e5']);
+    const pgn = g.pgn({ Event: 'A "quoted" \\ event', Site: '' });
+    expect(pgn).toContain('[Event "A \\"quoted\\" \\\\ event"]');
+    expect(pgn).toContain('[Site ""]');
+    const back = ChessGame.fromPgn(pgn);
+    expect(back.headers().Event).toBe('A "quoted" \\ event');
+    expect(back.headers().Site).toBe('');
+    expect(back.history().map((m) => m.san)).toEqual(['e4', 'e5']);
+    expect(ChessGame.fromPgn(back.pgn()).headers().Event).toBe('A "quoted" \\ event');
+  });
 });

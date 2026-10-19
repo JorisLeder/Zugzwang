@@ -80,7 +80,16 @@ describe('validateExplanationSegments (LLM validator, P0-11)', () => {
     expect(validateExplanationSegments([t('Nach dxe5 ist alles anders.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
     expect(validateExplanationSegments([t('Mach 0-0.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
     expect(validateExplanationSegments([t('Besser war [[Rxf2.')], FACTS)).toEqual({ ok: false, reason: 'marker' });
+    // Promotions, long algebraic moves and figurines are moves too.
+    expect(validateExplanationSegments([t('Nach [[Qc2]] war e8=T besser.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
+    expect(validateExplanationSegments([t('Dann kommt e8D+ mit Matt.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
+    expect(validateExplanationSegments([t('Besser war \u2656e8 mit Gewinn.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
+    expect(validateExplanationSegments([t('Besser war ♖e8 mit Gewinn.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
+    expect(validateExplanationSegments([t('Hier hilft e7-e8 nicht.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
+    expect(validateExplanationSegments([t('Hier hilft e2xe4 nicht.')], FACTS)).toEqual({ ok: false, reason: 'unmarked_move' });
     // Squares alone are fine.
+    expect(validateExplanationSegments([t('Der Bauer auf e4 steht gut.')], FACTS)).toMatchObject({ ok: true });
+    expect(validateExplanationSegments([t('Es gibt in e8 Gruppen und Mitte8 Zeilen.')], FACTS)).toMatchObject({ ok: true });
     expect(validateExplanationSegments([t('Der Läufer auf c4 und der Bauer auf e4 sind gedeckt.')], FACTS)).toMatchObject({ ok: true });
   });
 

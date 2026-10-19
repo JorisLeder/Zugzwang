@@ -115,8 +115,9 @@ export class ChessGame {
    */
   static fromPgn(pgn: string): ChessGame {
     const parser = new Chess();
+    const { text, tags: escapedTags } = unescapeTagSection(pgn);
     try {
-      parser.loadPgn(pgn);
+      parser.loadPgn(text);
     } catch (e) {
       throw new ChessRulesError('Die PGN konnte nicht gelesen werden.', e instanceof Error ? e.message : String(e));
     }
@@ -125,6 +126,7 @@ export class ChessGame {
     const moves = parser.history({ verbose: true }).map((m) => `${m.from}${m.to}${m.promotion ?? ''}`);
     const game = ChessGame.fromMoves(startFen, moves);
     for (const [k, v] of Object.entries(headers)) if (v != null) game.tags[k] = v;
+    Object.assign(game.tags, escapedTags);
     return game;
   }
 
@@ -341,10 +343,46 @@ export class ChessGame {
     }
     const status = this.status();
     if (!headers.Result) merged.Result = status.result;
-    for (const [k, v] of Object.entries(merged)) out.setHeader(k, v);
+    for (const [k, v] of Object.entries(merged)) out.setHeader(k, escapeTagValue(v));
     for (const r of this.records) out.move({ from: r.from, to: r.to, ...(r.promotion ? { promotion: r.promotion } : {}) });
-    return out.pgn();
+    return withEmptyTags(out.pgn(), Object.keys(merged).filter((k) => merged[k] === ''));
   }
+}
+
+/** Escapes `\` and `"` in a tag value (PGN standard); chess.js writes header values as they are. */
+function escapeTagValue(v: string): string {
+  return v.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+/** chess.js drops (or defaults to `?`) tags with an empty value; this writes them back as `[Name ""]`. */
+function withEmptyTags(pgn: string, names: readonly string[]): string {
+  let out = pgn;
+  for (const name of names) {
+    const line = new RegExp(`^\\[${name} "[^"\\n]*"\\]$`, 'm');
+    out = line.test(out) ? out.replace(line, `[${name} ""]`) : `[${name} ""]\n${out}`;
+  }
+  return out;
+}
+
+const TAG_LINE = /^(\s*\[\s*)([A-Za-z0-9_]+)(\s+")((?:[^"\\\n]|\\.)*)("\s*\].*)$/;
+
+/**
+ * chess.js cannot read escaped tag values (`\"`, `\\`). In the tag section the values containing a backslash are
+ * replaced by a neutral text for chess.js and returned unescaped, so `fromPgn` can restore the real values.
+ */
+function unescapeTagSection(pgn: string): { text: string; tags: Record<string, string> } {
+  const tags: Record<string, string> = {};
+  const lines = pgn.split('\n');
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i]!;
+    if (line.trim() === '') continue;
+    const m = TAG_LINE.exec(line);
+    if (!m) break;
+    if (!m[4]!.includes('\\')) continue;
+    tags[m[2]!] = m[4]!.replace(/\\(.)/g, '$1');
+    lines[i] = `${m[1]}${m[2]}${m[3]}_${m[5]}`;
+  }
+  return { text: lines.join('\n'), tags };
 }
 
 function toLegalMove(m: ChessJsMove): LegalMove {
