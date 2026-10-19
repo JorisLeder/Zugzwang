@@ -45,6 +45,8 @@ function reasonText(reason: PlayOutReason, maxMoves: number): string {
       return R.stalemate;
     case 'moves_exhausted':
       return R.movesExhausted(maxMoves);
+    case 'lost_position':
+      return R.lostPosition;
   }
 }
 
@@ -108,6 +110,7 @@ export function PlayOutStepView({ step, frame, timings, onComplete, onMistake }:
         playSound(soundForMove(record));
         const verdict = judgePlayOut(step, {
           status: game.status(),
+          fen: game.fen(),
           mover: 'bot',
           move: record,
           userMoves: moves.filter((m) => m.color === step.userColor).length,
@@ -135,7 +138,7 @@ export function PlayOutStepView({ step, frame, timings, onComplete, onMistake }:
       );
       const record = game.move(played.uci);
       if (!record) return;
-      const verdict = judgePlayOut(step, { status: game.status(), mover: 'user', move: record, userMoves: userMoves + 1 });
+      const verdict = judgePlayOut(step, { status: game.status(), fen: game.fen(), mover: 'user', move: record, userMoves: userMoves + 1 });
       setState((s) => ({ ...s, moves: [...s.moves, record], verdict }));
       finish(verdict);
     },

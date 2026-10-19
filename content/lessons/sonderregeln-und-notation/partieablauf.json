@@ -80,7 +80,7 @@
       "solution": [{ "move": "d8h4", "children": [] }],
       "acceptAnyMate": true,
       "claim": { "kind": "mate", "mateIn": 1 },
-      "hintsDe": ["Die Diagonale von d8 nach e1 ist offen."],
+      "hintsDe": ["Die Diagonale von h4 nach e1 ist offen."],
       "explanationDe": "Dh4#: Die Dame gibt über h4 Schach, nichts kann sich dazwischenstellen.",
       "puzzle": { "rating": 150, "themes": ["mateIn1"] }
     },

@@ -108,6 +108,37 @@ describe('merge rules', () => {
     expect(lessonStepsGained(lp({ currentStep: 5 }), lp({ currentStep: 5 }))).toBe(0);
   });
 
+  it('lesson progress: completed twice keeps the best score (LC-2)', () => {
+    const best = lp({ completed: true, currentStep: 7, stars: 3, score: 1, completedAt: '2026-10-15T00:00:00.000Z', updatedAt: '2026-10-15T00:00:00.000Z' });
+    const worse = lp({ completed: true, currentStep: 7, stars: 1, score: 6 / 7, completedAt: '2026-10-16T00:00:00.000Z', updatedAt: '2026-10-16T00:00:00.000Z' });
+    expect(mergeLessonProgress(best, worse).score).toBe(1);
+    expect(mergeLessonProgress(worse, best).score).toBe(1);
+    expect(mergeLessonProgress(lp({ completed: true, currentStep: 7 }), worse).score).toBe(6 / 7);
+    expect(mergeLessonProgress(lp({ completed: true, currentStep: 7 }), lp({ completed: true, currentStep: 7 })).score).toBeUndefined();
+  });
+
+  it('lesson progress: a retry after a failed test replaces the failed run (LC-4)', () => {
+    const failed = lp({ currentStep: 8, score: 0, mistakes: 7, hintsUsed: 2, updatedAt: '2026-10-16T10:00:00.000Z' });
+    const retry = lp({ currentStep: 4, score: 4 / 7, mistakes: 0, hintsUsed: 0, updatedAt: '2026-10-16T11:00:00.000Z' });
+    expect(mergeLessonProgress(failed, retry)).toMatchObject({ currentStep: 4, score: 4 / 7, mistakes: 0, hintsUsed: 0, completed: false });
+    // The remote copy of the failed run (older) cannot override the newer local retry (applyRemote merges (local, remote)).
+    expect(mergeLessonProgress(retry, failed)).toMatchObject({ currentStep: 4, score: 4 / 7, mistakes: 0, hintsUsed: 0 });
+    // The retry's score may be undefined (not a test record); it still wins wholesale.
+    expect(mergeLessonProgress(failed, { ...retry, score: undefined }).score).toBeUndefined();
+    // Ordinary lessons (no score) and an older record that is not a failed run are max-merged as before.
+    const plain = lp({ currentStep: 6, updatedAt: '2026-10-16T10:00:00.000Z' });
+    expect(mergeLessonProgress(plain, lp({ currentStep: 2, updatedAt: '2026-10-16T11:00:00.000Z' })).currentStep).toBe(6);
+    // A completed record is never replaced by a retry.
+    expect(mergeLessonProgress(lp({ completed: true, currentStep: 8, stars: 2, score: 0.9 }), retry)).toMatchObject({ completed: true, currentStep: 8, stars: 2 });
+  });
+
+  it('lesson progress: stepPenalty stays when the other copy (server) does not carry it', () => {
+    const local = lp({ currentStep: 3, mistakes: 1, stepPenalty: 1, updatedAt: '2026-10-16T11:00:00.000Z' });
+    const remote = lp({ currentStep: 3, mistakes: 1, updatedAt: '2026-10-16T11:00:00.000Z' });
+    expect(mergeLessonProgress(local, remote).stepPenalty).toBe(1);
+    expect(mergeLessonProgress(local, lp({ currentStep: 4 })).stepPenalty).toBeUndefined();
+  });
+
   it('settings and profile: last writer wins', () => {
     const older = { ...DEFAULT_SETTINGS, sound: false, updatedAt: '2026-10-16T10:00:00.000Z' };
     const newer = { ...DEFAULT_SETTINGS, notation: 'en' as const, updatedAt: '2026-10-16T11:00:00.000Z' };

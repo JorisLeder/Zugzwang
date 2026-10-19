@@ -67,12 +67,12 @@
       "orientation": "w",
       "solution": [
         { "move": "g2g3", "comment": "Der Bauer greift die Dame an und sperrt den Läufer.", "children": [] },
-        { "move": "h2h3", "comment": "Dein König bekommt ein Fluchtfeld.", "children": [] },
+        { "move": "h2h3", "comment": "Der Bauer h3 versperrt der Dame den Weg nach h2.", "children": [] },
         { "move": "f2f4", "comment": "Der Bauer sperrt die Diagonale des Läufers.", "children": [] }
       ],
       "acceptAnyMate": false,
       "claim": { "kind": "best" },
-      "hintsDe": ["Du kannst die Diagonale des Läufers sperren oder dem König Luft geben."],
+      "hintsDe": ["Du kannst die Diagonale des Läufers sperren oder der Dame den Weg nach h2 versperren."],
       "explanationDe": "g3, h3 oder f4 wehren die Drohung ab. Nach anderen Zügen verlierst du Material oder wirst mattgesetzt."
     },
     {

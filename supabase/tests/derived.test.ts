@@ -161,6 +161,27 @@ describe('lesson progress: furthest wins', () => {
     expect(await lessons(uid)).toBe(7);
   });
 
+  it('two completed runs keep the best test score (LC-2)', async () => {
+    const uid = await db.createUser();
+    const passed = { p_current_step: 7, p_completed: true, p_stars: 3, p_completed_at: '2026-10-18T10:00:00.000Z', p_score: 1 };
+    await call(uid, passed);
+    const again = await call(uid, { ...passed, p_stars: 2, p_score: 6 / 7, p_updated_at: '2026-10-18T11:00:00.000Z' });
+    expect(again).toMatchObject({ completed: true, stars: 3, score: 1 });
+  });
+
+  it('a retry after a failed test replaces the failed run, a stale copy of it does not override the retry (LC-4)', async () => {
+    const uid = await db.createUser();
+    await call(uid, { p_current_step: 8, p_score: 0, p_mistakes: 7, p_hints_used: 2, p_updated_at: '2026-10-18T10:00:00.000Z' });
+    const retry = await call(uid, { p_current_step: 4, p_score: 4 / 7, p_updated_at: '2026-10-18T11:00:00.000Z' });
+    expect(retry).toMatchObject({ current_step: 4, score: 4 / 7, mistakes: 0, hints_used: 0, completed: false });
+    const stale = await call(uid, { p_current_step: 8, p_score: 0, p_mistakes: 7, p_updated_at: '2026-10-18T10:00:00.000Z' });
+    expect(stale).toMatchObject({ current_step: 4, score: 4 / 7, mistakes: 0, updated_at: '2026-10-18T11:00:00.000Z' });
+    // Ordinary lessons (no score) keep the max-step rule.
+    const other = { p_lesson_id: 's1-k1-l2' };
+    await call(uid, { ...other, p_current_step: 6 });
+    expect((await call(uid, { ...other, p_current_step: 2, p_updated_at: '2026-10-18T12:00:00.000Z' })).current_step).toBe(6);
+  });
+
   it('a direct upsert (bypassing the RPC) cannot move progress back either', async () => {
     const uid = await db.createUser();
     await call(uid, { p_current_step: 4, p_completed: true, p_stars: 3, p_completed_at: '2026-10-18T10:00:00.000Z' });

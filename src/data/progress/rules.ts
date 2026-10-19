@@ -115,22 +115,56 @@ export function rateBotGame(
 const maxIso = (a: string, b: string) => (a >= b ? a : b);
 
 /**
- * Furthest progress wins (max step, completed OR, max stars; the further record supplies the other fields).
+ * A finished failed test attempt: not completed but scored, stored with `currentStep === steps.length`. Max-merging it
+ * would block a retry forever (the retry starts at a lower step), so a newer record replaces it (see below).
+ */
+const isFailedTestRun = (p: LessonProgress) => !p.completed && p.score !== undefined;
+
+/**
+ * Furthest progress wins (max step, completed OR, max stars; the further record supplies the other fields), with
+ * these refinements (mirrored by the SQL trigger `zz_lesson_progress_before_update`):
+ * - Both completed: the best test score wins (`score` max, undefined-safe).
+ * - Both not completed and the older record (by `updatedAt`, ties: the incoming one is newer) is a scored test run
+ *   that has not been passed: the newer record wins wholesale, so a retry after a failed test can resume at its own step.
+ * - `stepPenalty` (penalty of the unfinished step, local only) survives a merge with a record of the same step that
+ *   does not carry it (e.g. the server's copy).
  * `updatedAt` of the result: the given value, else the newer of both.
  */
 export function mergeLessonProgress(prev: LessonProgress | null | undefined, next: LessonProgress, updatedAt?: string): LessonProgress {
   if (!prev) return { ...next, updatedAt: updatedAt ?? next.updatedAt };
+  const resultAt = updatedAt ?? maxIso(prev.updatedAt, next.updatedAt);
+  if (!prev.completed && !next.completed) {
+    const nextIsNewer = next.updatedAt >= prev.updatedAt;
+    const older = nextIsNewer ? prev : next;
+    const newer = nextIsNewer ? next : prev;
+    if (isFailedTestRun(older)) {
+      return {
+        ...newer,
+        lessonVersion: Math.max(prev.lessonVersion, next.lessonVersion),
+        completedAt: prev.completedAt ?? next.completedAt,
+        updatedAt: resultAt,
+      };
+    }
+  }
   const incomingFurther = (next.completed && !prev.completed) || (next.completed === prev.completed && next.currentStep >= prev.currentStep);
   const base = incomingFurther ? next : prev;
-  return {
+  const other = incomingFurther ? prev : next;
+  const merged: LessonProgress = {
     ...base,
     lessonVersion: Math.max(prev.lessonVersion, next.lessonVersion),
     currentStep: Math.max(prev.currentStep, next.currentStep),
     completed: prev.completed || next.completed,
     stars: Math.max(prev.stars, next.stars) as LessonProgress['stars'],
     completedAt: prev.completedAt ?? next.completedAt,
-    updatedAt: updatedAt ?? maxIso(prev.updatedAt, next.updatedAt),
+    updatedAt: resultAt,
   };
+  if (prev.completed && next.completed && (prev.score !== undefined || next.score !== undefined)) {
+    merged.score = Math.max(prev.score ?? 0, next.score ?? 0);
+  }
+  if (base.stepPenalty === undefined && other.stepPenalty !== undefined && other.currentStep === base.currentStep) {
+    merged.stepPenalty = other.stepPenalty;
+  }
+  return merged;
 }
 
 /** Completed lesson steps gained by a merge (for daily activity): step delta + 1 for a newly completed lesson. */

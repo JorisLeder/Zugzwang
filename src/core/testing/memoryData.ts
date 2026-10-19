@@ -3,6 +3,7 @@
  * repositories with live `observe…`, a ProgressService implementing the rating/stat rules with `@/lib/rating`,
  * local auth and no-op sync. Used by tests of every package and by the WP-00 `createDataServices` placeholder.
  */
+import { mergeLessonProgress } from '@/data/progress/rules';
 import { newId } from '@/lib/ids';
 import { createValueStore } from '@/lib/observable';
 import { updateGlicko2 } from '@/lib/rating';
@@ -393,22 +394,8 @@ export function createMemoryDataServices(opts: MemoryDataOptions = {}): MemoryDa
 
     async recordLessonProgress(p) {
       const prev = db.lessonProgress.get(p.lessonId);
-      let merged: LessonProgress;
-      if (!prev) {
-        merged = { ...p };
-      } else {
-        const incomingFurther = (p.completed && !prev.completed) || (p.completed === prev.completed && p.currentStep >= prev.currentStep);
-        const base = incomingFurther ? p : prev;
-        merged = {
-          ...base,
-          lessonVersion: Math.max(prev.lessonVersion, p.lessonVersion),
-          currentStep: Math.max(prev.currentStep, p.currentStep),
-          completed: prev.completed || p.completed,
-          stars: Math.max(prev.stars, p.stars) as LessonProgress['stars'],
-          completedAt: prev.completedAt ?? p.completedAt,
-        };
-      }
-      merged.updatedAt = nowIso();
+      const ts = nowIso();
+      const merged = mergeLessonProgress(prev, { ...p, updatedAt: ts }, ts);
       db.lessonProgress.set(p.lessonId, merged);
       const steps = Math.max(0, merged.currentStep - (prev?.currentStep ?? 0)) + (merged.completed && !prev?.completed ? 1 : 0);
       if (steps > 0) bumpDaily({ lessons: steps });

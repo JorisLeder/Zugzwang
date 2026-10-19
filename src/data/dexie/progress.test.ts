@@ -1,6 +1,9 @@
 /** ProgressService on Dexie: write transactions stay short (≤ 50 ms) and queue exactly one outbox entry per write. */
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
+import { toRow } from '@/core/tables';
+import type { LessonProgress } from '@/core/lessons';
+import { applyRemoteChanges } from '../sync/applyRemote';
 import { createFakeDevice, FakeSupabaseServer, type FakeDevice } from '../testing';
 
 const devices: FakeDevice[] = [];
@@ -90,5 +93,23 @@ describe('Dexie ProgressService', () => {
     const entries = (await d.data.db.outbox.toArray()).slice(before);
     expect(entries.map((e) => e.table)).toEqual(['games', 'game_moves', 'game_moves']);
     expect((await d.data.repos.games.list())[0]!.updatedAt >= g.updatedAt).toBe(true);
+  });
+
+  it('lesson progress: a retry after a failed test resumes, a remote copy of the failed run cannot override it (LC-4)', async () => {
+    let t = Date.parse('2026-10-20T10:00:00.000Z');
+    const d = createFakeDevice(new FakeSupabaseServer(), { email: 'lea@example.com', online: false, now: () => new Date((t += 60_000)) });
+    devices.push(d);
+    await d.data.ready();
+    const rec = (o: Partial<LessonProgress>): LessonProgress => ({
+      lessonId: 'test-1', lessonVersion: 1, currentStep: 0, completed: false, stars: 0, mistakes: 0, hintsUsed: 0, updatedAt: '', completedAt: null, ...o,
+    });
+    const failed = await d.data.progress.recordLessonProgress(rec({ currentStep: 8, score: 0, mistakes: 7 }));
+    const retry = await d.data.progress.recordLessonProgress(rec({ currentStep: 4, score: 4 / 7 }));
+    expect(retry).toMatchObject({ currentStep: 4, score: 4 / 7, mistakes: 0 });
+    // A mistake on the next step is stored with the same currentStep and its step penalty.
+    expect(await d.data.progress.recordLessonProgress(rec({ currentStep: 4, score: 4 / 7, mistakes: 1, stepPenalty: 1 }))).toMatchObject({ currentStep: 4, mistakes: 1, stepPenalty: 1 });
+    // The server's copy of the failed run (older) arrives afterwards (e.g. from the first pull).
+    await applyRemoteChanges(d.data.db, [{ table: 'lesson_progress', op: 'update', row: toRow.lessonProgress(failed, d.data.db.name) }]);
+    expect(await d.data.repos.lessonProgress.get('test-1')).toMatchObject({ currentStep: 4, mistakes: 1, stepPenalty: 1, score: 4 / 7 });
   });
 });

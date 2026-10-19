@@ -1,19 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { ChessGame } from '@/lib/chess';
-import { judgePlayOut, movesLeft, type PlayOutPly } from './playOut';
+import { judgePlayOut as judgeWithFen, movesLeft, type PlayOutPly } from './playOut';
 import type { PlayOutStep } from './types';
 
 type Goal = Pick<PlayOutStep, 'goal' | 'maxMoves' | 'userColor'>;
 
+
+/** Start position of the latest `ply(...)` call (the step's FEN; `ply` is evaluated before `judgePlayOut`). */
+let startFen = '';
+const judgePlayOut = (step: Goal, p: PlayOutPly) => judgeWithFen({ ...step, fen: startFen }, p);
+
 /** Plays `moves` from `fen` and returns the ply input for the last move. */
 function ply(fen: string, moves: string[], mover: 'user' | 'bot', userMoves: number): PlayOutPly {
+  startFen = fen;
   const game = ChessGame.fromFen(fen);
   let last = null;
   for (const m of moves) {
     last = game.move(m);
     if (!last) throw new Error(`illegal ${m}`);
   }
-  return { status: game.status(), mover, move: last, userMoves };
+  return { status: game.status(), fen: game.fen(), mover, move: last, userMoves };
 }
 
 describe('judgePlayOut – checkmate goal', () => {
@@ -100,6 +106,36 @@ describe('judgePlayOut – draw goal', () => {
   it('fails when the learner is checkmated', () => {
     const fen = 'k7/8/1K6/8/8/8/8/7R w - - 0 1';
     expect(judgePlayOut(step, ply(fen, ['h1h8'], 'bot', 0))).toEqual({ outcome: 'fail', reason: 'user_was_mated' });
+  });
+
+  describe('lost position (LC-1)', () => {
+    // remis-halten: Black (learner) has the bare king against K+P.
+    const fen = '8/8/4k3/8/4P3/4K3/8/8 b - - 0 1';
+    const hold: Goal = { goal: 'draw', maxMoves: 15, userColor: 'b' };
+    const lost = ['e6f6', 'e4e5', 'f6g5', 'e5e6', 'g5g4', 'e6e7', 'g4g3', 'e7e8q'];
+
+    it('fails at once when the bot promotes, even though the game is not over', () => {
+      expect(judgePlayOut(hold, ply(fen, lost.slice(0, 7), 'user', 4))).toBeNull();
+      expect(judgePlayOut(hold, ply(fen, lost, 'bot', 4))).toEqual({ outcome: 'fail', reason: 'lost_position' });
+    });
+
+    it('does not turn "held" at maxMoves into success after a promotion', () => {
+      const late = [...lost, 'g3h2', 'e8e7', 'h2g3', 'e7d6'];
+      expect(judgePlayOut({ ...hold, maxMoves: 6 }, ply(fen, late, 'bot', 6))).toEqual({ outcome: 'fail', reason: 'lost_position' });
+    });
+
+    it('fails when the material moved clearly against the learner without a promotion', () => {
+      // Black (learner) hangs the rook: Ra1? Rxa1 – five points worse than at the start.
+      const rooks = 'r5k1/8/8/8/8/8/8/3R2K1 b - - 0 1';
+      const step: Goal = { goal: 'draw', maxMoves: 3, userColor: 'b' };
+      expect(judgePlayOut(step, ply(rooks, ['a8a1'], 'user', 1))).toBeNull();
+      expect(judgePlayOut(step, ply(rooks, ['a8a1', 'd1a1'], 'bot', 1))).toEqual({ outcome: 'fail', reason: 'lost_position' });
+    });
+
+    it('still succeeds with a genuine holding line (king stays in front of the pawn)', () => {
+      const line = ['e6e7', 'e3d3', 'e7e6', 'd3e3', 'e6e7', 'e3d3', 'e7e6', 'd3c3'];
+      expect(judgePlayOut({ ...hold, maxMoves: 4 }, ply(fen, line, 'bot', 4))).toEqual({ outcome: 'success', reason: 'held' });
+    });
   });
 });
 

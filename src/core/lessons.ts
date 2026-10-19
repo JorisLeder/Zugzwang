@@ -133,6 +133,11 @@ export interface LessonProgress {
   hintsUsed: number;
   /** Test score 0–1 (course/skip tests). */
   score?: number;
+  /**
+   * Local only (not stored on the server): mistakes + hints on the current unfinished step, 0 when a step completes.
+   * Lets a resumed step keep counting as "not a clean first try".
+   */
+  stepPenalty?: number;
   updatedAt: string;
   completedAt: string | null;
 }

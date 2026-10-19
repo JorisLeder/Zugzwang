@@ -86,8 +86,17 @@ export function LessonPlayer({ lesson, course, saved, ctx, timings = LESSON_TIMI
     const next = update((s) => completeStep(s, lesson));
     if (next !== before) persist(next);
   }, [update, persist, lesson]);
-  const mistake = useCallback(() => void update(recordMistake), [update]);
-  const hint = useCallback(() => void update(recordHint), [update]);
+  // Mistakes and hints are saved at once (same `currentStep`), so a reload cannot turn the step into a clean first try.
+  const penalize = useCallback(
+    (fn: (s: LessonSession) => LessonSession) => {
+      const before = sessionRef.current;
+      const next = update(fn);
+      if (next !== before) persist(next);
+    },
+    [update, persist],
+  );
+  const mistake = useCallback(() => penalize(recordMistake), [penalize]);
+  const hint = useCallback(() => penalize(recordHint), [penalize]);
 
   const index = session.index;
   const step = lesson.steps[index];

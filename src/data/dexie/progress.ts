@@ -144,7 +144,8 @@ export function createProgressService(ctx: DataContext): ProgressService & Progr
       const merged = await db.transaction('rw', [db.lessonProgress, db.dailyActivity, db.profile, db.outbox], async () => {
         const ts = ctx.nowIso();
         const prev = await db.lessonProgress.get(p.lessonId);
-        const next: LessonProgress = mergeLessonProgress(prev, p, ts);
+        // Stamped with the data layer's clock like the stored record, so "newer" is judged on one clock.
+        const next: LessonProgress = mergeLessonProgress(prev, { ...p, updatedAt: ts }, ts);
         await db.lessonProgress.put(next);
         const steps = lessonStepsGained(prev, next);
         if (steps > 0) await bumpDaily({ lessons: steps });

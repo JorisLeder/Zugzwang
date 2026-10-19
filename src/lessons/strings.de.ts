@@ -37,6 +37,7 @@ export const LESSONS_DE = {
     held: 'Du hast die Stellung gehalten.',
     drawn: 'Die Partie ist remis.',
     stalemate: 'Patt – Remis. Wer am Zug ist, hat keinen regelgemäßen Zug, steht aber nicht im Schach.',
+    lostPosition: 'Die Stellung ist nicht mehr zu halten: Der Bot hat sich zu viel Vorteil verschafft.',
     movesExhausted: (n: number) => (n === 1 ? 'Du hattest nur einen Zug.' : `Du hattest ${n} Züge.`),
   },
   errors: {

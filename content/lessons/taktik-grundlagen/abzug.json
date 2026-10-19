@@ -94,7 +94,7 @@
       ],
       "acceptAnyMate": false,
       "claim": { "kind": "best" },
-      "hintsDe": ["Der Läufer muss mit Schach wegziehen, sonst schlägt die Dame den Turm."],
+      "hintsDe": ["Der Läufer muss mit Schach wegziehen – sonst bringt Schwarz die Dame einfach in Sicherheit."],
       "explanationDe": "Lxh7+: Schwarz muss das Schach beantworten. Danach schlägt der Turm die Dame."
     }
   ]

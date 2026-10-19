@@ -14,6 +14,7 @@ import {
   recordMistake,
   type LessonSession,
 } from './session';
+import { mergeLessonProgress } from '@/data/progress/rules';
 import { explanation, lesson, progress, quiz } from './testUtils';
 
 const NOW = new Date('2026-10-17T12:00:00.000Z');
@@ -88,6 +89,7 @@ describe('lesson session', () => {
       stars: 2,
       mistakes: 1,
       hintsUsed: 0,
+      stepPenalty: 0,
       updatedAt: NOW.toISOString(),
       completedAt: NOW.toISOString(),
     });
@@ -158,5 +160,54 @@ describe('test session', () => {
     expect(record).toMatchObject({ currentStep: 3, score: 0.4, completed: false });
     const resumed = createLessonSession(TEST, record);
     expect(resumed).toMatchObject({ index: 3, correctFirstTries: 2, mistakes: 1, resumed: true });
+  });
+});
+
+describe('persisted mistakes and retry (LC-2, LC-3, LC-4)', () => {
+  it('a recorded mistake survives a reload: the resumed step is not a clean first try (LC-3)', () => {
+    let s = advance(createLessonSession(TEST, null), TEST);
+    s = recordMistake(s);
+    const saved = progressRecord(s, TEST, NOW);
+    expect(saved).toMatchObject({ currentStep: 1, mistakes: 1, stepPenalty: 1 });
+    const resumed = createLessonSession(TEST, saved);
+    expect(resumed).toMatchObject({ index: 1, mistakes: 1, taskPenalty: 1, resumed: true });
+    const done = completeStep(resumed, TEST);
+    expect(done.correctFirstTries).toBe(1); // step 0 clean, step 1 not
+    expect(progressRecord(done, TEST, NOW)).toMatchObject({ currentStep: 2, stepPenalty: 0, score: 0.2 });
+    // A hint counts the same way, and a mistake on step 0 is resumable, too.
+    const hinted = createLessonSession(TEST, progressRecord(recordHint(createLessonSession(TEST)), TEST, NOW));
+    expect(hinted).toMatchObject({ index: 0, hintsUsed: 1, taskPenalty: 1, resumed: true });
+    expect(completeStep(hinted, TEST).correctFirstTries).toBe(0);
+  });
+
+  it('merging the mistake record with the stored one keeps the step penalty', () => {
+    let s = advance(createLessonSession(TEST), TEST);
+    const stored = progressRecord(s, TEST, new Date('2026-10-17T12:00:00.000Z'));
+    s = recordMistake(s);
+    const merged = mergeLessonProgress(stored, progressRecord(s, TEST, new Date('2026-10-17T12:01:00.000Z')));
+    expect(merged).toMatchObject({ currentStep: 1, mistakes: 1, stepPenalty: 1 });
+  });
+
+  it('a retry after a failed test resumes at its own step; the best score of a passed test stays (LC-2, LC-4)', () => {
+    const seven = lesson('t7', Array.from({ length: 7 }, (_, i) => quiz(`q${i + 1}`)), { kind: 'course_test' });
+    let s = createLessonSession(seven);
+    for (let i = 0; i < 7; i++) s = goNext(completeStep(recordMistake(s), seven));
+    const failed = progressRecord(s, seven, new Date('2026-10-17T12:00:00.000Z'));
+    expect(failed).toMatchObject({ completed: false, score: 0, currentStep: 7 });
+    let stored = failed;
+
+    let retry = createLessonSession(seven, stored);
+    expect(retry).toMatchObject({ index: 0, resumed: false });
+    for (let i = 0; i < 4; i++) {
+      retry = goNext(completeStep(retry, seven));
+      stored = mergeLessonProgress(stored, progressRecord(retry, seven, new Date(Date.parse('2026-10-17T13:00:00.000Z') + i * 1000)));
+    }
+    const resumed = createLessonSession(seven, stored);
+    expect(resumed).toMatchObject({ index: 4, done: 4, resumed: true, correctFirstTries: 4, mistakes: 0 });
+
+    // Passing with 7/7 and repeating with 6/7 keeps the better score.
+    const perfect = { ...stored, completed: true, currentStep: 7, stars: 3 as const, score: 1, completedAt: '2026-10-17T14:00:00.000Z', updatedAt: '2026-10-17T14:00:00.000Z' };
+    const repeated = { ...perfect, stars: 2 as const, score: 6 / 7, updatedAt: '2026-10-18T14:00:00.000Z' };
+    expect(mergeLessonProgress(perfect, repeated)).toMatchObject({ score: 1, stars: 3 });
   });
 });

@@ -29,7 +29,7 @@
       "moves": [
         { "uci": "f3e5", "commentDe": "Sxe5: Der erste Angreifer schlägt." },
         { "uci": "c6e5", "commentDe": "Sxe5: Der Verteidiger schlägt zurück." },
-        { "uci": "c3e5", "commentDe": "Lxe5: Der zweite Angreifer gewinnt. Weiß hat einen Bauern mehr." }
+        { "uci": "c3e5", "commentDe": "Lxe5: Der zweite Angreifer gewinnt. Weiß hat einen Bauern gewonnen." }
       ]
     },
     {

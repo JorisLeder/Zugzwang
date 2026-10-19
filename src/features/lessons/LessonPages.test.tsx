@@ -272,8 +272,10 @@ describe('Lektion', () => {
     expect(screen.getByText('Du schaust dir einen erledigten Schritt an.')).toBeInTheDocument();
     fireEvent.click(nextButton());
     await waitForStep('find_move', 2);
-    await move('a1a8'); // a mistake on step 3 – saved only when the step is completed
-    await waitFor(async () => expect((await first.data.repos.lessonProgress.get('fixture-lesson'))!.currentStep).toBe(2));
+    await move('a1a8'); // a mistake on step 3 – saved at once, with the current step unchanged (LC-3)
+    await waitFor(async () =>
+      expect(await first.data.repos.lessonProgress.get('fixture-lesson')).toMatchObject({ currentStep: 2, mistakes: 1, stepPenalty: 1 }),
+    );
     first.unmount();
 
     await setup(`/learn/${COURSE}/fixture-lesson`, { data: first.data });

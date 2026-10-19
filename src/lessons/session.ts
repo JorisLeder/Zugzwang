@@ -1,12 +1,13 @@
 /**
  * Lesson session (P0-12): which step is shown, how many steps are completed, mistakes and hints, test scoring, and
- * the `LessonProgress` record written after every completed step (`data.progress.recordLessonProgress`).
+ * the `LessonProgress` record written after every completed step and after every mistake or hint
+ * (`data.progress.recordLessonProgress`; the latter keep `currentStep`, so reloading cannot erase them).
  *
  * - Steps are completed in order. `done` = number of completed steps; the learner can look back at any completed
  *   step (`index < done`, "review": mistakes and hints there are not counted) and work on step `done`.
  *   `index === steps.length` is the end screen.
  * - Resume (P0-12 "Wiedereinstieg an derselben Stelle"): a saved, not completed progress of the same lesson version
- *   with `currentStep < steps.length` continues at `currentStep` with its mistakes, hints and test score. A completed
+ *   with `currentStep < steps.length` continues at `currentStep` with its mistakes, hints, step penalty and test score. A completed
  *   lesson, a failed test (`currentStep === steps.length`, not completed) or another lesson version start fresh.
  * - Tests: `score` is stored as "correct first tries so far / all exercises" – it only grows while the test runs, is the
  *   final score at the end, and lets a resumed test restore its count.
@@ -51,7 +52,14 @@ export interface LessonResult {
 
 /** Whether saved progress can be resumed (see file header). */
 export function canResume(lesson: Pick<Lesson, 'version' | 'steps'>, saved: LessonProgress | null | undefined): saved is LessonProgress {
-  return !!saved && !saved.completed && saved.lessonVersion === lesson.version && saved.currentStep > 0 && saved.currentStep < lesson.steps.length;
+  return (
+    !!saved &&
+    !saved.completed &&
+    saved.lessonVersion === lesson.version &&
+    // At step 0 there is only something to resume once a mistake or hint was recorded there.
+    (saved.currentStep > 0 || (saved.stepPenalty ?? 0) > 0) &&
+    saved.currentStep < lesson.steps.length
+  );
 }
 
 /** New session, resuming `saved` when possible. */
@@ -80,6 +88,7 @@ export function createLessonSession(lesson: Lesson, saved?: LessonProgress | nul
     done: saved.currentStep,
     mistakes: Math.max(0, saved.mistakes),
     hintsUsed: Math.max(0, saved.hintsUsed),
+    taskPenalty: Math.max(0, saved.stepPenalty ?? 0),
     correctFirstTries: Math.min(exercisesBefore, Math.max(0, restored)),
     resumed: true,
   };
@@ -150,7 +159,7 @@ export function restartSession(lesson: Lesson): LessonSession {
   return createLessonSession(lesson, null);
 }
 
-/** The record for `recordLessonProgress` after a completed step. */
+/** The record for `recordLessonProgress` after a completed step, a mistake or a hint. */
 export function progressRecord(s: LessonSession, lesson: Lesson, now: Date = new Date()): LessonProgress {
   const ts = now.toISOString();
   const completed = s.result?.completed ?? false;
@@ -162,6 +171,7 @@ export function progressRecord(s: LessonSession, lesson: Lesson, now: Date = new
     stars: completed ? s.result!.stars : 0,
     mistakes: s.mistakes,
     hintsUsed: s.hintsUsed,
+    stepPenalty: s.taskPenalty,
     updatedAt: ts,
     completedAt: completed ? ts : null,
   };
