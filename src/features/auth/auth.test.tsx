@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createMemoryRouter, Outlet, RouterProvider, type RouteObject } from 'react-router';
 import { ServicesProvider } from '@/app/services';
 import { createFakeAppServices, createMemoryDataServices } from '@/core/testing';
+import { AuthError } from '@/data/auth/authService';
 import { createFakeDevice, FakeSupabaseServer, type FakeDevice } from '@/data/testing';
 import { AccountSection } from './AccountSection';
 import { AuthGate } from './AuthGate';
@@ -148,6 +149,15 @@ describe('AuthCallbackPage', () => {
     expect(await screen.findByRole('heading', { name: 'Anmeldung fehlgeschlagen' })).toBeInTheDocument();
     expect(screen.getByText(/Link ist vielleicht abgelaufen/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Zurück zur Anmeldung' })).toHaveAttribute('href', '/login');
+  });
+
+  it('DS-6: a link opened without the PKCE verifier explains to use the same browser or request a new link', async () => {
+    const { services, device } = await cloudServices();
+    vi.spyOn(device.data.auth, 'handleCallback').mockRejectedValue(new AuthError('pkce-verifier', 'x'));
+    renderApp(services, '/auth/callback?code=fremd');
+    expect(
+      await screen.findByText('Öffne den Link im selben Browser oder in der App, in der du ihn angefordert hast, oder fordere einen neuen Link an.'),
+    ).toBeInTheDocument();
   });
 
   it('local mode: forwards to the start page', async () => {

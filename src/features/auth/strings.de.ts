@@ -29,6 +29,7 @@ export const STRINGS_DE = {
     'rate-limited': 'Zu viele Versuche. Warte kurz und versuch es dann noch einmal.',
     network: 'Keine Verbindung zum Server. Prüfe deine Internetverbindung.',
     callback: 'Die Anmeldung konnte nicht abgeschlossen werden. Der Link ist vielleicht abgelaufen oder wurde schon benutzt – fordere einfach einen neuen an.',
+    'pkce-verifier': 'Öffne den Link im selben Browser oder in der App, in der du ihn angefordert hast, oder fordere einen neuen Link an.',
     unknown: 'Das hat nicht geklappt. Versuch es nochmal.',
   } satisfies Record<AuthErrorCode, string>,
   account: {

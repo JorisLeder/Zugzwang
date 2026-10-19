@@ -123,6 +123,11 @@ Ohne diese Schritte läuft die App im lokalen Modus. Du brauchst ein Supabase-Ko
    mit den neuen JWT-Signaturschlüsseln), deploye mit `--no-verify-jwt`.
 5. **Anmeldung** im Dashboard unter *Authentication*:
    - *Sign In / Providers:* „Email“ aktiv lassen – die App meldet per Magic Link an.
+   - *E-Mail-Vorlage (wichtig, *Authentication → Email Templates → Magic Link*):* Der Link in der Mail muss
+     `<a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email">Anmelden</a>` lauten (statt
+     `{{ .ConfirmationURL }}`). Nur so funktioniert der Link auch, wenn er in einem anderen Browser oder einer anderen
+     App als der angefordernden geöffnet wird (z. B. iPhone-Home-Bildschirm-App und Mail-App); der Standardlink braucht
+     den Speicher des Browsers, in dem er angefordert wurde.
    - *Google (optional):* In der Google Cloud Console einen OAuth-Client vom Typ „Webanwendung“ mit der
      Weiterleitungs-URI `https://<ref>.supabase.co/auth/v1/callback` anlegen, Client-ID und Secret beim Provider
      „Google“ eintragen.

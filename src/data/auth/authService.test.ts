@@ -119,6 +119,65 @@ describe('SupabaseAuthService (cloud mode, fake supabase-js client)', () => {
     expect(mock.signOut).toHaveBeenCalledWith({ scope: 'local' });
   });
 
+  it('DS-6: a code link without the PKCE verifier in this storage gets a clear German hint', async () => {
+    const { createClient } = await import('@supabase/supabase-js');
+    const storage = new Map<string, string>();
+    const client = createClient('https://abc.supabase.co', 'anon', {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        flowType: 'pkce',
+        storageKey: 'zz-auth',
+        storage: { getItem: (k) => storage.get(k) ?? null, setItem: (k, v) => void storage.set(k, v), removeItem: (k) => void storage.delete(k) },
+      },
+      global: { fetch: (async () => new Response('{}', { status: 500 })) as typeof fetch },
+    });
+    const auth = createSupabaseAuthService({ client: async () => client as unknown as SupabaseLike, redirectUrl: () => REDIRECT, storage: null });
+    await auth.ready();
+    await expect(auth.handleCallback(`${REDIRECT}?code=abc`)).rejects.toMatchObject({
+      code: 'pkce-verifier',
+      message: 'Öffne den Link im selben Browser oder in der App, in der du ihn angefordert hast, oder fordere einen neuen Link an.',
+    });
+    await client.auth.stopAutoRefresh();
+  });
+
+  it('DS-6: a thrown verifier error is mapped the same way; other exchange errors stay generic', async () => {
+    const make = (exchange: () => Promise<never>) =>
+      createSupabaseAuthService({
+        client: async () =>
+          ({
+            auth: {
+              getSession: async () => ({ data: { session: null }, error: null }),
+              onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
+              exchangeCodeForSession: exchange,
+            },
+          }) as unknown as SupabaseLike,
+      });
+    const missing = make(async () => {
+      throw Object.assign(new Error('PKCE code verifier not found in storage.'), { name: 'AuthPKCECodeVerifierMissingError' });
+    });
+    await missing.ready();
+    await expect(missing.handleCallback(`${REDIRECT}?code=x`)).rejects.toMatchObject({ code: 'pkce-verifier' });
+    const other = make(async () => {
+      throw new Error('boom');
+    });
+    await other.ready();
+    await expect(other.handleCallback(`${REDIRECT}?code=x`)).rejects.toMatchObject({ code: 'callback' });
+  });
+
+  it('DS-6: a token_hash link completes without any code verifier (other browser storage)', async () => {
+    const { server, auth } = setup();
+    await auth.ready();
+    await auth.signInWithEmailLink('lea@example.com');
+    const hash = new URL(server.lastMagicLink('lea@example.com')!).searchParams.get('code')!;
+    // A second browser (empty storage, no verifier) opens the template link `?token_hash=…&type=email`.
+    const fresh = createSupabaseAuthService({ client: async () => createFakeSupabaseClient(server, { storage: new Map() }), redirectUrl: () => REDIRECT });
+    await fresh.ready();
+    await fresh.handleCallback(`${REDIRECT}?token_hash=${hash}&type=email`);
+    expect(fresh.session()).toMatchObject({ email: 'lea@example.com', provider: 'email' });
+  });
+
   it('a broken client yields a logged-out state instead of hanging', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const auth = createSupabaseAuthService({ client: () => Promise.reject(new Error('chunk failed')) });

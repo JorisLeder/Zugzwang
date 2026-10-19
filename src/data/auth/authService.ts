@@ -15,7 +15,7 @@ import { AUTH_STORAGE_KEY } from '../supabase/client';
 import type { SbError, SbSession, SupabaseProvider } from '../supabase/types';
 
 /** Error codes of auth failures (the UI shows its own German text per code). */
-export type AuthErrorCode = 'local-mode' | 'invalid-email' | 'rate-limited' | 'network' | 'callback' | 'unknown';
+export type AuthErrorCode = 'local-mode' | 'invalid-email' | 'rate-limited' | 'network' | 'callback' | 'pkce-verifier' | 'unknown';
 
 /** Auth failure with a code and a German message. */
 export class AuthError extends Error {
@@ -80,8 +80,17 @@ function readStoredSession(storage: Pick<Storage, 'getItem'> | null | undefined,
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function toAuthError(err: { message?: string; status?: number; code?: string } | null | undefined, fallback: AuthErrorCode): AuthError {
+/** The magic link was opened in a browser/app whose storage lacks the code verifier of the request (PKCE). */
+const PKCE_VERIFIER_MESSAGE =
+  'Öffne den Link im selben Browser oder in der App, in der du ihn angefordert hast, oder fordere einen neuen Link an.';
+
+function isPkceVerifierMissing(err: { name?: string; message?: string } | null | undefined): boolean {
+  return !!err && (err.name === 'AuthPKCECodeVerifierMissingError' || /code verifier/i.test(err.message ?? ''));
+}
+
+function toAuthError(err: { name?: string; message?: string; status?: number; code?: string } | null | undefined, fallback: AuthErrorCode): AuthError {
   const msg = err?.message ?? '';
+  if (fallback === 'callback' && isPkceVerifierMissing(err)) return new AuthError('pkce-verifier', PKCE_VERIFIER_MESSAGE);
   if (err?.status === 429 || /rate limit|too many/i.test(msg)) {
     return new AuthError('rate-limited', 'Zu viele Versuche. Warte kurz und versuch es dann noch einmal.');
   }
@@ -188,9 +197,16 @@ export function createSupabaseAuthService(opts: SupabaseAuthOptions): CloudAuthS
       const tokenHash = param('token_hash');
       const accessToken = hash.get('access_token');
       const refreshToken = hash.get('refresh_token');
-      let result: { data: { session: SbSession | null }; error: { message?: string } | null } | null = null;
-      if (code) result = await client.auth.exchangeCodeForSession(code);
+      let result: { data: { session: SbSession | null }; error: { name?: string; message?: string } | null } | null = null;
+      if (code) {
+        try {
+          result = await client.auth.exchangeCodeForSession(code);
+        } catch (e) {
+          throw toAuthError(e as Error, 'callback'); // supabase-js normally returns the error; a throw is treated alike
+        }
+      }
       else if (tokenHash) {
+        // Works in any browser: no code verifier needed (e-mail template with `token_hash`, see README).
         const type = param('type');
         result = await client.auth.verifyOtp({ token_hash: tokenHash, type: type === 'magiclink' || type === 'signup' ? type : 'email' });
       } else if (accessToken && refreshToken) result = await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
