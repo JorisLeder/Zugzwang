@@ -3,7 +3,8 @@ import { START_FEN } from '@/core/chess';
 import type { EngineLine } from '@/core/engine';
 import { ChessGame } from '@/lib/chess';
 import { grossErrorCandidates, hangingPieces, movesIntoDanger, naturalTraits, plausibility } from './heuristics';
-import { selectHumanMove } from './models/human';
+import { comparableScore, rankWinPercent, selectHumanMove } from './models/human';
+import { humanParams } from './params';
 import { chooseGrossError } from './models/skill';
 import { createSeededRandom } from './random';
 
@@ -148,5 +149,59 @@ describe('human model selection (800–2000, D-16)', () => {
     let mates = 0;
     for (let i = 0; i < 200; i++) if (selectHumanMove(fen, mateLines, { temperature: 0.012, sharpness: 1, natural }, random)!.uci === 'a1a8') mates++;
     expect(mates).toBeGreaterThan(150);
+  });
+
+  describe('ranking beyond the ±1000 cp saturation (RPB-2)', () => {
+    const KRK_MATE = '6k1/8/6K1/8/8/8/8/R7 w - - 0 1';
+    const mate = (multipv: number, uci: string, n: number): EngineLine => ({ multipv, depth: 20, score: { type: 'mate', value: n }, pv: [uci] });
+
+    it('maps mates and cp to comparable values from the mover view', () => {
+      expect(comparableScore({ type: 'mate', value: 1 }, 'w')).toBe(99_999);
+      expect(comparableScore({ type: 'mate', value: 1 }, 'b')).toBe(-99_999);
+      expect(comparableScore({ type: 'mate', value: -3 }, 'b')).toBe(99_997);
+      expect(comparableScore({ type: 'cp', value: 250 }, 'b')).toBe(-250);
+    });
+
+    it('shorter mates rank strictly higher, every mate above any cp, +900 above +500', () => {
+      const r = (n: number) => rankWinPercent({ type: 'mate', value: n }, 'w');
+      expect(r(1)).toBeGreaterThan(r(2));
+      expect(r(2)).toBeGreaterThan(r(3));
+      expect(r(30)).toBeGreaterThan(rankWinPercent({ type: 'cp', value: 5000 }, 'w'));
+      expect(rankWinPercent({ type: 'cp', value: 900 }, 'w')).toBeGreaterThan(rankWinPercent({ type: 'cp', value: 500 }, 'w'));
+      expect(rankWinPercent({ type: 'cp', value: 1500 }, 'w')).toBeGreaterThan(rankWinPercent({ type: 'cp', value: 1000 }, 'w'));
+      expect(rankWinPercent({ type: 'mate', value: -2 }, 'w')).toBeLessThan(rankWinPercent({ type: 'cp', value: -5000 }, 'w'));
+      expect(rankWinPercent({ type: 'cp', value: 300 }, 'w')).toBeCloseTo(rankWinPercent({ type: 'cp', value: 300 }, 'w'), 10);
+    });
+
+    it('a bot of 800–2000 Elo always plays mate in 1 over mate in 2/3 and a winning alternative', () => {
+      const lines = [mate(1, 'a1a8', 1), mate(2, 'a1a7', 2), mate(3, 'a1b1', 3), line(4, 'a1a2', 900)];
+      for (const elo of [800, 1200, 2000]) {
+        const params = humanParams(elo, 'balanced');
+        const random = createSeededRandom(elo);
+        for (let i = 0; i < 300; i++) expect(selectHumanMove(KRK_MATE, lines, params, random)!.uci).toBe('a1a8');
+      }
+    });
+
+    it('between mates the shorter one has the lower loss; +500 vs +900 differ in loss', () => {
+      const natural = { recapture: 0, check: 0, capture: 0, development: 0, castle: 0 };
+      const s = selectHumanMove(KRK_MATE, [mate(1, 'a1a7', 2), mate(2, 'a1b1', 3), line(3, 'a1a2', 900), line(4, 'a1a3', 500)], { temperature: 0.1, sharpness: 2, natural }, () => 0)!;
+      const loss = (u: string) => s.candidates.find((c) => c.uci === u)!.loss;
+      expect(loss('a1a7')).toBe(0);
+      expect(loss('a1b1')).toBeGreaterThan(loss('a1a7'));
+      expect(loss('a1a3')).toBeGreaterThan(loss('a1a2'));
+      expect(loss('a1a2')).toBeGreaterThan(loss('a1b1'));
+    });
+
+    it('lines of +483..+497 cp still rank by cp (unchanged scale below 1000)', () => {
+      const natural = { recapture: 0, check: 0, capture: 0, development: 0, castle: 0 };
+      const cps = [497, 492, 488, 483];
+      const ucis = ['a1a2', 'a1a3', 'a1a4', 'a1a5'];
+      const s = selectHumanMove(KRK_MATE, cps.map((cp, i) => line(i + 1, ucis[i]!, cp)), { temperature: 0.05, sharpness: 2, natural }, () => 0)!;
+      const losses = ucis.map((u) => s.candidates.find((c) => c.uci === u)!.loss);
+      expect(losses[0]).toBe(0);
+      expect([...losses].sort((a, b) => a - b)).toEqual(losses);
+      expect(losses[3]!).toBeGreaterThan(0);
+      expect(losses[3]!).toBeLessThan(0.01);
+    });
   });
 });

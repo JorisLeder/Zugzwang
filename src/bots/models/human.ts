@@ -15,8 +15,8 @@
  *    blunders sprinkled over perfect play.
  */
 import type { Color, Fen, PieceSymbol, Square, Uci } from '@/core/chess';
-import type { EngineLine, EngineService } from '@/core/engine';
-import { scoreWinPercent } from '@/analysis';
+import type { EngineLine, EngineService, Score } from '@/core/engine';
+import { WIN_PERCENT_MULTIPLIER } from '@/analysis';
 import { ChessGame, type LegalMove } from '@/lib/chess';
 import { naturalTraits } from '../heuristics';
 import type { HumanParams } from '../params';
@@ -25,7 +25,7 @@ import { softmaxWeights, weightedPick, type RandomSource } from '../random';
 /** One candidate of the human model. */
 export interface HumanCandidate {
   uci: Uci;
-  /** Mover's win percentage after the move (0–100) according to the search used. */
+  /** Mover's win percentage after the move (0–100, ranking scale without the ±1000 saturation) of the search used. */
   winPct: number;
   /** Expected-points loss vs. the best candidate (0–1). */
   loss: number;
@@ -46,6 +46,37 @@ export interface HumanSelection {
 /** The opponent's last move (for recaptures). */
 export type PreviousMove = { to: Square; captured?: PieceSymbol } | null;
 
+/** Mate scores are mapped to `MATE_BASE - N` (mover's view) so that shorter mates compare higher than longer ones. */
+const MATE_BASE = 100_000;
+/** Centipawn ceiling for ranking only (analysis/Coach keep the Lichess ±1000 in `scoreWinPercent`). */
+const RANK_CP_CEILING = 2000;
+
+/** Comparable value of an engine score from the mover's point of view: cp unclamped, mate N = ±(100000 − N). */
+export function comparableScore(score: Score, mover: Color): number {
+  if (score.type === 'mate') {
+    const n = Math.abs(score.value);
+    const moverMates = score.value !== 0 && score.value > 0 === (mover === 'w');
+    return moverMates ? MATE_BASE - n : -(MATE_BASE - n);
+  }
+  return mover === 'w' ? score.value : -score.value;
+}
+
+/**
+ * Mover's win percentage (0–100) for ranking candidates only. Unlike `scoreWinPercent` it does not saturate at ±1000 cp:
+ * cp are clamped at ±2000 (+500 < +900 < +1500 stay distinguishable) and forced mates sit strictly above every cp
+ * score, the shorter mate higher (mate in 1 > mate in 2 > …); mates against the mover mirror this below.
+ */
+export function rankWinPercent(score: Score, mover: Color): number {
+  const v = comparableScore(score, mover);
+  if (Math.abs(v) >= MATE_BASE - 1000) {
+    const n = Math.min(MATE_BASE - Math.abs(v), 50);
+    const win = 99.95 + (0.049 * (51 - n)) / 50;
+    return v > 0 ? win : 100 - win;
+  }
+  const cp = Math.min(RANK_CP_CEILING, Math.max(-RANK_CP_CEILING, v));
+  return 100 / (1 + Math.exp(WIN_PERCENT_MULTIPLIER * cp));
+}
+
 /**
  * Pure selection step: candidates from engine lines (scores White POV, D-08) → softmax pick.
  * Lines without a move are ignored; illegal moves (stale lines) are skipped.
@@ -61,19 +92,22 @@ export function selectHumanMove(
   const mover: Color = game.turn();
   const legal = new Map<Uci, LegalMove>(game.legalMoves().map((m) => [m.uci, m]));
   const seen = new Set<Uci>();
+  const mateInOne = new Set<Uci>();
   const raw: Array<{ uci: Uci; winPct: number; move: LegalMove }> = [];
   for (const line of [...lines].sort((a, b) => a.multipv - b.multipv)) {
     const uci = line.pv[0];
     const move = uci ? legal.get(uci) : undefined;
     if (!uci || !move || seen.has(uci)) continue;
     seen.add(uci);
-    raw.push({ uci, winPct: scoreWinPercent(line.score, mover, mover), move });
+    raw.push({ uci, winPct: rankWinPercent(line.score, mover), move });
+    if (line.score.type === 'mate' && comparableScore(line.score, mover) === MATE_BASE - 1) mateInOne.add(uci);
   }
   if (raw.length === 0) return null;
   const bestWin = Math.max(...raw.map((c) => c.winPct));
   const t = Math.max(params.temperature, 1e-6);
   const candidates: HumanCandidate[] = raw.map((c) => {
-    const loss = Math.max(0, (bestWin - c.winPct) / 100);
+    // A mate in 1 is always taken: every other candidate counts as fully lost against it.
+    const loss = mateInOne.size > 0 && !mateInOne.has(c.uci) ? 1 : Math.max(0, (bestWin - c.winPct) / 100);
     const traits = naturalTraits(fen, c.move, previous);
     const n = params.natural;
     const bonus =
