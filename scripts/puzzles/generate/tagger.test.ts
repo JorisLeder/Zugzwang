@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PUZZLE_THEMES } from '@/core/puzzles';
-import { between, distance, lineContext, openingTagsFromName, sortThemes, tagPuzzle, type TagInput } from './tagger';
+import { between, bishopMate, distance, lineContext, openingTagsFromName, sortThemes, tagPuzzle, type TagInput } from './tagger';
 
 /** Known positions in Lichess format (fen before the opponent's move, moves[0] = opponent). */
 const KNOWN: Record<string, TagInput> = {
@@ -101,5 +101,34 @@ describe('helpers', () => {
     expect(openingTagsFromName('Sicilian Defense: Dragon Variation, Yugoslav Attack')).toEqual(['Sicilian_Defense', 'Sicilian_Defense_Dragon_Variation']);
     expect(openingTagsFromName("King's Gambit Accepted")).toEqual(['Kings_Gambit_Accepted']);
     expect(openingTagsFromName(null)).toEqual([]);
+  });
+});
+
+describe('bishopMate (PR-5)', () => {
+  const mate = (fen: string, moves: string[]) => {
+    const ctx = lineContext(fen, moves);
+    expect(ctx?.endsInMate).toBe(true);
+    return bishopMate(ctx!);
+  };
+
+  it('does not count a bishop that is far from the king (king e8, mating bishop g6, second bishop c1)', () => {
+    expect(mate('3qkbn1/p2pp3/8/8/4B3/8/8/2B3K1 b - - 0 1', ['a7a6', 'e4g6'])).toBeNull();
+  });
+
+  it('still tags a real Boden mate (bishops from both sides of the king)', () => {
+    const fen = '2kr1b1r/pp1nqppp/8/8/5B2/8/PPP1BPPP/5RK1 b - - 0 1';
+    expect(mate(fen, ['b7b6', 'e2a6'])).toBe('bodenMate');
+    expect(tagPuzzle({ fen, moves: ['b7b6', 'e2a6'], mateIn: 1, phase: 'middlegame' })).toContain('bodenMate');
+  });
+
+  it('still tags a double-bishop mate (both bishops on the same side of the king)', () => {
+    const fen = 'kb6/p6p/8/4B3/2B5/8/8/6K1 b - - 0 1';
+    expect(mate(fen, ['h7h6', 'c4d5'])).toBe('doubleBishopMate');
+    expect(tagPuzzle({ fen, moves: ['h7h6', 'c4d5'], mateIn: 1, phase: 'endgame' })).toContain('doubleBishopMate');
+  });
+
+  it('shipped puzzles gen-68c1a1bf1f and gen-701dc2dc42 are no Boden mates', () => {
+    expect(mate('r1bqkb1r/ppnpppp1/2p4p/3nP3/3PN2P/8/PPP1BPP1/R1BQK1NR b KQkq - 2 7', ['f7f5', 'e2h5', 'g7g6', 'h5g6'])).toBeNull();
+    expect(mate('rn1qkbn1/p2bp2B/7p/2pP2p1/3P4/2N5/PPP2PP1/R1BQK1NR b KQq - 0 10', ['c5d4', 'h7g6'])).toBeNull();
   });
 });

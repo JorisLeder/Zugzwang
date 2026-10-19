@@ -225,7 +225,7 @@ describe('realtime publication', () => {
       expect(await tables()).toEqual(sorted(SYNCED_TABLES));
       expect(SYNCED_TABLES).not.toContain('explanation_usage');
       // Re-running the guarded block (e.g. migrations re-applied after a reset) adds nothing twice.
-      const sql = readFileSync(join(MIGRATIONS_DIR, migrationFiles().at(-1)!), 'utf8');
+      const sql = readFileSync(join(MIGRATIONS_DIR, migrationFiles().find((f) => f.includes('functions_realtime'))!), 'utf8');
       const block = sql.slice(sql.lastIndexOf('do $$'));
       expect(block).toMatch(/supabase_realtime/);
       await rt.pg.exec(block);

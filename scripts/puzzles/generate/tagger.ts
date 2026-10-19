@@ -496,13 +496,16 @@ export function bishopMate(ctx: LineContext): 'bodenMate' | 'doubleBishopMate' |
   const king = finalKing(ctx);
   if (!king) return null;
   const map = pieceMap(ctx.final);
-  const bishops = boardPieces(ctx.final).filter((p) => p.type === 'b' && p.color === ctx.solver);
-  if (bishops.length < 2) return null;
+  // Only bishops that attack the king's square or one of its neighbours take part (a far-away bishop does not count).
+  const involved: Square[] = [];
   for (const s of [king, ...neighbours(king)]) {
-    if (!attackersOf(ctx.final, s, ctx.solver).every((a) => map.get(a)?.type === 'b')) return null;
+    const attackers = attackersOf(ctx.final, s, ctx.solver);
+    if (!attackers.every((a) => map.get(a)?.type === 'b')) return null;
+    for (const a of attackers) if (!involved.includes(a)) involved.push(a);
   }
-  const [b0, b1] = bishops as [BoardPiece, BoardPiece];
-  return (fileOf(b0.square) < fileOf(king)) === (fileOf(b1.square) > fileOf(king)) ? 'bodenMate' : 'doubleBishopMate';
+  if (involved.length < 2) return null;
+  const [s0, s1] = involved as [Square, Square];
+  return (fileOf(s0) < fileOf(king)) === (fileOf(s1) > fileOf(king)) ? 'bodenMate' : 'doubleBishopMate';
 }
 
 /** Dovetail mate: the queen mates diagonally adjacent; every escape square is covered only by her or blocked. */
