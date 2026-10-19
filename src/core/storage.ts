@@ -263,6 +263,11 @@ export interface AuthSession {
   email?: string;
   provider: 'email' | 'google' | 'local';
   expiresAt?: string;
+  /**
+   * Cloud mode only: the session was restored from storage while the token could not be refreshed (offline start). The
+   * user may use the app, but syncing stays off until a refresh succeeds and the real session is emitted.
+   */
+  unverified?: true;
 }
 
 /** Authentication (Supabase in cloud mode; a local session in local mode, D-15). */

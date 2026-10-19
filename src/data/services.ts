@@ -44,6 +44,9 @@ export interface DexieDataOptions {
   random?: () => number;
   /** Absolute URL of `/auth/callback` (default: current origin). */
   redirectUrl?: () => string;
+  /** Where supabase-js persisted the session, for the offline-start fallback (default `localStorage`; tests). */
+  authStorage?: Pick<Storage, 'getItem'> | null;
+  authStorageKey?: string;
   /** Sync tuning (tests). */
   sync?: Pick<SyncEngineOptions, 'debounceMs' | 'backoffBaseMs' | 'backoffMaxMs' | 'batchSize' | 'maxPermanentAttempts'>;
   /** ActivityTracker tuning (tests). */
@@ -128,7 +131,12 @@ export function createDexieDataServices(opts: DexieDataOptions): DexieDataServic
   });
 
   const localAuth: LocalAuthService | null = cloud ? null : createLocalAuthService('local-user');
-  const cloudAuth: CloudAuthService | null = cloud ? createSupabaseAuthService({ client: opts.client!, redirectUrl: opts.redirectUrl }) : null;
+  const cloudAuth: CloudAuthService | null = cloud ? createSupabaseAuthService({
+        client: opts.client!,
+        redirectUrl: opts.redirectUrl,
+        storage: opts.authStorage,
+        storageKey: opts.authStorageKey,
+      }) : null;
 
   /** Local mode: the local profile exists from the first start on. */
   async function ensureLocalProfile(d: ZugzwangDb): Promise<void> {
@@ -212,13 +220,18 @@ export function createDexieDataServices(opts: DexieDataOptions): DexieDataServic
     engine.notifyEnqueued();
   }
 
-  async function onSession(uid: string | null): Promise<void> {
+  /**
+   * `verified` = false: the session was restored from storage while offline (token refresh pending). The data is
+   * assigned to the user, but syncing stays off until the real session arrives.
+   */
+  async function onSession(uid: string | null, verified = true): Promise<void> {
     if (uid === syncUserId) return;
     stopRealtime?.();
     stopRealtime = null;
     syncUserId = null;
     if (!uid) return;
     await adoptOwner(uid);
+    if (!verified) return;
     syncUserId = uid;
     await afterLogin(uid);
   }
@@ -234,7 +247,8 @@ export function createDexieDataServices(opts: DexieDataOptions): DexieDataServic
     if (cloudAuth) {
       stopAuth = cloudAuth.observe().subscribe((s) => {
         const uid = s?.userId ?? null;
-        sessionChain = sessionChain.then(() => onSession(uid)).catch((e) => console.warn('Sync: processing the login failed', e));
+        const verified = !s?.unverified;
+        sessionChain = sessionChain.then(() => onSession(uid, verified)).catch((e) => console.warn('Sync: processing the login failed', e));
       });
     }
   }

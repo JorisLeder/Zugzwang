@@ -6,10 +6,13 @@
  *   `/auth/callback`. supabase-js persists the session in localStorage and refreshes the access token
  *   automatically; how long a login lasts (30 days) is the project's session setting on the server.
  *   `observe()` emits only once the stored session has been read (`session()` is `null` until then).
+ * - Offline cold start: when the access token is expired and the refresh fails for network reasons, the stored session
+ *   is exposed as `unverified` so the user can keep working; syncing waits for the real session (token refresh).
  */
 import type { AuthService, AuthSession, Subscribable } from '@/core/storage';
 import { createValueStore } from '@/lib/observable';
-import type { SbSession, SupabaseProvider } from '../supabase/types';
+import { AUTH_STORAGE_KEY } from '../supabase/client';
+import type { SbError, SbSession, SupabaseProvider } from '../supabase/types';
 
 /** Error codes of auth failures (the UI shows its own German text per code). */
 export type AuthErrorCode = 'local-mode' | 'invalid-email' | 'rate-limited' | 'network' | 'callback' | 'unknown';
@@ -62,6 +65,19 @@ export function toAuthSession(s: SbSession | null | undefined): AuthSession | nu
   return session;
 }
 
+/** Reads the persisted supabase-js session (JSON under the storage key) as an unverified `AuthSession`. */
+function readStoredSession(storage: Pick<Storage, 'getItem'> | null | undefined, key: string): AuthSession | null {
+  try {
+    const raw = storage?.getItem(key);
+    if (!raw) return null;
+    const stored = JSON.parse(raw) as SbSession | null;
+    const session = toAuthSession(stored);
+    return session ? { ...session, unverified: true } : null;
+  } catch {
+    return null;
+  }
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function toAuthError(err: { message?: string; status?: number; code?: string } | null | undefined, fallback: AuthErrorCode): AuthError {
@@ -79,6 +95,12 @@ export interface SupabaseAuthOptions {
   client: SupabaseProvider;
   /** Absolute URL of `/auth/callback` (default: current origin). */
   redirectUrl?: () => string;
+  /** Where supabase-js persists the session (default: `localStorage`; `null` = no offline fallback). */
+  storage?: Pick<Storage, 'getItem'> | null;
+  /** Storage key of the persisted session (default `AUTH_STORAGE_KEY`). */
+  storageKey?: string;
+  /** Browser connectivity (default `navigator.onLine`). */
+  isOnline?: () => boolean;
 }
 
 /** Cloud-mode auth service with its readiness promise. */
@@ -94,18 +116,31 @@ export function createSupabaseAuthService(opts: SupabaseAuthOptions): CloudAuthS
   const redirectUrl =
     opts.redirectUrl ?? (() => (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '/auth/callback'));
 
-  const set = (s: SbSession | null | undefined) => {
-    const next = toAuthSession(s);
+  const storage = opts.storage === undefined ? (typeof localStorage !== 'undefined' ? localStorage : null) : opts.storage;
+  const storageKey = opts.storageKey ?? AUTH_STORAGE_KEY;
+  const isOnline = opts.isOnline ?? (() => typeof navigator === 'undefined' || navigator.onLine !== false);
+
+  const setSession = (next: AuthSession | null) => {
     const cur = store.get();
     if (cur === undefined || JSON.stringify(cur) !== JSON.stringify(next)) store.set(next);
   };
+  const set = (s: SbSession | null | undefined) => setSession(toAuthSession(s));
+
+  /** The refresh failed for network reasons (as opposed to a rejected refresh token, which signs the user out). */
+  const isOfflineError = (e: SbError | null | undefined): boolean =>
+    !!e && (e.name === 'AuthRetryableFetchError' || !isOnline());
 
   const ready = (async () => {
     try {
       const client = await opts.client();
-      client.auth.onAuthStateChange((_event, session) => set(session));
-      const { data } = await client.auth.getSession();
-      set(data.session);
+      client.auth.onAuthStateChange((event, session) => {
+        // A null session counts only on sign-out; the initial one is read below (it may be an offline start).
+        if (!session && event !== 'SIGNED_OUT') return;
+        set(session);
+      });
+      const { data, error } = await client.auth.getSession();
+      if (!data.session && isOfflineError(error)) setSession(readStoredSession(storage, storageKey));
+      else set(data.session);
     } catch (e) {
       console.warn('Auth: reading the session failed', e);
       if (store.get() === undefined) store.set(null);

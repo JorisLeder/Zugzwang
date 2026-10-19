@@ -5,6 +5,8 @@
 
 /** Error object of PostgREST / functions responses. */
 export interface SbError {
+  /** Error class name (auth errors: `AuthRetryableFetchError`, `AuthPKCECodeVerifierMissingError`, ...). */
+  name?: string;
   message: string;
   code?: string;
   details?: string | null;

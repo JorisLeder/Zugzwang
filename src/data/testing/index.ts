@@ -8,12 +8,12 @@ import type { SbSession } from '../supabase/types';
 import { globalIndexedDb, type IndexedDbDeps } from '../db';
 import { createDexieDataServices, type DexieDataOptions, type DexieDataServices } from '../services';
 import { manualOnlineSource } from '../sync/syncService';
-import { createFakeSupabaseClient, type FakeSupabaseClient } from './fakeClient';
+import { createFakeSupabaseClient, FAKE_AUTH_STORAGE_KEY, type FakeSupabaseClient } from './fakeClient';
 import type { FakeSupabaseServer } from './fakeServer';
 import { newId } from '@/lib/ids';
 
 export { waitFor } from './waitFor';
-export { createFakeSupabaseClient, type FakeClientOptions, type FakeSupabaseClient } from './fakeClient';
+export { createFakeSupabaseClient, FAKE_AUTH_STORAGE_KEY, type FakeClientOptions, type FakeSupabaseClient } from './fakeClient';
 export { FakeServerError, FakeSupabaseServer, type FailureRule, type FakeRequest, type FakeServerOptions, type FakeUser } from './fakeServer';
 
 /** Options of `createFakeDevice`. */
@@ -66,6 +66,8 @@ export function createFakeDevice(server: FakeSupabaseServer, opts: FakeDeviceOpt
     timeZone: opts.timeZone ?? 'Europe/Berlin',
     deviceId: opts.deviceId ?? newId(),
     redirectUrl: () => 'http://localhost:5208/auth/callback',
+    authStorage: { getItem: (k) => storage.get(k) ?? null },
+    authStorageKey: FAKE_AUTH_STORAGE_KEY,
     sync: opts.sync,
   });
   return {

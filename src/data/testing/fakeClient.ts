@@ -43,7 +43,9 @@ export interface FakeSupabaseClient extends SupabaseLike {
   };
 }
 
-const STORAGE_KEY = 'sb-fake-auth-token';
+/** Storage key of the fake client's persisted session. */
+export const FAKE_AUTH_STORAGE_KEY = 'sb-fake-auth-token';
+const STORAGE_KEY = FAKE_AUTH_STORAGE_KEY;
 
 /** Creates a fake client connected to `server`. */
 export function createFakeSupabaseClient(server: FakeSupabaseServer, opts: FakeClientOptions = {}): FakeSupabaseClient {
@@ -71,7 +73,8 @@ export function createFakeSupabaseClient(server: FakeSupabaseServer, opts: FakeC
   const validSession = (): SbSession | null => {
     const s = readSession();
     if (!s) return null;
-    if (s.expires_at && s.expires_at * 1000 <= server.now().getTime() && s.refresh_token && isOnline()) {
+    if (s.expires_at && s.expires_at * 1000 <= server.now().getTime() && !isOnline()) return null; // unusable token
+    if (s.expires_at && s.expires_at * 1000 <= server.now().getTime() && s.refresh_token) {
       try {
         const next = server.refreshSession(s.refresh_token);
         writeSession(next, 'TOKEN_REFRESHED');
@@ -149,12 +152,17 @@ export function createFakeSupabaseClient(server: FakeSupabaseServer, opts: FakeC
 
   const auth: SbAuth = {
     async getSession() {
+      const stored = readSession();
+      // Like supabase-js: an expired token that cannot be refreshed offline is a retryable network error.
+      if (stored?.expires_at && stored.expires_at * 1000 <= server.now().getTime() && !isOnline()) {
+        return { data: { session: null }, error: { name: 'AuthRetryableFetchError', message: 'Failed to fetch' } };
+      }
       return { data: { session: validSession() }, error: null };
     },
     onAuthStateChange(cb) {
       listeners.add(cb);
       queueMicrotask(() => {
-        if (listeners.has(cb)) cb('INITIAL_SESSION', readSession());
+        if (listeners.has(cb)) cb('INITIAL_SESSION', validSession());
       });
       return { data: { subscription: { unsubscribe: () => listeners.delete(cb) } } };
     },
