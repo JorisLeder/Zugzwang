@@ -328,9 +328,10 @@ describe('Themen-Training', () => {
     const fork = cards.find((c) => c.getAttribute('data-theme') === 'fork')!;
     expect(fork).toHaveTextContent('1 Puzzle');
     expect(fork).toHaveTextContent('Noch nicht trainiert');
-    // Leicht = 300–500 around 600: the fork fixture (800) drops out, the mate in 1 fixtures stay.
+    // Leicht = 300–500 around 600 has fewer than 20 puzzles per theme: the easiest puzzles of the theme are served (PR-3),
+    // so the fork fixture (800) stays instead of an empty card.
     fireEvent.click(screen.getByRole('radio', { name: 'Leicht' }));
-    await waitFor(() => expect(within(screen.getByTestId('theme-list')).getAllByTestId('theme-card').find((c) => c.getAttribute('data-theme') === 'fork')).toHaveTextContent('Noch keine Puzzles'));
+    await waitFor(() => expect(within(screen.getByTestId('theme-list')).getAllByTestId('theme-card').find((c) => c.getAttribute('data-theme') === 'fork')).toHaveTextContent('1 Puzzle'));
     const mate1 = within(screen.getByTestId('theme-list')).getAllByTestId('theme-card').find((c) => c.getAttribute('data-theme') === 'mateIn1')!;
     expect(mate1).toHaveTextContent('2 Puzzles');
     expect(mate1).toHaveAttribute('href', '/puzzles/themes/mateIn1?d=easy');

@@ -1,7 +1,10 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Puzzle } from '@/core/puzzles';
 import { createMemoryDataServices, FIXTURE_PUZZLES, seededRandom } from '@/core/testing';
+import type { PuzzleBankManifest } from '@/core/puzzles';
 import { puzzleAttemptInput } from './attempt';
+import { TRAINABLE_THEMES } from './themes';
 import {
   countThemePuzzles,
   difficultyRange,
@@ -112,6 +115,7 @@ describe('theme training selection', () => {
 
   it('maps difficulties to rating ranges around the user rating', () => {
     expect(difficultyRange('easy', 600)).toEqual({ ratingMin: 300, ratingMax: 500 });
+    expect(difficultyRange('easy', 200)).toEqual({ ratingMin: -100, ratingMax: 300 }); // never empty-ceilinged for beginners
     expect(difficultyRange('medium', 600)).toEqual({ ratingMin: 500, ratingMax: 700 });
     expect(difficultyRange('hard', 600)).toEqual({ ratingMin: 700, ratingMax: 900 });
     expect(difficultyRange('all', 600)).toEqual({});
@@ -120,7 +124,8 @@ describe('theme training selection', () => {
   it('counts and selects by theme, difficulty and opening', async () => {
     const repo = createMemoryDataServices({ puzzles: themed, random: seededRandom(4) }).repos.puzzles;
     expect(await countThemePuzzles(repo, { theme: 'fork', difficulty: 'all', userRating: 600 })).toBe(3);
-    expect(await countThemePuzzles(repo, { theme: 'fork', difficulty: 'easy', userRating: 600 })).toBe(1);
+    // fewer than 20 in the easy range -> the 20 easiest puzzles of the theme (here: all 3)
+    expect(await countThemePuzzles(repo, { theme: 'fork', difficulty: 'easy', userRating: 600 })).toBe(3);
     expect(await countThemePuzzles(repo, { theme: 'fork', difficulty: 'all', userRating: 600, openingTag: 'Sicilian_Defense' })).toBe(2);
     expect((await selectThemePuzzle(repo, { theme: 'fork', difficulty: 'hard', userRating: 600 }))!.id).toBe('f3');
     expect((await selectThemePuzzle(repo, { theme: 'fork', difficulty: 'medium', userRating: 600 }, { seenIds: ['f2'], currentId: 'f2' }))!.id).toBe('f2');
@@ -133,5 +138,46 @@ describe('theme training selection', () => {
     const repo = createMemoryDataServices({ puzzles: themed }).repos.puzzles;
     expect(await openingTagsForTheme(repo, 'fork')).toEqual(['Italian_Game', 'Sicilian_Defense']);
     expect(await openingTagsForTheme(repo, 'skewer')).toEqual([]);
+  });
+});
+
+describe('easy difficulty fallback (PR-3)', () => {
+  it('serves and counts the 20 easiest puzzles of a theme when the easy range has fewer than 20', async () => {
+    const many = Array.from({ length: 30 }, (_, i) => puzzle(`e${String(i).padStart(2, '0')}`, 1000 + i * 10));
+    const repo = createMemoryDataServices({ puzzles: many, random: seededRandom(7) }).repos.puzzles;
+    const f = { theme: 'fork' as const, difficulty: 'easy' as const, userRating: 200 };
+    expect(await countThemePuzzles(repo, f)).toBe(20);
+    for (let i = 0; i < 15; i += 1) {
+      const p = (await selectThemePuzzle(repo, f))!;
+      expect(p.rating).toBeLessThanOrEqual(1190); // among the 20 easiest (1000..1190)
+    }
+    // enough puzzles in the real easy range: unchanged
+    const wide = Array.from({ length: 25 }, (_, i) => puzzle(`w${i}`, 400 + i * 4));
+    const repo2 = createMemoryDataServices({ puzzles: [...wide, ...many] }).repos.puzzles;
+    expect(await countThemePuzzles(repo2, { ...f, userRating: 600 })).toBe(25);
+    // medium/hard are not touched by the fallback
+    expect(await countThemePuzzles(repo, { ...f, difficulty: 'medium' })).toBe(0);
+  });
+
+  it('real bank: every theme with puzzles has an easy count > 0 at rating 200; medium/hard unchanged at 1200', async () => {
+    const dir = 'public/data/puzzles';
+    const manifest = JSON.parse(readFileSync(`${dir}/manifest.json`, 'utf8')) as PuzzleBankManifest;
+    const puzzles = manifest.chunks.flatMap((c) => JSON.parse(readFileSync(`${dir}/${c.file}`, 'utf8')) as Puzzle[]);
+    const repo = createMemoryDataServices({ puzzles }).repos.puzzles;
+    let withPuzzles = 0;
+    for (const t of TRAINABLE_THEMES) {
+      const total = await repo.count({ themes: [t.id] });
+      const easy = await countThemePuzzles(repo, { theme: t.id, difficulty: 'easy', userRating: 200 });
+      if (total > 0) {
+        withPuzzles += 1;
+        expect(easy, `${t.id} easy`).toBeGreaterThan(0);
+        expect(easy).toBeLessThanOrEqual(Math.max(total, 20) + 5);
+      }
+      for (const difficulty of ['medium', 'hard'] as const) {
+        const raw = await repo.count({ themes: [t.id], ...difficultyRange(difficulty, 1200) });
+        expect(await countThemePuzzles(repo, { theme: t.id, difficulty, userRating: 1200 })).toBe(raw);
+      }
+    }
+    expect(withPuzzles).toBeGreaterThan(20);
   });
 });

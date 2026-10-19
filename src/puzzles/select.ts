@@ -98,12 +98,21 @@ export type ThemeDifficulty = 'easy' | 'medium' | 'hard' | 'all';
 /** All difficulties in display order. */
 export const THEME_DIFFICULTIES: readonly ThemeDifficulty[] = ['easy', 'medium', 'hard', 'all'];
 
-/** Rating range of a difficulty around the user's rating: Leicht −300…−100, Mittel ±100, Schwer +100…+300, Alle. */
+/** Minimum number of puzzles of a theme in "Leicht"; below it the easiest puzzles of the theme are served instead. */
+export const MIN_EASY_PUZZLES = 20;
+
+/** Rating ceiling of "Leicht" for very low ratings (so the range is never empty for beginners around 200). */
+const EASY_FLOOR_MAX = 300;
+
+/**
+ * Rating range of a difficulty around the user's rating: Leicht −300…−100 (ceiling at least 300), Mittel ±100,
+ * Schwer +100…+300, Alle.
+ */
 export function difficultyRange(difficulty: ThemeDifficulty, userRating: number): { ratingMin?: number; ratingMax?: number } {
   const r = Math.round(userRating);
   switch (difficulty) {
     case 'easy':
-      return { ratingMin: r - 300, ratingMax: r - 100 };
+      return { ratingMin: r - 300, ratingMax: Math.max(r - 100, EASY_FLOOR_MAX) };
     case 'medium':
       return { ratingMin: r - 100, ratingMax: r + 100 };
     case 'hard':
@@ -121,9 +130,25 @@ export interface ThemeFilter {
   openingTag?: string;
 }
 
+type ThemeQuery = Omit<PuzzleQuery, 'limit' | 'shuffle' | 'excludeIds'>;
+
+/**
+ * The query behind a theme filter, shared by the counts (theme cards) and the selection (theme page) so both agree.
+ * "Leicht" with fewer than `MIN_EASY_PUZZLES` puzzles in its range falls back to the easiest `MIN_EASY_PUZZLES` puzzles
+ * of the theme (rating ascending; ties at the 20th rating stay in), so a theme with puzzles is never empty.
+ */
+export async function themeQuery(repo: PuzzleRepository, f: ThemeFilter): Promise<ThemeQuery> {
+  const base: ThemeQuery = { themes: [f.theme], openingTag: f.openingTag, ...difficultyRange(f.difficulty, f.userRating) };
+  if (f.difficulty !== 'easy') return base;
+  if ((await repo.count(base)) >= MIN_EASY_PUZZLES) return base;
+  const easiest = await repo.query({ themes: base.themes, openingTag: f.openingTag, limit: MIN_EASY_PUZZLES });
+  const last = easiest.at(-1);
+  return last ? { themes: base.themes, openingTag: f.openingTag, ratingMax: last.rating } : base;
+}
+
 /** Number of puzzles matching a theme filter. */
-export function countThemePuzzles(repo: PuzzleRepository, f: ThemeFilter): Promise<number> {
-  return repo.count({ themes: [f.theme], openingTag: f.openingTag, ...difficultyRange(f.difficulty, f.userRating) });
+export async function countThemePuzzles(repo: PuzzleRepository, f: ThemeFilter): Promise<number> {
+  return repo.count(await themeQuery(repo, f));
 }
 
 /**
@@ -135,7 +160,7 @@ export async function selectThemePuzzle(
   f: ThemeFilter,
   opts: { seenIds?: Iterable<string>; currentId?: string } = {},
 ): Promise<Puzzle | null> {
-  const base = { themes: [f.theme], openingTag: f.openingTag, ...difficultyRange(f.difficulty, f.userRating) };
+  const base = await themeQuery(repo, f);
   const seen = new Set(opts.seenIds ?? []);
   if (opts.currentId) seen.add(opts.currentId);
   const [fresh] = await repo.query({ ...base, excludeIds: seen, limit: 1, shuffle: true });
