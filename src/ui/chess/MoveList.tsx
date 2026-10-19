@@ -60,7 +60,8 @@ export function MoveList({ moves, currentPly, onSelectPly, notation, classificat
         onClick={() => onSelectPly?.(m.ply)}
         className={cn(
           'focus-inset flex items-center gap-1.5 rounded-sm px-2 text-left text-move whitespace-nowrap tabular-nums hover:bg-surface-2',
-          strip ? 'h-11' : 'h-8 pointer-coarse:h-11',
+          // Strip (phones): every half-move at least 44 × 44 px, also short ones like "e4".
+          strip ? 'h-11 min-w-11 justify-center' : 'h-8 pointer-coarse:h-11',
           current && 'bg-surface-3 font-semibold',
         )}
       >

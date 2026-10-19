@@ -10,7 +10,6 @@ import { expect, test } from '../support/fixtures';
 import { expectDashboard, nav, visible } from './helpers';
 
 test.describe('Kern-Ablauf 1: Erster Start', () => {
-
   test('onboarding → dashboard with first course, fitting bot and start rating; every item leads on', async ({ page }) => {
     test.setTimeout(60_000);
     const neuling = SELF_ASSESSMENT_OPTIONS.find((o) => o.id === 'newcomer')!;

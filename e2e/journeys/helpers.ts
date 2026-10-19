@@ -2,6 +2,7 @@
  * Helpers for the four core journeys (PRD "Kern-Abläufe", WP-12): main navigation, a lesson walker that solves every
  * step from the lesson JSON in `content/lessons/`, and a bot-game player whose moves come from a Node Stockfish in
  * the test process (`src/lib/uci/node`). Chess facts only via the rules layer (`src/lib/chess`).
+ * The journeys run in both projects: desktop (1440 × 900) and phone (390 × 844, touch).
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';

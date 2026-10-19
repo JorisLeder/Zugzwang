@@ -14,7 +14,7 @@ export interface SwitchProps {
   className?: string;
 }
 
-/** Settings row with a switch on the right: 44 × 26 px track, on = accent, thumb white. */
+/** Settings row with a switch on the right: 44 × 26 px track in a 44 × 44 px hit area, on = accent, thumb white. */
 export function Switch({ checked, onCheckedChange, label, description, disabled, className }: SwitchProps) {
   const id = useId();
   const descId = `${id}-desc`;
@@ -37,11 +37,14 @@ export function Switch({ checked, onCheckedChange, label, description, disabled,
         onCheckedChange={onCheckedChange}
         disabled={disabled}
         className={cn(
-          'relative inline-flex h-[26px] w-11 shrink-0 items-center rounded-full border border-border-strong bg-surface-3 transition-colors duration-[var(--zz-dur-base)]',
-          'data-[state=checked]:border-accent data-[state=checked]:bg-accent disabled:opacity-60',
+          // 44 × 44 px touch target; the 44 × 26 px track is drawn by ::before, which also carries the focus ring.
+          'relative inline-flex size-11 shrink-0 items-center rounded-full focus-visible:outline-none disabled:opacity-60',
+          'before:absolute before:inset-x-0 before:top-[9px] before:h-[26px] before:rounded-full before:border before:border-border-strong before:bg-surface-3 before:transition-colors before:duration-[var(--zz-dur-base)]',
+          'data-[state=checked]:before:border-accent data-[state=checked]:before:bg-accent',
+          'focus-visible:before:outline-2 focus-visible:before:outline-offset-2 focus-visible:before:outline-focus',
         )}
       >
-        <RadixSwitch.Thumb className="block size-5 translate-x-0.5 rounded-full bg-white shadow-1 transition-transform duration-[var(--zz-dur-base)] data-[state=checked]:translate-x-[20px]" />
+        <RadixSwitch.Thumb className="relative block size-5 translate-x-[3px] rounded-full bg-white shadow-1 transition-transform duration-[var(--zz-dur-base)] data-[state=checked]:translate-x-[21px]" />
       </RadixSwitch.Root>
     </div>
   );

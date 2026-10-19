@@ -15,7 +15,6 @@ const FIRST = lessonContent(COURSE, 'brett-und-feldnamen');
 const SECOND = lessonContent(COURSE, 'turm-und-laeufer');
 
 test.describe('Kern-Ablauf 4: Lektion', () => {
-
   test('Lernpfad → course → lesson step by step → exercise → stars → next lesson unlocked', async ({ page }) => {
     test.setTimeout(90_000);
     await completeOnboarding(page, 'Neuling', 20);

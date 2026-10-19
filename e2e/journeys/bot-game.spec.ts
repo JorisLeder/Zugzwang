@@ -23,7 +23,6 @@ async function goToPly(page: Page, ply: number) {
 }
 
 test.describe('Kern-Ablauf 3: Bot-Partie', () => {
-
   let engine: EngineService | undefined;
   test.afterEach(() => {
     engine?.dispose();

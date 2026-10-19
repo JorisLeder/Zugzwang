@@ -34,7 +34,11 @@ function StepHeader({ courseTitle, backTo, stepIndex, stepCount, isTest, title, 
   return (
     <div className="flex flex-col gap-2" data-testid="lesson-header">
       <p className="flex flex-wrap items-center gap-2 text-caption text-muted">
-        <Link to={backTo} className="underline-offset-4 hover:text-text hover:underline" data-testid="lesson-course-link">
+        <Link
+          to={backTo}
+          className="inline-flex items-center underline-offset-4 hover:text-text hover:underline pointer-coarse:min-h-11"
+          data-testid="lesson-course-link"
+        >
           {courseTitle || STRINGS_DE.learn}
         </Link>
         {isTest && <Badge tone="info">{STRINGS_DE.testBadge}</Badge>}

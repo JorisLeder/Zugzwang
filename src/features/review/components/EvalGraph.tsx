@@ -100,7 +100,7 @@ export function EvalGraph({ analysis, moves, ply, onSelectPly, notation }: EvalG
         </svg>
       </div>
       <details id={tableId} className="text-body-sm text-muted">
-        <summary className="cursor-pointer select-none py-1 hover:text-text">{STRINGS_DE.graphTable}</summary>
+        <summary className="cursor-pointer select-none py-1 hover:text-text pointer-coarse:py-3">{STRINGS_DE.graphTable}</summary>
         <div className="max-h-64 overflow-y-auto">
           <table className="mt-2 w-full border-collapse text-left tabular-nums">
             <caption className="sr-only">{STRINGS_DE.graphTableCaption}</caption>

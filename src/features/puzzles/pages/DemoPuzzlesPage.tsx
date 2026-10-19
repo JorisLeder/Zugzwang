@@ -34,12 +34,15 @@ export function Component() {
       puzzle={puzzle}
       mode="demo"
       modeTitle={STRINGS_DE.puzzlesDemo}
-      backTo={paths.puzzlesDemo()}
+      backTo={paths.puzzles()}
       headerMeta={<Badge tone="neutral" data-testid="demo-progress">{STRINGS_DE.demoProgress(index + 1)}</Badge>}
       notice={
         <>
           {STRINGS_DE.demoNotice}{' '}
-          <Link to={paths.login()} className="font-medium text-accent-text underline-offset-4 hover:underline">
+          <Link
+            to={paths.login()}
+            className="font-medium text-accent-text underline-offset-4 hover:underline pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:items-center"
+          >
             {STRINGS_DE.demoCta}
           </Link>
         </>

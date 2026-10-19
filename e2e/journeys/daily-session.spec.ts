@@ -27,7 +27,6 @@ async function minutesToday(page: Page): Promise<number> {
 }
 
 test.describe('Kern-Ablauf 2: Tägliche Einheit', () => {
-
   test('start page → 10 rated puzzles → continue the lesson → daily goal reached', async ({ page }) => {
     test.setTimeout(240_000);
     await page.clock.install({ time: DAY_1 });
