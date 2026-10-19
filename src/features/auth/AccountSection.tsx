@@ -23,10 +23,13 @@ export function AccountSection() {
   const cloud = data.auth.mode === 'cloud';
   const source = useMemo(() => data.auth.observe(), [data]);
   const session = useSubscribable(source, data.auth.session());
-  const [busy, setBusy] = useState<'export' | 'delete' | 'signout' | null>(null);
+  const [busy, setBusy] = useState<'export' | 'delete' | 'signout' | 'sync' | null>(null);
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmText, setConfirmText] = useState('');
+  const [signOutOpen, setSignOutOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [syncError, setSyncError] = useState(false);
 
   async function exportData() {
     setBusy('export');
@@ -45,10 +48,42 @@ export function AccountSection() {
     setBusy('signout');
     try {
       await data.auth.signOut();
+      setSignOutOpen(false);
       navigate(paths.login(), { replace: true });
     } finally {
       setBusy(null);
     }
+  }
+
+  /** Unsynced progress would be lost if another account logs in on this device: ask first. */
+  function requestSignOut() {
+    const pending = data.sync.state().pending;
+    if (pending > 0) {
+      setPendingCount(pending);
+      setSyncError(false);
+      setSignOutOpen(true);
+    } else {
+      void signOut();
+    }
+  }
+
+  /** "Erst synchronisieren": flush; sign out only if nothing is left, otherwise stay and say so. */
+  async function syncThenSignOut() {
+    setBusy('sync');
+    setSyncError(false);
+    try {
+      await data.sync.flush();
+    } catch {
+      // The state below tells whether anything is left.
+    }
+    const left = data.sync.state().pending;
+    setBusy(null);
+    if (left > 0) {
+      setPendingCount(left);
+      setSyncError(true);
+      return;
+    }
+    await signOut();
   }
 
   async function deleteAll() {
@@ -83,11 +118,35 @@ export function AccountSection() {
       </div>
       {cloud && (
         <div>
-          <Button variant="secondary" icon={<LogOut />} loading={busy === 'signout'} disabled={busy !== null} onClick={() => void signOut()}>
+          <Button variant="secondary" icon={<LogOut />} loading={busy === 'signout'} disabled={busy !== null} onClick={requestSignOut}>
             {A.signOut}
           </Button>
         </div>
       )}
+      <Dialog open={signOutOpen} onOpenChange={setSignOutOpen}>
+        {signOutOpen && (
+          <DialogContent title={A.signOutPendingTitle} description={A.signOutPendingBody(pendingCount)}>
+            {syncError && (
+              <p role="alert" className="text-body-sm text-danger-text">
+                {A.syncFailed}
+              </p>
+            )}
+            <div className="flex flex-wrap justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="ghost" disabled={busy !== null}>
+                  {A.cancel}
+                </Button>
+              </DialogClose>
+              <Button variant="secondary" loading={busy === 'sync'} disabled={busy !== null} onClick={() => void syncThenSignOut()}>
+                {busy === 'sync' ? A.syncing : A.syncFirst}
+              </Button>
+              <Button variant="danger" loading={busy === 'signout'} disabled={busy !== null} onClick={() => void signOut()}>
+                {A.signOutAnyway}
+              </Button>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
       <Dialog
         open={confirmOpen}
         onOpenChange={(open) => {

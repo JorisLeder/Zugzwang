@@ -125,7 +125,7 @@ describe('SupabaseSyncAdapter', () => {
 
   describe('permanent failure of a multi-row group (DS-2)', () => {
     const baseGame = {
-      source: 'bot' as const,
+      source: 'bot' as 'bot' | 'pgn' | 'lichess',
       externalId: null as string | null,
       botId: 'b',
       userColor: 'w' as const,
@@ -156,8 +156,8 @@ describe('SupabaseSyncAdapter', () => {
     }
 
     it('only the offending entry fails, the others are stored, game_moves of G are then accepted', async () => {
-      const { server, user, adapter } = await seedServerGame({ source: 'lichess' as never, externalId: 'abc' });
-      const L1 = game('L1', { source: 'lichess' as never, externalId: 'abc' });
+      const { server, user, adapter } = await seedServerGame({ source: 'lichess' as const, externalId: 'abc' });
+      const L1 = game('L1', { source: 'lichess' as const, externalId: 'abc' });
       const L2 = game('L2');
       const G = game('G');
       const res = await adapter.push([outbox.game(L1, 'x', AT), outbox.game(L2, 'x', AT), outbox.game(G, 'x', AT)]);

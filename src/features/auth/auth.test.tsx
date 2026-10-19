@@ -198,11 +198,54 @@ describe('AccountSection', () => {
     expect(device.data.auth.session()).toBeNull();
   });
 
-  it('cloud mode: sign-out returns to the login page', async () => {
+  it('cloud mode: sign-out returns to the login page (nothing pending: no question)', async () => {
     const user = userEvent.setup();
-    const { services } = await cloudServices({ email: 'lea@example.com' });
+    const { services, device } = await cloudServices({ email: 'lea@example.com' });
+    await device.data.settled();
+    expect(device.data.sync.state().pending).toBe(0);
     const router = renderApp(services, '/settings');
     await user.click(await screen.findByRole('button', { name: 'Abmelden' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/login'));
+    expect(services.data.auth.session()).toBeNull();
+  });
+
+  it('DS-3: with unsynced entries the sign-out asks first; "Trotzdem abmelden" signs out, cancel keeps the session', async () => {
+    const user = userEvent.setup();
+    const { services, device } = await cloudServices({ email: 'lea@example.com' });
+    const router = renderApp(services, '/settings');
+    const state = vi.spyOn(device.data.sync, 'state').mockReturnValue({ mode: 'cloud', online: false, pending: 2, status: 'offline' });
+    const flush = vi.spyOn(device.data.sync, 'flush').mockResolvedValue();
+    await user.click(await screen.findByRole('button', { name: 'Abmelden' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nicht alles ist synchronisiert' });
+    expect(dialog).toHaveTextContent('2 Änderungen wurden noch nicht übertragen');
+    expect(services.data.auth.session()).not.toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Abbrechen' }));
+    await waitFor(() => expect(dialog).not.toBeInTheDocument());
+    expect(services.data.auth.session()).not.toBeNull();
+
+    // "Erst synchronisieren": the flush leaves entries behind → stay, show the hint.
+    await user.click(screen.getByRole('button', { name: 'Abmelden' }));
+    await user.click(await screen.findByRole('button', { name: 'Erst synchronisieren' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Das Synchronisieren hat nicht geklappt');
+    expect(flush).toHaveBeenCalled();
+    expect(services.data.auth.session()).not.toBeNull();
+
+    // Once the flush empties the outbox, the sign-out follows.
+    state.mockReturnValue({ mode: 'cloud', online: true, pending: 0, status: 'synced' });
+    await user.click(screen.getByRole('button', { name: 'Erst synchronisieren' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/login'));
+    expect(services.data.auth.session()).toBeNull();
+  });
+
+  it('DS-3: "Trotzdem abmelden" signs out without syncing', async () => {
+    const user = userEvent.setup();
+    const { services, device } = await cloudServices({ email: 'lea@example.com' });
+    const router = renderApp(services, '/settings');
+    vi.spyOn(device.data.sync, 'state').mockReturnValue({ mode: 'cloud', online: false, pending: 1, status: 'offline' });
+    await user.click(await screen.findByRole('button', { name: 'Abmelden' }));
+    expect(await screen.findByRole('dialog', { name: 'Nicht alles ist synchronisiert' })).toHaveTextContent('1 Änderung wurde noch nicht übertragen');
+    await user.click(screen.getByRole('button', { name: 'Trotzdem abmelden' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'));
     expect(services.data.auth.session()).toBeNull();
   });

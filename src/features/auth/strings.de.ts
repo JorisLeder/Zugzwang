@@ -42,6 +42,13 @@ export const STRINGS_DE = {
     exportDone: 'Export heruntergeladen',
     exportFailed: 'Der Export hat nicht geklappt. Versuch es nochmal.',
     signOut: 'Abmelden',
+    signOutPendingTitle: 'Nicht alles ist synchronisiert',
+    signOutPendingBody: (n: number) =>
+      `${n === 1 ? '1 Änderung wurde' : `${n} Änderungen wurden`} noch nicht übertragen. Meldest du dich jetzt ab und danach meldet sich ein anderes Konto auf diesem Gerät an, geht dieser Fortschritt verloren.`,
+    syncFirst: 'Erst synchronisieren',
+    syncing: 'Synchronisiere …',
+    signOutAnyway: 'Trotzdem abmelden',
+    syncFailed: 'Das Synchronisieren hat nicht geklappt. Prüfe deine Verbindung und versuch es nochmal.',
     deleteLocal: 'Alle Daten löschen',
     deleteCloud: 'Konto löschen',
     deleteHintLocal: 'Löscht deinen gesamten Fortschritt auf diesem Gerät.',
