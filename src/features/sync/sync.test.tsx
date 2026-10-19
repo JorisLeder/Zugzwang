@@ -28,6 +28,7 @@ describe('SyncStatusIndicator', () => {
     [cloud('pending', { pending: 2 }), 'Speichern …'],
     [cloud('offline'), 'Offline'],
     [cloud('error', { pending: 1, error: '503' }), 'Nicht synchronisiert'],
+    [cloud('error', { deadLetterCount: 2 }), 'Teilweise nicht gespeichert'],
     [{ mode: 'local', online: true, pending: 0, status: 'local-only' } as SyncState, 'Lokal'],
   ])('shows %o as "%s" (word + icon)', (state, label) => {
     const { services } = servicesWith(state);
@@ -109,5 +110,19 @@ describe('SyncBanners', () => {
     // A new failure waits again.
     act(() => store.set(cloud('error', { pending: 1 })));
     expect(screen.queryByText(/Nicht synchronisiert/)).not.toBeInTheDocument();
+  });
+
+  it('DS-2: rejected entries show a banner without retry and never "Gespeichert"', () => {
+    vi.useFakeTimers();
+    const { services } = servicesWith(cloud('error', { deadLetterCount: 1 }));
+    render(
+      <ServicesProvider services={services}>
+        <SyncBanners />
+      </ServicesProvider>,
+    );
+    act(() => vi.advanceTimersByTime(ERROR_BANNER_DELAY_MS + 100));
+    expect(screen.getByText(/Ein Teil deiner Änderungen hat der Server abgelehnt/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Jetzt erneut versuchen' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Gespeichert/)).not.toBeInTheDocument();
   });
 });

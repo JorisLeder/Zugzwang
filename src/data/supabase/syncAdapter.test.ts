@@ -122,4 +122,87 @@ describe('SupabaseSyncAdapter', () => {
     expect(res.every((r) => r.ok)).toBe(true);
     expect(server.rows('games', user.id)).toMatchObject([{ id: 'g1', status: 'finished', user_id: user.id }]);
   });
+
+  describe('permanent failure of a multi-row group (DS-2)', () => {
+    const baseGame = {
+      source: 'bot' as const,
+      externalId: null as string | null,
+      botId: 'b',
+      userColor: 'w' as const,
+      assistance: 'training' as const,
+      timeControl: { kind: 'none' as const },
+      startFen: 'x',
+      pgn: '',
+      headers: {},
+      status: 'active' as const,
+      result: '*' as const,
+      endReason: null,
+      origin: { type: 'new' as const },
+      activeDeviceId: null,
+      activeHeartbeatAt: null,
+      ratingBefore: null,
+      ratingAfter: null,
+      createdAt: AT,
+      updatedAt: AT,
+      finishedAt: null,
+    };
+    const game = (id: string, over: Partial<typeof baseGame> = {}) => ({ ...baseGame, id, ...over });
+
+    async function seedServerGame(over: Partial<typeof baseGame>) {
+      const ctx = setup();
+      // The server already holds a game with the same (source, external id) under another id.
+      await ctx.adapter.push([outbox.game(game('server-copy', over), 'x', AT)]);
+      return ctx;
+    }
+
+    it('only the offending entry fails, the others are stored, game_moves of G are then accepted', async () => {
+      const { server, user, adapter } = await seedServerGame({ source: 'lichess' as never, externalId: 'abc' });
+      const L1 = game('L1', { source: 'lichess' as never, externalId: 'abc' });
+      const L2 = game('L2');
+      const G = game('G');
+      const res = await adapter.push([outbox.game(L1, 'x', AT), outbox.game(L2, 'x', AT), outbox.game(G, 'x', AT)]);
+      expect(res.map((r) => [r.ok, r.retryable])).toEqual([
+        [false, false],
+        [true, undefined],
+        [true, undefined],
+      ]);
+      expect(res[0]!.error).toContain('games_user_source_external_id_key');
+      expect(server.rows('games', user.id).map((r) => r.id).sort()).toEqual(['G', 'L2', 'server-copy']);
+
+      const move = outbox.gameMove({ id: 'm1', gameId: 'G', seq: 1, kind: 'move', ply: 1, uci: 'e2e4', san: 'e4', createdAt: AT } as never, user.id, AT);
+      expect(await adapter.push([move])).toEqual([{ id: move.id, ok: true }]);
+      expect(server.rows('game_moves', user.id)).toHaveLength(1);
+    });
+
+    it('does not split a group after a retryable failure', async () => {
+      const { server, adapter } = setup();
+      server.failNext({ count: 1, status: 503, match: (r) => r.target === 'games' });
+      const res = await adapter.push([outbox.game(game('A'), 'x', AT), outbox.game(game('B'), 'x', AT)]);
+      expect(res.map((r) => [r.ok, r.retryable])).toEqual([
+        [false, true],
+        [false, true],
+      ]);
+      expect(server.log.filter((l) => l.target === 'games' && l.kind === 'upsert')).toHaveLength(1);
+    });
+
+    it('an imported PGN game that already exists on the server (other id) counts as a duplicate', async () => {
+      const { server, user, adapter } = await seedServerGame({ source: 'pgn', externalId: 'hash1' });
+      const res = await adapter.push([outbox.game(game('L1', { source: 'pgn', externalId: 'hash1' }), 'x', AT), outbox.game(game('L2'), 'x', AT)]);
+      expect(res).toEqual([
+        { id: expect.any(String), ok: true, duplicate: true },
+        { id: expect.any(String), ok: true },
+      ]);
+      expect(server.rows('games', user.id).map((r) => r.id).sort()).toEqual(['L2', 'server-copy']);
+    });
+
+    it('keeps "Duplicate seq" semantics of game_moves (permanent, reported per entry)', async () => {
+      const { user, adapter } = setup();
+      await adapter.push([outbox.game(game('G'), 'x', AT)]);
+      const mv = (seq: number, san: string) => outbox.gameMove({ id: `m${seq}-${san}`, gameId: 'G', seq, kind: 'move', ply: seq, uci: 'e2e4', san, createdAt: AT } as never, user.id, AT);
+      expect((await adapter.push([mv(1, 'e4')]))[0]).toMatchObject({ ok: true });
+      const res = await adapter.push([mv(1, 'e4-again'), mv(2, 'e5')]);
+      expect(res.map((r) => r.ok)).toEqual([false, true]);
+      expect(res[0]).toMatchObject({ retryable: false });
+    });
+  });
 });

@@ -8,6 +8,13 @@
  * - Profile: plain upsert in one request; the server's `updated_at` guard (trigger) keeps the newer values – settings
  *   by `settings.updatedAt`, the other fields by `updated_at` (same rule as `mergeProfile`).
  * - Other tables: upsert by primary key (rows for the same key in one batch are collapsed first).
+ * - A multi-row request that fails permanently (a constraint violation rejects the whole statement) is re-pushed
+ *   key by key, so only the offending entry reports the failure and the others succeed. Retryable failures are not
+ *   split (the whole group is retried later).
+ * - A `games` row whose `(user_id, source, external_id)` already exists on the server under another id (the same PGN
+ *   imported on two devices; unique constraint `games_user_source_external_id_key`) is reported as `duplicate`. The
+ *   adapter cannot adopt the server id (the local game and its outbox entries are keyed by the local id), so the next
+ *   pull delivers the server row; the local copy stays as it is.
  * - Consecutive entries of the same table/op are pushed in one request, in outbox order. A retryable failure
  *   (network, 5xx, 401, 408, 429) stops the push so later rows (e.g. moves of a new game) never overtake earlier ones.
  */
@@ -44,6 +51,14 @@ function fromResponse(entries: readonly OutboxEntry[], res: SbResponse<unknown>)
   return failure(entries, res.error.message || 'Speichern fehlgeschlagen', isRetryableStatus(res.status));
 }
 
+const GAMES_EXTERNAL_ID_CONSTRAINT = 'games_user_source_external_id_key';
+
+/** Unique violation of the imported-game identity (same PGN already stored under another game id). */
+function isExternalIdConflict(res: SbResponse<unknown>, rows: readonly Row[]): boolean {
+  const e = res.error;
+  return !!e && (e.code === '23505' || res.status === 409) && e.message.includes(GAMES_EXTERNAL_ID_CONSTRAINT) && rows.every((r) => r.source === 'pgn');
+}
+
 /** Groups consecutive entries with the same table and op (RPC entries are pushed one by one). */
 export function groupEntries(entries: readonly OutboxEntry[]): OutboxEntry[][] {
   const groups: OutboxEntry[][] = [];
@@ -59,7 +74,38 @@ export function groupEntries(entries: readonly OutboxEntry[]): OutboxEntry[][] {
 export function createSupabaseSyncAdapter(opts: SupabaseSyncAdapterOptions): DataSyncAdapter {
   const pageSize = opts.pageSize ?? 1000;
 
+  /** Pushes a group; a permanent failure of a multi-row request is isolated by re-pushing the rows key by key. */
   async function pushGroup(group: OutboxEntry[], uid: string): Promise<PushResult[]> {
+    const results = await pushRequest(group, uid);
+    if (group.length < 2 || group[0]!.op === 'rpc' || results.every((r) => r.ok || r.retryable !== false)) return results;
+    const table = group[0]!.table;
+    if (!isUserTable(table)) return results;
+    // Rows with the same key stay together (they are merged into one statement row).
+    const byKey = new Map<string, OutboxEntry[]>();
+    for (const e of group) {
+      const k = rowKey(table, withOwner(table, e.payload as Row, uid));
+      byKey.set(k, [...(byKey.get(k) ?? []), e]);
+    }
+    if (byKey.size < 2) return results;
+    const split = new Map<string, PushResult>();
+    for (const part of byKey.values()) {
+      let res: PushResult[];
+      try {
+        res = await pushRequest(part, uid);
+      } catch (e) {
+        res = failure(part, e instanceof Error ? e.message : String(e), true);
+      }
+      for (const r of res) split.set(r.id, r);
+      // A retryable failure in between: stop isolating, the rest is retried later (order is kept).
+      if (res.some((r) => !r.ok && r.retryable !== false)) {
+        for (const e of group) if (!split.has(e.id)) split.set(e.id, { id: e.id, ok: false, retryable: true, error: res.find((r) => !r.ok)?.error });
+        break;
+      }
+    }
+    return group.map((e) => split.get(e.id)!);
+  }
+
+  async function pushRequest(group: OutboxEntry[], uid: string): Promise<PushResult[]> {
     const client = await opts.client();
     const first = group[0]!;
     const table = first.table;
@@ -118,7 +164,11 @@ export function createSupabaseSyncAdapter(opts: SupabaseSyncAdapterOptions): Dat
         byKey.set(k, r);
       }
     }
-    const res = await client.from(table).upsert([...byKey.values()], { onConflict: pk.join(',') });
+    const upsertRows = [...byKey.values()];
+    const res = await client.from(table).upsert(upsertRows, { onConflict: pk.join(',') });
+    if (table === 'games' && upsertRows.length === 1 && isExternalIdConflict(res, upsertRows)) {
+      return group.map((e) => ({ id: e.id, ok: true, duplicate: true }));
+    }
     return fromResponse(group, res) ?? group.map((e) => ({ id: e.id, ok: true }));
   }
 

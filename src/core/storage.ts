@@ -245,6 +245,8 @@ export interface SyncState {
   /** Outbox entries not yet confirmed. */
   pending: number;
   status: 'local-only' | 'synced' | 'pending' | 'offline' | 'error';
+  /** Entries the server rejected permanently (dead letters; present only when > 0). Status is then at least `error`. */
+  deadLetterCount?: number;
   lastSyncedAt?: string;
   error?: string;
 }

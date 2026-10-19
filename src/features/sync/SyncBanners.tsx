@@ -8,7 +8,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { useServices } from '@/app/services';
 import { Banner } from '@/ui/primitives/Banner';
 import { Button } from '@/ui/primitives/Button';
-import { SYNC_DE } from './strings.de';
+import { onlyDeadLetters, SYNC_DE } from './strings.de';
 import { dismissLocalBanner, localBannerDismissed, useSyncState } from './useSyncState';
 
 /** The help dialog loads on demand (keeps the dialog primitives off the start-up path). */
@@ -60,7 +60,8 @@ export function SyncBanners() {
             {SYNC_DE.localBanner}
           </Banner>
         )}
-        {showError && (
+        {showError && onlyDeadLetters(state) && <Banner tone="warning">{SYNC_DE.deadLetterBanner}</Banner>}
+        {showError && !onlyDeadLetters(state) && (
           <Banner
             tone="warning"
             action={

@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
 import { newId } from '@/lib/ids';
-import { EXPORT_FORMAT } from './account';
+import { EXPORT_FORMAT, wipeUserData } from './account';
 import { USER_DATA_TABLES } from './db';
 import { createDexieDataServices, type DexieDataServices } from './services';
 import { createFakeDevice, FakeSupabaseServer, waitFor, type FakeDevice } from './testing';
@@ -86,6 +86,21 @@ describe('AccountService – local mode', () => {
     expect(fresh!.id).not.toBe(firstId);
     expect(data.auth.session()?.userId).toBe(fresh!.id);
     expect(await data.repos.puzzles.count()).toBe(1); // static puzzle bank stays
+  });
+});
+
+describe('AccountService – dead letters (DS-5)', () => {
+  it('exports dead letters and removes them with the user data', async () => {
+    const data = createDexieDataServices({ mode: 'local', dbName: `acc-${newId()}`, timeZone: 'Europe/Berlin', deviceId: 'd' });
+    open.push(data);
+    await data.ready();
+    const letter = { id: 'x', table: 'game_moves', op: 'insert', payload: {}, enqueuedAt: '2026-10-16T10:00:00.000Z', attempts: 5, lastError: 'fk', droppedAt: '2026-10-16T10:01:00.000Z' };
+    await data.db.setMeta('deadLetters', [letter]);
+    const json = JSON.parse(await (await data.account.exportData()).text());
+    expect(json.deadLetters).toEqual([letter]);
+    await wipeUserData(data.db);
+    expect(await data.db.getMeta('deadLetters')).toBeUndefined();
+    expect(JSON.parse(await (await data.account.exportData()).text()).deadLetters).toEqual([]);
   });
 });
 

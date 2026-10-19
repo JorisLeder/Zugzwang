@@ -136,6 +136,7 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
   const enabled = mode === 'cloud' && adapter.kind !== 'none';
 
   let pending = 0;
+  let deadLetterCount = 0;
   let failures = 0;
   let lastError: string | undefined;
   let lastSyncedAt: string | undefined;
@@ -157,8 +158,10 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
     else if (!isOnline) status = 'offline';
     else if (lastError && pending > 0) status = 'error';
     else if (pending > 0) status = 'pending';
+    else if (deadLetterCount > 0) status = 'error'; // entries the server rejected for good: never read as 'synced'
     else status = 'synced';
     const s: SyncState = { mode, online: isOnline, pending, status };
+    if (deadLetterCount > 0) s.deadLetterCount = deadLetterCount;
     if (lastSyncedAt) s.lastSyncedAt = lastSyncedAt;
     if (lastError && status === 'error') s.error = lastError;
     return s;
@@ -170,6 +173,7 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
     if (
       cur.status !== next.status ||
       cur.pending !== next.pending ||
+      cur.deadLetterCount !== next.deadLetterCount ||
       cur.online !== next.online ||
       cur.lastSyncedAt !== next.lastSyncedAt ||
       cur.error !== next.error
@@ -178,8 +182,19 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
     }
   }
 
+  async function readDeadLetterCount(): Promise<number> {
+    const letters = (await db.meta.get(META.deadLetters))?.value as DeadLetter[] | undefined;
+    return letters?.length ?? 0;
+  }
+
   async function recount(): Promise<void> {
-    pending = await db.outbox.count();
+    try {
+      pending = await db.outbox.count();
+      deadLetterCount = await readDeadLetterCount();
+    } catch (e) {
+      if ((e as { name?: string } | null)?.name === 'DatabaseClosedError') return; // closed while counting
+      throw e;
+    }
     publish();
   }
 
@@ -347,9 +362,10 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
           }
         }),
       );
-      const sub = liveQuery(() => db.outbox.count()).subscribe({
-        next: (n) => {
+      const sub = liveQuery(async () => ({ n: await db.outbox.count(), dead: await readDeadLetterCount() })).subscribe({
+        next: ({ n, dead }) => {
           pending = n;
+          deadLetterCount = dead;
           publish();
         },
         error: (e: unknown) => {

@@ -10,7 +10,7 @@ import type { LessonProgress } from '@/core/lessons';
 import type { PuzzleAttempt } from '@/core/puzzles';
 import type { RatingRecord } from '@/core/rating';
 import type { SyncState } from '@/core/storage';
-import type { LessonProgressRow, ProfileRow, PuzzleAttemptRow, RatingRow } from '@/core/tables';
+import { toRow, type GameRow, type LessonProgressRow, type ProfileRow, type PuzzleAttemptRow, type RatingRow } from '@/core/tables';
 import { updateGlicko2 } from '@/lib/rating';
 import { createFakeDevice, FakeSupabaseServer, waitFor, type FakeDevice } from '../testing';
 
@@ -217,10 +217,36 @@ describe('P0-02 GWT 3 – failing saves', () => {
       rev: 0,
     });
     await a.data.progress.recordLessonProgress(lesson({ currentStep: 1 }));
-    await waitFor(() => a.data.sync.state().status === 'synced' && a.data.sync.state().pending === 0, 5000);
+    await waitFor(() => a.data.sync.state().deadLetterCount === 1 && a.data.sync.state().pending === 0, 5000);
     expect(server.rows('lesson_progress')).toHaveLength(1);
     const letters = (await a.data.db.getMeta<Array<{ id: string; attempts: number }>>('deadLetters')) ?? [];
     expect(letters).toMatchObject([{ id: 'orphan', attempts: 5 }]);
+    // DS-2: dead letters are never shown as "synced".
+    expect(a.data.sync.state()).toMatchObject({ status: 'error', pending: 0, deadLetterCount: 1 });
+  });
+
+  it('DS-2: one permanently rejected game of a group does not block the others; their moves are accepted', async () => {
+    const server = new FakeSupabaseServer();
+    const a = device(server, { email: EMAIL, sync: { backoffBaseMs: 5, backoffMaxMs: 20 } });
+    await a.data.ready();
+    await a.data.settled();
+    const uid = server.userByEmail(EMAIL)!.id;
+    // The server already stores this lichess game under another id (imported on another device).
+    server.upsert('games', uid, [toRow.game({ ...newGame(), id: 'server-copy', externalId: 'abc', source: 'lichess', createdAt: '2026-10-01T10:00:00.000Z', updatedAt: '2026-10-01T10:00:00.000Z' } as Game, uid) as never], {});
+    a.setOnline(false);
+    await waitFor(() => a.data.sync.state().status === 'offline');
+    const l1 = await a.data.progress.createGame({ ...newGame(), source: 'lichess', externalId: 'abc' });
+    const l2 = await a.data.progress.createGame(newGame());
+    const g = await a.data.progress.createGame(newGame());
+    await a.data.progress.appendGameEvent({ gameId: g.id, seq: 1, kind: 'move', ply: 1, uci: 'e2e4', san: 'e4' });
+    a.setOnline(true);
+    await waitFor(() => a.data.sync.state().deadLetterCount === 1 && a.data.sync.state().pending === 0, 5000);
+    expect(server.rows<GameRow>('games', uid).map((r) => r.id).sort()).toEqual([g.id, l2.id, 'server-copy'].sort());
+    expect(server.rows('game_moves', uid)).toHaveLength(1);
+    expect(a.data.sync.state()).toMatchObject({ status: 'error', deadLetterCount: 1 });
+    const letters = (await a.data.db.getMeta<Array<{ id: string; table: string }>>('deadLetters')) ?? [];
+    expect(letters).toMatchObject([{ table: 'games' }]);
+    expect(l1.id).not.toBe(g.id);
   });
 });
 

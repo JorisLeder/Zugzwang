@@ -9,7 +9,7 @@ import type { SyncState } from '@/core/storage';
 import { cn } from '@/lib/cn';
 import { Dialog } from '@/ui/primitives/Dialog';
 import { Tooltip } from '@/ui/primitives/Tooltip';
-import { SYNC_DE, SYNC_STATUS_DE } from './strings.de';
+import { SYNC_DE, syncStatusText } from './strings.de';
 import { SyncHelpDialogContent } from './SyncHelpDialog';
 import { useSyncState } from './useSyncState';
 
@@ -39,7 +39,7 @@ const TONES: Record<SyncState['status'], string> = {
 export function SyncStatusIndicator({ compact = false }: SyncStatusIndicatorProps) {
   const state = useSyncState();
   const [open, setOpen] = useState(false);
-  const status = SYNC_STATUS_DE[state.status];
+  const status = syncStatusText(state);
   const Icon = ICONS[state.status];
   return (
     <Dialog open={open} onOpenChange={setOpen}>

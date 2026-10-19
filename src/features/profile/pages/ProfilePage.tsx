@@ -10,7 +10,7 @@ import { useServices } from '@/app/services';
 import { DAILY_GOAL_OPTIONS, SELF_ASSESSMENT_OPTIONS, type Profile } from '@/core/profile';
 import type { RatingRecord } from '@/core/rating';
 import { AccountSection } from '@/features/auth/AccountSection';
-import { SYNC_STATUS_DE } from '@/features/sync/strings.de';
+import { syncStatusText } from '@/features/sync/strings.de';
 import { useSyncState } from '@/features/sync/useSyncState';
 import { formatNumber } from '@/i18n';
 import { Page } from '@/ui/layout';
@@ -230,7 +230,7 @@ function SyncCard() {
   const { data } = useServices();
   const sync = useSyncState();
   const cloud = data.auth.mode === 'cloud';
-  const status = SYNC_STATUS_DE[sync.status];
+  const status = syncStatusText(sync);
   const Icon = cloud ? Cloud : HardDrive;
   return (
     <Card className="flex flex-col gap-3" data-testid="profile-sync" data-mode={data.auth.mode} data-status={sync.status}>

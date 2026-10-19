@@ -3,7 +3,7 @@
  * The shell loads this module (and the dialog primitives) only when the help is opened.
  */
 import { Dialog, DialogContent } from '@/ui/primitives/Dialog';
-import { SYNC_DE, SYNC_STATUS_DE } from './strings.de';
+import { SYNC_DE, syncStatusText } from './strings.de';
 import { useSyncState } from './useSyncState';
 
 /** The help as a controlled dialog (mount it when it opens). */
@@ -18,7 +18,7 @@ export function SyncHelpDialog({ onOpenChange }: { onOpenChange: (open: boolean)
 /** Content of the help dialog (render inside a `Dialog`). */
 export function SyncHelpDialogContent() {
   const state = useSyncState();
-  const status = SYNC_STATUS_DE[state.status];
+  const status = syncStatusText(state);
   const time = state.lastSyncedAt
     ? new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date(state.lastSyncedAt))
     : null;

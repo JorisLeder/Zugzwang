@@ -311,6 +311,7 @@ export class FakeSupabaseServer {
       throw new FakeServerError(400, 'ON CONFLICT DO UPDATE command cannot affect row a second time', '21000');
     }
     if (table === 'game_moves') this.checkGameMoves(uid, input);
+    if (table === 'games') this.checkGameExternalIds(input);
     const written: Row[] = [];
     for (const row of input) {
       const key = rowKey(table, row);
@@ -436,6 +437,22 @@ export class FakeSupabaseServer {
 
   private get<T extends object>(table: UserTableName, key: Row): T | undefined {
     return this.data.get(table)!.get(rowKey(table, key)) as T | undefined;
+  }
+
+  /** `games_user_source_external_id_key`: unique (user_id, source, external_id) for imported games. */
+  private checkGameExternalIds(rows: Row[]): void {
+    const seen = new Map<string, unknown>();
+    for (const r of rows) {
+      if (r.external_id == null) continue;
+      const k = `${String(r.user_id)}|${String(r.source)}|${String(r.external_id)}`;
+      const clash =
+        [...this.data.get('games')!.values()].some((g) => g.id !== r.id && `${String(g.user_id)}|${String(g.source)}|${String(g.external_id)}` === k) ||
+        (seen.has(k) && seen.get(k) !== r.id);
+      if (clash) {
+        throw new FakeServerError(409, 'duplicate key value violates unique constraint "games_user_source_external_id_key"', '23505');
+      }
+      seen.set(k, r.id);
+    }
   }
 
   private checkGameMoves(uid: string, rows: Row[]): void {

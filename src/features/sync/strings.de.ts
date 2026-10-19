@@ -19,6 +19,22 @@ export const SYNC_STATUS_DE: Record<SyncState['status'], { label: string; descri
   },
 };
 
+/** Status text when the server permanently rejected entries (no retry would help; everything else is saved). */
+export const SYNC_DEAD_LETTER_DE = {
+  label: 'Teilweise nicht gespeichert',
+  description: 'Der Server hat einen Teil deiner Änderungen abgelehnt, deshalb konnten sie nicht gespeichert werden. Alles andere ist gesichert.',
+};
+
+/** Whether the error status comes from rejected entries only (nothing is retried). */
+export function onlyDeadLetters(state: SyncState): boolean {
+  return state.status === 'error' && (state.deadLetterCount ?? 0) > 0 && state.pending === 0 && !state.error;
+}
+
+/** Label and description of the current sync state. */
+export function syncStatusText(state: SyncState): { label: string; description: string } {
+  return onlyDeadLetters(state) ? SYNC_DEAD_LETTER_DE : SYNC_STATUS_DE[state.status];
+}
+
 /** One section of the help dialog. */
 export interface HelpSection {
   title: string;
@@ -31,6 +47,7 @@ export const SYNC_DE = {
   pendingCount: (n: number) => (n === 1 ? '1 Änderung wartet auf die Übertragung.' : `${n} Änderungen warten auf die Übertragung.`),
   lastSynced: (time: string) => `Zuletzt synchronisiert um ${time} Uhr.`,
   localBanner: 'Lokaler Modus – Fortschritt nur auf diesem Gerät',
+  deadLetterBanner: 'Ein Teil deiner Änderungen hat der Server abgelehnt und konnte nicht gespeichert werden. Alles andere ist gesichert.',
   errorBanner: 'Nicht synchronisiert – es wird automatisch erneut versucht. Nichts geht verloren.',
   learnMore: 'Mehr erfahren',
   retryNow: 'Jetzt erneut versuchen',

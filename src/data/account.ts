@@ -18,13 +18,13 @@ export async function wipeUserData(db: ZugzwangDb): Promise<void> {
   const tables = USER_DATA_TABLES.map((t) => db[t]);
   await db.transaction('rw', [...tables, db.meta], async () => {
     await Promise.all(tables.map((t) => t.clear()));
-    await db.meta.bulkDelete([META.ownerId, META.ownerKind, META.lastPullAt, META.pendingRated]);
+    await db.meta.bulkDelete([META.ownerId, META.ownerKind, META.lastPullAt, META.pendingRated, META.deadLetters]);
   });
 }
 
 /** Reads all user data as a plain object (the export document). */
 export async function readExport(db: ZugzwangDb, mode: 'local' | 'cloud', at: string): Promise<Record<string, unknown>> {
-  return db.transaction('r', USER_DATA_TABLES.map((t) => db[t]), async () => ({
+  return db.transaction('r', [...USER_DATA_TABLES.map((t) => db[t]), db.meta], async () => ({
     ...EXPORT_FORMAT,
     exportedAt: at,
     mode,
@@ -39,6 +39,8 @@ export async function readExport(db: ZugzwangDb, mode: 'local' | 'cloud', at: st
     themeStats: await db.themeStats.toArray(),
     reviewQueue: await db.reviewQueue.toArray(),
     explanationFeedback: await db.explanationFeedback.toArray(),
+    /** Entries the server rejected permanently (kept for support). */
+    deadLetters: ((await db.meta.get(META.deadLetters))?.value as unknown[] | undefined) ?? [],
   }));
 }
 
