@@ -215,6 +215,10 @@ export class GameController {
   private gen = 0;
   private nextSeq = 1;
   private writes: Promise<void> = Promise.resolve();
+  /** Unsaved log writes in seq order (a write stays here until it succeeded; a failed one blocks all later ones). */
+  private pendingWrites: Array<{ seq: number; run: () => Promise<unknown> }> = [];
+  /** A write failed: moves, takebacks and the bot turn are blocked until `retry()` has saved every pending write. */
+  private writeFailed = false;
   private botAbort: AbortController | null = null;
   private evalAbort: AbortController | null = null;
   private threatAbort: AbortController | null = null;
@@ -462,6 +466,7 @@ export class GameController {
       v.phase === 'active' &&
       !v.readOnly &&
       !this.finishing &&
+      !this.writeFailed &&
       this.chess !== null &&
       !this.chess.status().isOver &&
       this.chess.turn() === v.userColor &&
@@ -475,7 +480,7 @@ export class GameController {
   /** Decides what happens in the current position (see the file header). */
   private continuePlay(): void {
     const v = this.get();
-    if (v.phase !== 'active' || v.readOnly || !this.chess || this.finishing) return;
+    if (v.phase !== 'active' || v.readOnly || !this.chess || this.finishing || this.writeFailed) return;
     const status = this.chess.status();
     this.refreshEval();
     if (status.isOver) {
@@ -563,10 +568,23 @@ export class GameController {
     }
   }
 
-  /** Retries after a bot error. */
+  /**
+   * Retries after a bot or save error. Pending log writes are re-sent first, in seq order; only when all of them are
+   * stored the error is cleared and play continues.
+   */
   retry(): void {
-    this.set({ actionError: null });
-    this.continuePlay();
+    if (this.pendingWrites.length === 0 && !this.writeFailed) {
+      this.set({ actionError: null });
+      this.continuePlay();
+      return;
+    }
+    this.writeFailed = false;
+    this.writes = this.writes.then(() => this.drainWrites());
+    void this.writes.then(() => {
+      if (this.disposed || this.writeFailed) return;
+      this.set({ actionError: null });
+      this.continuePlay();
+    });
   }
 
   // --------------------------------------------------------------------------------------------------- user moves
@@ -671,7 +689,7 @@ export class GameController {
   commitMove(move: MoveRecord): void {
     const chess = this.chess;
     const v = this.get();
-    if (!chess || v.phase !== 'active' || v.readOnly || chess.turn() !== v.userColor) return;
+    if (!chess || v.phase !== 'active' || v.readOnly || this.writeFailed || chess.turn() !== v.userColor) return;
     const fenBefore = chess.fen();
     const rec = chess.move(move.uci);
     if (!rec) return;
@@ -722,18 +740,41 @@ export class GameController {
   private persistMove(rec: MoveRecord): void {
     const seq = this.nextSeq++;
     const gameId = this.deps.gameId;
-    this.enqueue(() =>
-      this.s.data.progress
-        .appendGameEvent({ gameId, seq, kind: 'move', ply: rec.ply, uci: rec.uci, san: rec.san, fenAfter: rec.fenAfter })
-        .then(() => undefined),
+    this.enqueue(seq, () =>
+      this.s.data.progress.appendGameEvent({ gameId, seq, kind: 'move', ply: rec.ply, uci: rec.uci, san: rec.san, fenAfter: rec.fenAfter }),
     );
   }
 
-  private enqueue(write: () => Promise<void>): void {
-    this.writes = this.writes.then(write).catch((e: unknown) => {
-      console.error('GameController: save failed', e);
-      this.set({ actionError: STRINGS_DE.saveError });
-    });
+  /** Queues a log write. It stays pending (same seq, in order) until it was stored – a failure never drops it. */
+  private enqueue(seq: number, run: () => Promise<unknown>): void {
+    this.pendingWrites.push({ seq, run });
+    this.writes = this.writes.then(() => this.drainWrites());
+  }
+
+  /** Sends pending writes in seq order; stops at the first failure and blocks play (`writeFailed`). */
+  private async drainWrites(): Promise<void> {
+    while (!this.writeFailed && this.pendingWrites.length > 0) {
+      const next = this.pendingWrites[0]!;
+      try {
+        await next.run();
+      } catch (e) {
+        // The write may have reached the store although the answer got lost: that counts as success.
+        if (!(e instanceof Error && e.message.startsWith('Duplicate seq'))) {
+          console.error('GameController: save failed', e);
+          this.onWriteFailed();
+          return;
+        }
+      }
+      this.pendingWrites.shift();
+    }
+  }
+
+  private onWriteFailed(): void {
+    this.writeFailed = true;
+    this.gen++;
+    this.abortAll();
+    this.answer(false);
+    this.set({ botThinking: false, warning: null, confirm: null, ownClaim: null, actionError: STRINGS_DE.saveError });
   }
 
   /** Resolves when every queued write has finished (tests, before finishing). */
@@ -790,6 +831,7 @@ export class GameController {
       v.phase === 'active' &&
       !v.readOnly &&
       !this.finishing &&
+      !this.writeFailed &&
       v.warning === null &&
       v.confirm === null &&
       this.chess !== null &&
@@ -807,7 +849,7 @@ export class GameController {
     const seq = this.nextSeq++;
     const gameId = this.deps.gameId;
     const ply = this.chess.ply();
-    this.enqueue(() => this.s.data.progress.appendGameEvent({ gameId, seq, kind: 'takeback', plies, ply }).then(() => undefined));
+    this.enqueue(seq, () => this.s.data.progress.appendGameEvent({ gameId, seq, kind: 'takeback', plies, ply }));
     this.lastAssessment = null;
     this.set({ ...this.positionPatch(), botThinking: false, ownClaim: null, hint: NO_HINT, threat: null, praise: null, botChat: null, actionError: null });
     this.continuePlay();
@@ -859,6 +901,12 @@ export class GameController {
     const { result, reason } = status;
     const pgn = chess.pgn({ ...v.game.headers, Result: result });
     await this.writes;
+    if (this.writeFailed || this.pendingWrites.length > 0) {
+      // The stored log is behind: finishing would store a result for moves the log does not contain. `retry()` saves first.
+      this.finishing = false;
+      this.set({ actionError: STRINGS_DE.saveError });
+      return;
+    }
     try {
       const r = await this.s.data.progress.finishGame(v.game.id, result, reason, pgn);
       const event = endChatEvent(result, this.botColor);

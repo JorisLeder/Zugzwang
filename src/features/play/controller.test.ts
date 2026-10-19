@@ -155,6 +155,127 @@ describe('playing and persistence (P0-09)', () => {
   });
 });
 
+/** Makes `appendGameEvent` fail once for the given seq (the write is not stored), then work again. */
+function failOnce(data: MemoryDataServices, seq: number): { failures: () => number } {
+  const original = data.progress.appendGameEvent.bind(data.progress);
+  let failures = 0;
+  vi.spyOn(data.progress, 'appendGameEvent').mockImplementation(async (event) => {
+    if (event.seq === seq && failures === 0) {
+      failures++;
+      throw new Error('network down');
+    }
+    return original(event);
+  });
+  return { failures: () => failures };
+}
+
+describe('failed saves are kept and retried (RPB-1)', () => {
+  it('a failed move write blocks play, retry re-sends it with the same seq, the stored log has no gap', async () => {
+    const bot = new ScriptedBot({}, false, 40);
+    const { c, data, services, game } = await setup({ bot });
+    const f = failOnce(data, 1);
+    await play(c, 'e2e4');
+    await vi.waitFor(() => expect(c.get().actionError).not.toBeNull());
+    expect(f.failures()).toBe(1);
+    // Board stays on the error state: no bot reply, no accepted move.
+    await new Promise((r) => setTimeout(r, 80));
+    expect(c.get().botThinking).toBe(false);
+    expect(c.get().history).toHaveLength(1);
+    expect(await data.repos.gameMoves.list(game.id)).toEqual([]);
+    expect(await c.attemptMove({ from: 'd7', to: 'd5' })).toBe(false);
+    c.commitMove(ChessGame.fromFen(c.get().fen).move('d7d5')!);
+    expect(c.get().history).toHaveLength(1);
+
+    c.retry();
+    await vi.waitFor(() => expect(c.get().actionError).toBeNull());
+    await userTurn(c);
+    await c.flush();
+    const events = await data.repos.gameMoves.list(game.id);
+    expect(events.map((e) => e.seq)).toEqual([1, 2]);
+    expect(events[0]).toMatchObject({ kind: 'move', uci: 'e2e4' });
+    expect(c.get().history).toHaveLength(2);
+    const again = open(services, game.id);
+    await again.load();
+    expect(again.get().phase).toBe('active');
+    expect(again.get().history.map((m) => m.uci)).toEqual(c.get().history.map((m) => m.uci));
+  });
+
+  it('a failed bot-move write keeps the user from moving until retry succeeded; later writes wait in order', async () => {
+    const { c, data, game } = await setup();
+    const f = failOnce(data, 2);
+    await play(c, 'e2e4');
+    await vi.waitFor(() => expect(c.get().actionError).not.toBeNull());
+    expect(f.failures()).toBe(1);
+    expect(c.get().history).toHaveLength(2);
+    expect((await data.repos.gameMoves.list(game.id)).map((e) => e.seq)).toEqual([1]);
+    expect(c.canTakeback()).toBe(false);
+    expect(await play(c, 'd2d4')).toBe(false);
+    expect(c.get().history).toHaveLength(2);
+    c.retry();
+    await vi.waitFor(() => expect(c.get().actionError).toBeNull());
+    await c.flush();
+    expect((await data.repos.gameMoves.list(game.id)).map((e) => e.seq)).toEqual([1, 2]);
+    expect(await play(c, 'd2d4')).toBe(true);
+    await userTurn(c);
+    await c.flush();
+    expect((await data.repos.gameMoves.list(game.id)).map((e) => e.seq)).toEqual([1, 2, 3, 4]);
+  });
+
+  it('retry stays on the error while the store keeps failing; a Duplicate seq answer counts as saved', async () => {
+    const { c, data, game } = await setup();
+    const original = data.progress.appendGameEvent.bind(data.progress);
+    let mode: 'down' | 'lostAck' | 'ok' = 'down';
+    vi.spyOn(data.progress, 'appendGameEvent').mockImplementation(async (event) => {
+      if (mode === 'down') throw new Error('network down');
+      await original(event);
+      if (mode === 'lostAck' && event.seq === 1) {
+        mode = 'ok';
+        throw new Error(`Duplicate seq ${event.seq} for game ${event.gameId}`);
+      }
+      return undefined as never;
+    });
+    await play(c, 'e2e4');
+    await vi.waitFor(() => expect(c.get().actionError).not.toBeNull());
+    c.retry();
+    await c.flush();
+    expect(c.get().actionError).not.toBeNull();
+    expect(await data.repos.gameMoves.list(game.id)).toEqual([]);
+    mode = 'lostAck';
+    await original({ gameId: game.id, seq: 1, kind: 'move', ply: 1, uci: 'e2e4', san: 'e4', fenAfter: c.get().history[0]!.fenAfter });
+    c.retry();
+    await vi.waitFor(() => expect(c.get().actionError).toBeNull());
+    await userTurn(c);
+    await c.flush();
+    expect((await data.repos.gameMoves.list(game.id)).map((e) => e.seq)).toEqual([1, 2]);
+  });
+
+  it('a failed takeback write is kept: no gap, no move or second takeback before retry, reload sees the takeback', async () => {
+    const { c, data, services, game } = await setup({ assistance: 'training' });
+    await play(c, 'e2e4');
+    await userTurn(c);
+    await c.flush();
+    const f = failOnce(data, 3);
+    c.takeback();
+    await vi.waitFor(() => expect(c.get().actionError).not.toBeNull());
+    expect(f.failures()).toBe(1);
+    expect(c.get().history).toHaveLength(0);
+    expect((await data.repos.gameMoves.list(game.id)).map((e) => e.seq)).toEqual([1, 2]);
+    expect(await play(c, 'd2d4')).toBe(false);
+    expect(c.get().history).toHaveLength(0);
+    c.retry();
+    await vi.waitFor(() => expect(c.get().actionError).toBeNull());
+    await c.flush();
+    const events = await data.repos.gameMoves.list(game.id);
+    expect(events.map((e) => e.seq)).toEqual([1, 2, 3]);
+    expect(events[2]).toMatchObject({ kind: 'takeback', plies: 2, ply: 0 });
+    const again = open(services, game.id, { assistance: 'training' });
+    await again.load();
+    expect(again.get().phase).toBe('active');
+    expect(again.get().history).toHaveLength(0);
+    expect(await play(c, 'd2d4')).toBe(true);
+  });
+});
+
 describe('assistance levels (P0-08)', () => {
   it('Wettkampf: no takeback, no hints, no eval; the finished game updates the bot rating', async () => {
     // Fool's mate: the bot (White) plays f3 and g4, the user mates with Qh4#.
