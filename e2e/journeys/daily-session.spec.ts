@@ -27,8 +27,6 @@ async function minutesToday(page: Page): Promise<number> {
 }
 
 test.describe('Kern-Ablauf 2: Tägliche Einheit', () => {
-  // Desktop journey (1440×900); the phone runs of the journeys follow separately.
-  test.skip(({ isMobile }) => isMobile, 'desktop journey');
 
   test('start page → 10 rated puzzles → continue the lesson → daily goal reached', async ({ page }) => {
     test.setTimeout(240_000);

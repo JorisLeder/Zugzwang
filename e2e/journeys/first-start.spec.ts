@@ -10,8 +10,6 @@ import { expect, test } from '../support/fixtures';
 import { expectDashboard, nav, visible } from './helpers';
 
 test.describe('Kern-Ablauf 1: Erster Start', () => {
-  // Desktop journey (1440×900); the phone runs of the journeys follow separately.
-  test.skip(({ isMobile }) => isMobile, 'desktop journey');
 
   test('onboarding → dashboard with first course, fitting bot and start rating; every item leads on', async ({ page }) => {
     test.setTimeout(60_000);

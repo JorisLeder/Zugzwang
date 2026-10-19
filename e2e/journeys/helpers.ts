@@ -21,12 +21,22 @@ export function visible(locator: Locator): Locator {
   return locator.filter({ visible: true }).first();
 }
 
-/** Main navigation entries (sidebar from 1280 px). */
+/** Main navigation entries (sidebar from 768 px, bottom tab bar below). */
 export type NavArea = 'Start' | 'Puzzles' | 'Spielen' | 'Lernen' | 'Analyse' | 'Profil';
 
-/** Opens an area through the main navigation (client-side navigation, like a user). */
+/**
+ * Opens an area through the main navigation (client-side navigation, like a user). On a phone board screen the tab
+ * bar gives way to the action bar, so the "‹" back link of the top bar leads to the area hub with the tab bar first.
+ */
 export async function nav(page: Page, area: NavArea): Promise<void> {
-  await visible(page.getByRole('navigation', { name: 'Hauptnavigation' })).getByRole('link', { name: area, exact: true }).click();
+  const mainNav = page.getByRole('navigation', { name: 'Hauptnavigation' }).filter({ visible: true });
+  const back = page.locator('header a[aria-label^="Zurück"]').filter({ visible: true });
+  await expect(mainNav.or(back).first()).toBeVisible();
+  if ((await mainNav.count()) === 0) {
+    await back.first().click();
+    await expect(mainNav.first()).toBeVisible();
+  }
+  await mainNav.first().getByRole('link', { name: area, exact: true }).click();
 }
 
 /** Waits for the start page (dashboard). */

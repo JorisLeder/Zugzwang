@@ -185,8 +185,12 @@ export function GameScreen({ controller, view }: GameScreenProps) {
     </div>
   );
 
+  const levelBadge = <Badge tone={level === 'competition' ? 'neutral' : 'accent'}>{STRINGS_DE.levelChip(STRINGS_DE.levels[level])}</Badge>;
+
   const panel = (
     <div className="flex flex-col gap-3" data-testid="game-panel" data-coach-ready={view.coachReady ? 'true' : 'false'}>
+      {/* Phone/tablet: the desktop panel header (bot and help level) is hidden, so the level is shown here. */}
+      <div className="lg:hidden">{levelBadge}</div>
       <p role="status" data-testid="game-status" className="text-body text-text">
         {statusText}
         {helps && evalText && <span className="text-muted md:hidden"> · {STRINGS_DE.evalLabel(evalText)}</span>}
@@ -334,7 +338,7 @@ export function GameScreen({ controller, view }: GameScreenProps) {
               <p aria-hidden="true" className="truncate text-h3 text-text">
                 {bot.name} <span className="text-body text-muted tabular-nums">{bot.elo}</span>
               </p>
-              <Badge tone={level === 'competition' ? 'neutral' : 'accent'}>{STRINGS_DE.levelChip(STRINGS_DE.levels[level])}</Badge>
+              {levelBadge}
             </div>
             {menu}
           </div>

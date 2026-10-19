@@ -23,8 +23,6 @@ async function goToPly(page: Page, ply: number) {
 }
 
 test.describe('Kern-Ablauf 3: Bot-Partie', () => {
-  // Desktop journey (1440×900); the phone runs of the journeys follow separately.
-  test.skip(({ isMobile }) => isMobile, 'desktop journey');
 
   let engine: EngineService | undefined;
   test.afterEach(() => {
@@ -50,7 +48,7 @@ test.describe('Kern-Ablauf 3: Bot-Partie', () => {
     await setup.getByRole('button', { name: 'Partie starten' }).click();
     await expect(page).toHaveURL(/\/play\/game\/[0-9a-f-]+$/);
     await expect(board(page)).toBeVisible();
-    await expect(page.getByText(`Hilfe-Stufe: Training`).first()).toBeVisible();
+    await expect(visible(page.getByText(`Hilfe-Stufe: Training`))).toBeVisible();
     await expect(page.getByTestId('eval-bar').filter({ visible: true })).toHaveCount(1);
 
     // Play to the end.

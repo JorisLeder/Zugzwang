@@ -15,8 +15,6 @@ const FIRST = lessonContent(COURSE, 'brett-und-feldnamen');
 const SECOND = lessonContent(COURSE, 'turm-und-laeufer');
 
 test.describe('Kern-Ablauf 4: Lektion', () => {
-  // Desktop journey (1440×900); the phone runs of the journeys follow separately.
-  test.skip(({ isMobile }) => isMobile, 'desktop journey');
 
   test('Lernpfad → course → lesson step by step → exercise → stars → next lesson unlocked', async ({ page }) => {
     test.setTimeout(90_000);
