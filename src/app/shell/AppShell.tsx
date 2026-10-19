@@ -3,18 +3,21 @@
  * active board screens), offline banner slot, main content. Frozen (WP-00).
  */
 import { Settings as SettingsIcon } from 'lucide-react';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
 import { OfflineBanner } from '@/features/pwa/OfflineBanner';
-import { SyncStatusIndicator } from '@/features/sync/SyncStatusIndicator';
 import { cn } from '@/lib/cn';
 import { useSubscribable } from '@/lib/observable';
+import { useMediaQuery } from '@/ui/chess/useMediaQuery';
 import { ShellContext, type ShellControls } from '@/ui/layout/shellContext';
 import { NAV_AREAS, type NavArea } from '../navigation';
 import { paths } from '../paths';
 import { useServices } from '../services';
 import { APP_DE } from '../strings.de';
 import { BrandMark } from './BrandMark';
+
+/** Sidebar-only (≥ 768 px), with tooltip and help dialog: loaded on demand, off the phone start-up path. */
+const SyncStatusIndicator = lazy(() => import('@/features/sync/SyncStatusIndicator').then((m) => ({ default: m.SyncStatusIndicator })));
 
 function SkipLink() {
   return (
@@ -55,6 +58,7 @@ function SideNavItem({ area, active }: { area: NavArea; active: boolean }) {
 }
 
 function SideNav({ pathname }: { pathname: string }) {
+  const sidebarVisible = useMediaQuery('(min-width: 768px)');
   const settingsActive = pathname === paths.settings() || pathname.startsWith(`${paths.settings()}/`);
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-[var(--zz-sidebar-w)] flex-col border-r border-border bg-surface md:flex">
@@ -70,7 +74,11 @@ function SideNav({ pathname }: { pathname: string }) {
         </ul>
       </nav>
       <div className="flex flex-col gap-1 border-t border-border px-2 py-3">
-        <SyncStatusIndicator />
+        {sidebarVisible && (
+          <Suspense fallback={<div aria-hidden="true" className="min-h-11" />}>
+            <SyncStatusIndicator />
+          </Suspense>
+        )}
         <Link
           to={paths.settings()}
           aria-current={settingsActive ? 'page' : undefined}

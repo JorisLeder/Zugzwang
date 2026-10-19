@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { pwaOptions } from './pwa.config.ts';
+import { routePreload } from './scripts/vite/routePreload.ts';
 
 /** Directories other coders write to in parallel – never trigger reloads (D-22). */
 const WATCH_IGNORED = ['**/.build/**', '**/.cache/**', '**/test-results/**', '**/playwright-report/**', '**/coverage/**'];
@@ -33,11 +34,18 @@ const PREBUNDLED_DEPS = [
   'zustand',
 ];
 
+/**
+ * Modules without import-time side effects: the UI component libraries (`src/ui/*`) and barrel files (`index.ts`).
+ * Declaring them side-effect free lets the bundler drop the parts a page does not use – otherwise every page that
+ * imports `{ Button }` from `@/ui/primitives` also loads every other primitive and its Radix package.
+ */
+const SIDE_EFFECT_FREE = /\/src\/(?:ui\/.+\.tsx?|(?:.+\/)?index\.ts)$/;
+
 export default defineConfig(({ mode }) => {
   const e2e = mode === 'e2e';
   const e2ePort = process.env.E2E_PORT;
   return {
-    plugins: [react(), tailwindcss(), VitePWA(pwaOptions)],
+    plugins: [react(), tailwindcss(), VitePWA(pwaOptions), routePreload()],
     resolve: {
       alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
     },
@@ -52,6 +60,11 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       sourcemap: false,
+      rolldownOptions: {
+        treeshake: {
+          moduleSideEffects: (id: string, external: boolean) => (!external && SIDE_EFFECT_FREE.test(id) ? false : undefined),
+        },
+      },
     },
   };
 });

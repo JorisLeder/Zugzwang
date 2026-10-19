@@ -7,7 +7,6 @@
  * (e.g. `${gameId}:${ply}`) and concurrent requests for the same key share one call.
  */
 import type { ExplanationFacts, ExplanationService, ExplanationText } from '@/core/explain';
-import { requestLlmExplanation, LLM_TIMEOUT_MS } from './llm';
 import { explainRuleBased } from './ruleBased';
 import { plainText } from './segments';
 import { validateExplanationSegments } from './validate';
@@ -121,6 +120,8 @@ export class RuleAndLlmExplanationService implements ExplanationService {
     }
     if (!token && !this.opts.allowAnonymous) return null;
     const fetchFn = this.opts.fetchFn ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
+    // The LLM client (with its zod response schema) loads only when the LLM path is actually used.
+    const { requestLlmExplanation, LLM_TIMEOUT_MS } = await import('./llm');
     const outcome = await requestLlmExplanation(facts, {
       url,
       token,

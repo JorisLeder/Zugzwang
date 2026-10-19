@@ -1,7 +1,19 @@
-/** In-app help "Speichern und Synchronisieren": local vs cloud mode, what syncs, conflict rules, setup. */
-import { DialogContent } from '@/ui/primitives';
+/**
+ * In-app help "Speichern und Synchronisieren": local vs cloud mode, what syncs, conflict rules, setup.
+ * The shell loads this module (and the dialog primitives) only when the help is opened.
+ */
+import { Dialog, DialogContent } from '@/ui/primitives/Dialog';
 import { SYNC_DE, SYNC_STATUS_DE } from './strings.de';
 import { useSyncState } from './useSyncState';
+
+/** The help as a controlled dialog (mount it when it opens). */
+export function SyncHelpDialog({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+  return (
+    <Dialog open onOpenChange={onOpenChange}>
+      <SyncHelpDialogContent />
+    </Dialog>
+  );
+}
 
 /** Content of the help dialog (render inside a `Dialog`). */
 export function SyncHelpDialogContent() {

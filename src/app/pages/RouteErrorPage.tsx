@@ -1,6 +1,6 @@
 import { useRouteError } from 'react-router';
 import { Page } from '@/ui/layout/Page';
-import { ErrorState } from '@/ui/primitives';
+import { ErrorState } from '@/ui/primitives/States';
 import { APP_DE } from '../strings.de';
 
 /** Error element of the root route: never a blank screen (DESIGN §5.12). */

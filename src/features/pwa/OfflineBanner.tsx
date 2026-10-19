@@ -8,7 +8,8 @@
  */
 import { RefreshCw } from 'lucide-react';
 import { useEffect } from 'react';
-import { Banner, Button, OfflineIcon } from '@/ui/primitives';
+import { Banner, OfflineIcon } from '@/ui/primitives/Banner';
+import { Button } from '@/ui/primitives/Button';
 import { applyUpdate, dismissUpdate, startServiceWorker, useOnline, useUpdateState } from './pwaState';
 import { STRINGS_DE } from './strings.de';
 

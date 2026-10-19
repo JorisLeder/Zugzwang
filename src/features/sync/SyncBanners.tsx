@@ -4,12 +4,15 @@
  * - cloud mode: "Nicht synchronisiert" while saving keeps failing (after 3 s, so short hiccups stay silent).
  * The offline banner is the PWA package's. Hidden on board screens, whose layout fills the viewport.
  */
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useServices } from '@/app/services';
-import { Banner, Button, Dialog } from '@/ui/primitives';
+import { Banner } from '@/ui/primitives/Banner';
+import { Button } from '@/ui/primitives/Button';
 import { SYNC_DE } from './strings.de';
-import { SyncHelpDialogContent } from './SyncHelpDialog';
 import { dismissLocalBanner, localBannerDismissed, useSyncState } from './useSyncState';
+
+/** The help dialog loads on demand (keeps the dialog primitives off the start-up path). */
+const SyncHelpDialog = lazy(() => import('./SyncHelpDialog').then((m) => ({ default: m.SyncHelpDialog })));
 
 /** Delay before a persisting sync error is shown as a banner. */
 export const ERROR_BANNER_DELAY_MS = 3000;
@@ -43,7 +46,7 @@ export function SyncBanners() {
   );
 
   return (
-    <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+    <>
       <div className="[[data-board-screen]_&]:hidden" data-testid="sync-banners">
         {showLocal && (
           <Banner
@@ -70,7 +73,11 @@ export function SyncBanners() {
           </Banner>
         )}
       </div>
-      {helpOpen && <SyncHelpDialogContent />}
-    </Dialog>
+      {helpOpen && (
+        <Suspense fallback={null}>
+          <SyncHelpDialog onOpenChange={setHelpOpen} />
+        </Suspense>
+      )}
+    </>
   );
 }

@@ -15,9 +15,36 @@
         if (localStorage.getItem('zz-theme') === 'light') document.documentElement.dataset.theme = 'light';
       } catch (e) {}
     </script>
+    <style>
+      /* Start screen until the app's first render replaces #root (paints right after the HTML and CSS arrive). */
+      .zz-splash {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: var(--zz-text-muted);
+        font-size: 16px;
+        line-height: 24px;
+      }
+      .zz-splash svg {
+        width: 40px;
+        height: 40px;
+        color: var(--zz-accent);
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="zz-splash" role="status">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="1" y="1" width="30" height="30" rx="8" fill="currentColor" />
+          <path d="M9 9h14v3.2L13.6 20H23v3H9v-3.2L18.4 12H9z" fill="var(--zz-on-accent)" />
+        </svg>
+        <span>Wird geladen …</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

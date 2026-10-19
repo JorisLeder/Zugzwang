@@ -1,7 +1,8 @@
 import { SearchX } from 'lucide-react';
 import { Link } from 'react-router';
 import { Page } from '@/ui/layout/Page';
-import { Button, EmptyState } from '@/ui/primitives';
+import { Button } from '@/ui/primitives/Button';
+import { EmptyState } from '@/ui/primitives/States';
 import { paths } from '../paths';
 import { APP_DE } from '../strings.de';
 

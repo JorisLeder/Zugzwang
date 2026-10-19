@@ -1,4 +1,4 @@
-import { Spinner } from '@/ui/primitives';
+import { Spinner } from '@/ui/primitives/Spinner';
 import { APP_DE } from '../strings.de';
 
 /** Fallback while a lazy route loads. */

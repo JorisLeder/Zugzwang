@@ -7,7 +7,8 @@ import { CloudAlert, CloudCheck, CloudOff, HardDrive, RefreshCw } from 'lucide-r
 import { useState } from 'react';
 import type { SyncState } from '@/core/storage';
 import { cn } from '@/lib/cn';
-import { Dialog, Tooltip } from '@/ui/primitives';
+import { Dialog } from '@/ui/primitives/Dialog';
+import { Tooltip } from '@/ui/primitives/Tooltip';
 import { SYNC_DE, SYNC_STATUS_DE } from './strings.de';
 import { SyncHelpDialogContent } from './SyncHelpDialog';
 import { useSyncState } from './useSyncState';

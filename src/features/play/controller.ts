@@ -43,6 +43,8 @@ export const PRAISE_EVERY = 3;
 export const PRAISED: readonly MoveClassification[] = ['brilliant', 'great', 'best'];
 /** Eval bar search (Training/Coach) on the `play` engine. */
 export const EVAL_SEARCH = { depth: 12, movetimeMs: 400 } as const;
+/** `performance.measure` name of a bot answer without the artificial think time (PRD NFR: ≤ 1 s). */
+export const BOT_ANSWER_MEASURE = 'zz-bot-answer';
 /** Hint search on the `play` engine. */
 export const HINT_SEARCH = { depth: 14, movetimeMs: 800 } as const;
 
@@ -166,6 +168,24 @@ function initialView(): GameView {
 }
 
 const NO_HINT: GameView['hint'] = { stage: 0, move: null, loading: false, failed: false };
+
+function perfNow(): number | null {
+  try {
+    return performance.now();
+  } catch {
+    return null;
+  }
+}
+
+/** Records how long the bot needed for its move (from the request to the chosen move, without think time). */
+function measureBotAnswer(start: number | null): void {
+  if (start === null) return;
+  try {
+    performance.measure(BOT_ANSWER_MEASURE, { start, end: performance.now() });
+  } catch {
+    // no Performance API (or no User Timing L3)
+  }
+}
 
 function isAbort(e: unknown): boolean {
   return e instanceof Error && e.name === 'AbortError';
@@ -520,8 +540,10 @@ export class GameController {
     this.botAbort = ctrl;
     this.set({ botThinking: true, actionError: null });
     const t0 = Date.now();
+    const p0 = perfNow();
     try {
       const move = await this.s.bots.chooseMove({ bot, startFen: chess.startFen(), moves: chess.uciMoves(), signal: ctrl.signal });
+      measureBotAnswer(p0);
       const wait = move.thinkTimeMs - (Date.now() - t0);
       if (wait > 0) await sleep(wait, ctrl.signal);
       if (gen !== this.gen || ctrl.signal.aborted) return;

@@ -10,7 +10,7 @@ import { useServices } from '@/app/services';
 import type { AuthSession } from '@/core/storage';
 import { useSubscribable } from '@/lib/observable';
 import { SyncBanners } from '@/features/sync/SyncBanners';
-import { Spinner } from '@/ui/primitives';
+import { Spinner } from '@/ui/primitives/Spinner';
 import { rememberNextPath } from './session';
 import { STRINGS_DE } from './strings.de';
 

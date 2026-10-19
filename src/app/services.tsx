@@ -9,16 +9,58 @@
  */
 import { createContext, useCallback, useContext, useEffect, type ReactNode } from 'react';
 import { create } from 'zustand';
-import { createAnalysisService } from '@/analysis';
-import { BOT_ROSTER, createBotEngine } from '@/bots';
+import { BOT_ROSTER } from '@/bots/roster';
+import type { AnalysisService } from '@/core/analysis';
+import type { BotEngine } from '@/core/bots';
 import type { Settings } from '@/core/profile';
 import { DEFAULT_SETTINGS } from '@/core/profile';
 import type { AppConfig, AppServices } from '@/core/services';
 import { createDataServices } from '@/data';
 import { createEngineService } from '@/engine';
-import { createExplanationService } from '@/explain';
+import { createExplanationService } from '@/explain/create';
 
-/** Builds all services for a configuration. */
+/**
+ * Memoised loader of a lazily imported module. A failed import (e.g. offline before the chunk was cached) is not
+ * remembered, so the next call retries.
+ */
+export function lazyLoader<T>(load: () => Promise<T>): () => Promise<T> {
+  let pending: Promise<T> | null = null;
+  return () =>
+    (pending ??= load().catch((e: unknown) => {
+      pending = null;
+      throw e;
+    }));
+}
+
+/**
+ * `AnalysisService` whose implementation (motifs, classification, facts – and with them most of the rules layer)
+ * loads on first use, so it stays off the start-up path of every page.
+ */
+export function lazyAnalysisService(load: () => Promise<AnalysisService>): AnalysisService {
+  const get = lazyLoader(load);
+  return {
+    prepare: (fen) => {
+      get().then(
+        (s) => s.prepare(fen),
+        () => undefined, // best effort: the next real call reports the failure
+      );
+    },
+    analyseGame: async (input, opts) => (await get()).analyseGame(input, opts),
+    assessMove: async (fenBefore, move, opts) => (await get()).assessMove(fenBefore, move, opts),
+    findThreats: async (fen, opts) => (await get()).findThreats(fen, opts),
+  };
+}
+
+/** `BotEngine` whose implementation (models, repertoire, think time) loads with the first bot move. */
+export function lazyBotEngine(load: () => Promise<BotEngine>): BotEngine {
+  const get = lazyLoader(load);
+  return {
+    chooseMove: async (req) => (await get()).chooseMove(req),
+    shouldClaimDraw: async (fen, bot) => (await get()).shouldClaimDraw(fen, bot),
+  };
+}
+
+/** Builds all services for a configuration. Analysis and bots load lazily (Lighthouse mobile ≥ 85, PRD P0-16). */
 export function createAppServices(config: AppConfig): AppServices {
   const data = createDataServices(config);
   const engines = { play: createEngineService('play', config), analysis: createEngineService('analysis', config) };
@@ -26,8 +68,8 @@ export function createAppServices(config: AppConfig): AppServices {
     config,
     data,
     engines,
-    analysis: createAnalysisService(engines.analysis, config),
-    bots: createBotEngine(engines.play, config),
+    analysis: lazyAnalysisService(async () => (await import('@/analysis')).createAnalysisService(engines.analysis, config)),
+    bots: lazyBotEngine(async () => (await import('@/bots')).createBotEngine(engines.play, config)),
     botRoster: BOT_ROSTER,
     explain: createExplanationService(config, data),
   };

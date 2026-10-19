@@ -3,7 +3,7 @@
  * aufgehört hast", "Nächste Lektion", "Als Nächstes trainieren" and a fitting bot. Every area is one click away.
  * Redirects to `/onboarding` while the onboarding is not completed (first start).
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router';
 import { paths } from '@/app/paths';
 import { useServices } from '@/app/services';
@@ -44,21 +44,31 @@ export function Component() {
   const decision = onboardingDecision(profile, settled);
 
   if (decision === 'onboarding') return <Navigate to={paths.onboarding()} replace />;
-  if (decision === 'loading' || !profile) {
-    return (
-      <Page title={STRINGS_DE.home}>
-        <div className="flex items-center gap-3 text-muted" role="status">
-          <Spinner size={20} />
-          {STRINGS_DE.loading}
-        </div>
-      </Page>
-    );
-  }
+  if (decision === 'loading' || !profile) return <DashboardLoading />;
   return <Dashboard dailyGoalMinutes={profile.dailyGoalMinutes ?? DEFAULT_DAILY_GOAL_MINUTES} displayName={profile.displayName} />;
 }
 
+function DashboardLoading() {
+  return (
+    <Page title={STRINGS_DE.home}>
+      <div className="flex items-center gap-3 text-muted" role="status">
+        <Spinner size={20} />
+        {STRINGS_DE.loading}
+      </div>
+    </Page>
+  );
+}
+
+/** Longest wait for all start-page data before the page shows what it has (with skeletons for the rest). */
+const MAX_LOADING_MS = 2000;
+
 function Dashboard({ dailyGoalMinutes, displayName }: { dailyGoalMinutes: number; displayName: string }) {
   const { botRoster } = useServices();
+  const [waitedLong, setWaitedLong] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setWaitedLong(true), MAX_LOADING_MS);
+    return () => clearTimeout(t);
+  }, []);
   const today = useTodayKey();
   const todayActivity = useTodayActivity(today);
   const streak = useStreak(today, todayActivity);
@@ -99,6 +109,20 @@ function Dashboard({ dailyGoalMinutes, displayName }: { dailyGoalMinutes: number
   const name = displayName.trim();
   const subtitle = name && name !== 'Du' ? STRINGS_DE.greeting(name) : STRINGS_DE.subtitle;
   const minutes = todayActivity === undefined ? undefined : (todayActivity?.minutes ?? 0);
+
+  // All local reads settle within a few frames: show the page in one piece instead of skeletons that grow and push
+  // the cards below them down (layout shift, Lighthouse CLS). A slow part (e.g. the lesson catalog on a bad
+  // connection) holds the page back for at most MAX_LOADING_MS.
+  const loaded =
+    minutes !== undefined &&
+    streak !== undefined &&
+    puzzleRating !== undefined &&
+    botRating !== undefined &&
+    targets !== undefined &&
+    next !== undefined &&
+    bot !== undefined &&
+    rec !== undefined;
+  if (!loaded && !waitedLong) return <DashboardLoading />;
 
   return (
     <Page title={STRINGS_DE.home} subtitle={subtitle}>
