@@ -176,7 +176,7 @@ describe('human model selection (800–2000, D-16)', () => {
     it('a bot of 800–2000 Elo always plays mate in 1 over mate in 2/3 and a winning alternative', () => {
       const lines = [mate(1, 'a1a8', 1), mate(2, 'a1a7', 2), mate(3, 'a1b1', 3), line(4, 'a1a2', 900)];
       for (const elo of [800, 1200, 2000]) {
-        const params = humanParams(elo, 'balanced');
+        const params = humanParams(elo);
         const random = createSeededRandom(elo);
         for (let i = 0; i < 300; i++) expect(selectHumanMove(KRK_MATE, lines, params, random)!.uci).toBe('a1a8');
       }
@@ -190,6 +190,19 @@ describe('human model selection (800–2000, D-16)', () => {
       expect(loss('a1b1')).toBeGreaterThan(loss('a1a7'));
       expect(loss('a1a3')).toBeGreaterThan(loss('a1a2'));
       expect(loss('a1a2')).toBeGreaterThan(loss('a1b1'));
+    });
+
+    it('cp far beyond the ceiling (Stockfish KRK: +3000 … +9000) still ranks by cp difference', () => {
+      const natural = { recapture: 0, check: 0, capture: 0, development: 0, castle: 0 };
+      const s = selectHumanMove(KRK_MATE, [line(1, 'a1a2', 8749), line(2, 'a1a3', 8709), line(3, 'a1a4', 6750), line(4, 'a1a5', 1317)], { temperature: 0.07, sharpness: 3, natural }, () => 0)!;
+      const loss = (u: string) => s.candidates.find((c) => c.uci === u)!.loss;
+      expect(loss('a1a2')).toBe(0);
+      expect(loss('a1a3')).toBeLessThan(0.01);
+      expect(loss('a1a4')).toBeGreaterThan(0.15);
+      expect(loss('a1a5')).toBeGreaterThan(loss('a1a4'));
+      // A mate beats any cp score, however large.
+      const m = selectHumanMove(KRK_MATE, [line(1, 'a1a2', 9165), mate(2, 'a1a8', 12)], { temperature: 0.07, sharpness: 3, natural }, () => 0)!;
+      expect(m.candidates.find((c) => c.uci === 'a1a2')!.loss).toBeGreaterThan(0.01);
     });
 
     it('lines of +483..+497 cp still rank by cp (unchanged scale below 1000)', () => {

@@ -78,7 +78,26 @@ export function rankWinPercent(score: Score, mover: Color): number {
 }
 
 /**
- * Pure selection step: candidates from engine lines (scores White POV, D-08) → softmax pick.
+ * Stockfish reports cp far beyond the logistic's reach (KRK: +3000 … +9000 before it sees the mate). Beyond the ranking
+ * ceiling the cp difference counts linearly: 1000 cp = 0.1 expected points, cp capped at ±10000, a forced mate = +10500.
+ */
+const EXCESS_LOSS_PER_CP = 0.0001;
+const EXCESS_CP_CAP = 10_000;
+const MATE_EXCESS = 10_500;
+
+/** Part of a score beyond the ranking ceiling (signed, mover's view); 0 for all scores inside ±2000 cp. */
+function excessCp(score: Score, mover: Color): number {
+  const v = comparableScore(score, mover);
+  if (Math.abs(v) >= MATE_BASE - 1000) return v > 0 ? MATE_EXCESS : -MATE_EXCESS;
+  return Math.sign(v) * Math.max(0, Math.min(Math.abs(v), EXCESS_CP_CAP) - RANK_CP_CEILING);
+}
+
+/** Extra expected-points loss per additional move of a forced mate (so a bot homes in on the quickest mate, not any mate). */
+const MATE_STEP_LOSS = 0.03;
+/** Mate distances beyond this many extra moves do not cost more. */
+const MATE_STEP_CAP = 15;
+
+/** Pure selection step: candidates from engine lines (scores White POV, D-08) → softmax pick.
  * Lines without a move are ignored; illegal moves (stale lines) are skipped.
  */
 export function selectHumanMove(
@@ -93,21 +112,26 @@ export function selectHumanMove(
   const legal = new Map<Uci, LegalMove>(game.legalMoves().map((m) => [m.uci, m]));
   const seen = new Set<Uci>();
   const mateInOne = new Set<Uci>();
-  const raw: Array<{ uci: Uci; winPct: number; move: LegalMove }> = [];
+  const raw: Array<{ uci: Uci; winPct: number; move: LegalMove; mateIn: number | null; excess: number }> = [];
   for (const line of [...lines].sort((a, b) => a.multipv - b.multipv)) {
     const uci = line.pv[0];
     const move = uci ? legal.get(uci) : undefined;
     if (!uci || !move || seen.has(uci)) continue;
     seen.add(uci);
-    raw.push({ uci, winPct: rankWinPercent(line.score, mover), move });
-    if (line.score.type === 'mate' && comparableScore(line.score, mover) === MATE_BASE - 1) mateInOne.add(uci);
+    const value = comparableScore(line.score, mover);
+    const mateIn = line.score.type === 'mate' && value > 0 ? MATE_BASE - value : null;
+    raw.push({ uci, winPct: rankWinPercent(line.score, mover), move, mateIn, excess: excessCp(line.score, mover) });
+    if (mateIn === 1) mateInOne.add(uci);
   }
   if (raw.length === 0) return null;
   const bestWin = Math.max(...raw.map((c) => c.winPct));
+  const bestExcess = Math.max(...raw.map((c) => c.excess));
+  const bestMate = Math.min(...raw.map((c) => c.mateIn ?? Infinity));
   const t = Math.max(params.temperature, 1e-6);
   const candidates: HumanCandidate[] = raw.map((c) => {
     // A mate in 1 is always taken: every other candidate counts as fully lost against it.
-    const loss = mateInOne.size > 0 && !mateInOne.has(c.uci) ? 1 : Math.max(0, (bestWin - c.winPct) / 100);
+    const mateLoss = c.mateIn === null ? 0 : Math.min(c.mateIn - bestMate, MATE_STEP_CAP) * MATE_STEP_LOSS;
+    const loss = mateInOne.size > 0 && !mateInOne.has(c.uci) ? 1 : Math.max(0, (bestWin - c.winPct) / 100) + (bestExcess - c.excess) * EXCESS_LOSS_PER_CP + mateLoss;
     const traits = naturalTraits(fen, c.move, previous);
     const n = params.natural;
     const bonus =
