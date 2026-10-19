@@ -17,7 +17,7 @@ import type { LessonProgress } from '@/core/lessons';
 import type { Profile, Settings, ThemeStat } from '@/core/profile';
 import type { PuzzleAttempt, PuzzleMode } from '@/core/puzzles';
 import type { RatingKind, RatingRecord } from '@/core/rating';
-import { RATING_DEFAULTS } from '@/core/rating';
+import { MIN_PUZZLE_RATING, RATING_DEFAULTS } from '@/core/rating';
 import { updateGlicko2 } from '@/lib/rating';
 
 /** The fields of an attempt that decide rating and theme stats. */
@@ -67,7 +67,7 @@ export function ratePuzzleAttempt(
   const next = updateGlicko2(before, [
     { opponentRating: a.puzzleRating, opponentRd: puzzleRd || RATING_DEFAULTS.puzzleRd, score: puzzleScore(a) },
   ]);
-  return { ...before, ...next, gamesCount: before.gamesCount + 1, updatedAt: at, provisional };
+  return { ...before, ...next, rating: Math.max(MIN_PUZZLE_RATING, next.rating), gamesCount: before.gamesCount + 1, updatedAt: at, provisional };
 }
 
 /** Theme stats after one attempt (only the attempt's themes are returned). Empty for modes that do not count. */
@@ -109,7 +109,7 @@ export function rateBotGame(
   if (!isRatedBotGame(g, result)) return null;
   const elo = botOpponentElo(g)!;
   const next = updateGlicko2(before, [{ opponentRating: elo, opponentRd: RATING_DEFAULTS.botRd, score: gameScore(result, g.userColor!) }]);
-  return { ...before, ...next, gamesCount: before.gamesCount + 1, updatedAt: at, provisional };
+  return { ...before, ...next, rating: Math.max(MIN_PUZZLE_RATING, next.rating), gamesCount: before.gamesCount + 1, updatedAt: at, provisional };
 }
 
 const maxIso = (a: string, b: string) => (a >= b ? a : b);

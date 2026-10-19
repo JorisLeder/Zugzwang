@@ -9,12 +9,13 @@
  * - Profile upserts → `mergeProfile`; game upserts → `mergeGame`.
  */
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Game } from '@/core/games';
 import type { LessonProgress } from '@/core/lessons';
 import { DEFAULT_SETTINGS, type DailyActivity, type Profile, type ThemeStat } from '@/core/profile';
 import type { PuzzleAttempt, PuzzleMode, PuzzleThemeId } from '@/core/puzzles';
-import type { RatingKind, RatingRecord } from '@/core/rating';
+import { MIN_PUZZLE_RATING, type RatingKind, type RatingRecord } from '@/core/rating';
 import {
   fromRow,
   toRow,
@@ -162,6 +163,38 @@ describe('puzzle attempts: rating, theme stats and daily activity (10 generated 
     }
     expect(rated).toBeGreaterThan(50);
     expect(dates.has('2026-10-25')).toBe(true); // the DST day is covered
+  });
+});
+
+describe('rating floor (PR-2)', () => {
+  it('server floor equals MIN_PUZZLE_RATING and a beginner never drops below it', async () => {
+    const sql = readFileSync('supabase/migrations/20261019000000_rating_floor.sql', 'utf8');
+    expect(sql).toContain(`greatest(${MIN_PUZZLE_RATING}, nxt.rating)`);
+    const at = '2026-10-20T10:00:00.000Z';
+    const uid = await db.createUser();
+    const profile: Profile = {
+      id: uid, displayName: 'Neuling', settings: { ...DEFAULT_SETTINGS, updatedAt: at }, dailyGoalMinutes: 10, selfAssessment: 'beginner',
+      onboardingCompleted: true, stageZeroSkipped: false, createdAt: at, updatedAt: at,
+    };
+    let rating: RatingRecord = { ...defaultRating('puzzle', at), rating: 400, rd: 350 };
+    await db.asUser(uid, async (tx) => {
+      await upsert(tx, 'profiles', [toRow.profile(profile)], { onConflict: 'id' });
+      await upsert(tx, 'ratings', [toRow.rating(rating, uid)], { onConflict: 'user_id,kind', ignoreDuplicates: true });
+    });
+    for (let i = 0; i < 6; i += 1) {
+      const createdAt = new Date(Date.parse(at) + i * 60_000).toISOString();
+      const a: PuzzleAttempt = {
+        id: randomUUID(), puzzleId: `seed-${i}`, mode: 'rated', solved: false, firstTry: false, hintsUsed: 0, solutionShown: false,
+        timeMs: 5000, themes: [], puzzleRating: 150, ratingBefore: 1, ratingAfter: 2, createdAt,
+      };
+      const [row] = await db.asUser(uid, (tx) =>
+        upsert<PuzzleAttemptRow>(tx, 'puzzle_attempts', [toRow.puzzleAttempt(a, uid, 80)], { onConflict: 'id', ignoreDuplicates: true, returning: '*' }),
+      );
+      rating = ratePuzzleAttempt(rating, a, 80, createdAt);
+      expect(row!.rating_after).toBeGreaterThanOrEqual(MIN_PUZZLE_RATING);
+      expect(close(row!.rating_after, rating.rating)).toBe(true);
+    }
+    await expectRating(uid, 'puzzle', rating);
   });
 });
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Game } from '@/core/games';
 import type { LessonProgress } from '@/core/lessons';
 import { DEFAULT_SETTINGS, type Profile } from '@/core/profile';
+import { MIN_PUZZLE_RATING } from '@/core/rating';
 import { updateGlicko2 } from '@/lib/rating';
 import {
   addToDay,
@@ -49,6 +50,22 @@ describe('rating rules', () => {
     const next = ratePuzzleAttempt(before, { solved: true, hintsUsed: 0, solutionShown: false, puzzleRating: 700 }, 0, 't', true);
     const expected = updateGlicko2(before, [{ opponentRating: 700, opponentRd: 80, score: 1 }]);
     expect(next).toMatchObject({ rating: expected.rating, rd: expected.rd, gamesCount: 1, updatedAt: 't', provisional: true });
+  });
+
+  it('puzzle rating never falls below MIN_PUZZLE_RATING (beginner 400/RD 350 failing 6 easy puzzles)', () => {
+    let r = { ...defaultRating('puzzle', 'x'), rating: 400, rd: 350 };
+    for (let i = 0; i < 6; i += 1) {
+      r = ratePuzzleAttempt(r, { solved: false, hintsUsed: 0, solutionShown: false, puzzleRating: 150 }, 80, 't');
+      expect(r.rating).toBeGreaterThanOrEqual(MIN_PUZZLE_RATING);
+    }
+    const low = { ...defaultRating('puzzle', 'x'), rating: 105, rd: 350 };
+    expect(ratePuzzleAttempt(low, { solved: false, hintsUsed: 0, solutionShown: false, puzzleRating: 100 }, 80, 't').rating).toBe(MIN_PUZZLE_RATING);
+  });
+
+  it('bot rating uses the same floor', () => {
+    const g = { source: 'bot', assistance: 'competition', userColor: 'w', headers: { BlackElo: '100' } } as Pick<Game, 'source' | 'assistance' | 'userColor' | 'headers'>;
+    const before = { ...defaultRating('bot', 'x'), rating: 110, rd: 350 };
+    expect(rateBotGame(before, g, '0-1', 't')!.rating).toBe(MIN_PUZZLE_RATING);
   });
 
   it('bot rating: competition bot games only, opponent = bot Elo from the headers with RD 50', () => {

@@ -48,3 +48,6 @@ export const RATING_DEFAULTS = {
   puzzleRd: 80,
   botRd: 50,
 } as const;
+
+/** Lowest stored puzzle/bot rating (client and server floor; keeps beginners from sinking to absurd values). */
+export const MIN_PUZZLE_RATING = 100;
