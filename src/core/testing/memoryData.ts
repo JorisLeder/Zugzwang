@@ -230,6 +230,11 @@ export function createMemoryDataServices(opts: MemoryDataOptions = {}): MemoryDa
         for (const p of puzzles) db.puzzles.set(p.id, clone(p));
         changed();
       },
+      replaceAll: async (puzzles) => {
+        db.puzzles.clear();
+        for (const p of puzzles) db.puzzles.set(p.id, clone(p));
+        changed();
+      },
       bankVersion: async () => db.bankVersion,
       setBankVersion: async (v) => {
         db.bankVersion = v;

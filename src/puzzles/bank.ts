@@ -89,7 +89,9 @@ async function load(repo: PuzzleRepository, opts: LoadPuzzleBankOptions): Promis
   const chunks = await Promise.all(
     manifest.chunks.map(async (c) => parseChunk(await fetchJson(doFetch, bankUrl(baseUrl, c.file), opts.signal), c.file)),
   );
-  await repo.bulkUpsert(chunks.flat());
+  // All chunks of the new version are loaded: replace (not merge) so puzzles removed from the bank disappear. A failed
+  // chunk download throws above and leaves the old bank and its version untouched.
+  await repo.replaceAll(chunks.flat());
   await repo.setBankVersion(manifest.version);
   return { version: manifest.version, count: await repo.count(), updated: true, offline: false };
 }

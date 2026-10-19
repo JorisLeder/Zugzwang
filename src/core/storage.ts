@@ -49,6 +49,8 @@ export interface PuzzleRepository {
   query(q: PuzzleQuery): Promise<Puzzle[]>;
   count(q?: Omit<PuzzleQuery, 'limit'>): Promise<number>;
   bulkUpsert(p: Puzzle[]): Promise<void>;
+  /** Replaces the whole bank atomically (clear + insert in one transaction; attempts reference puzzles by id only and stay). */
+  replaceAll(p: Puzzle[]): Promise<void>;
   /** Manifest version of the loaded bank, `null` if none is loaded. */
   bankVersion(): Promise<string | null>;
   setBankVersion(v: string): Promise<void>;

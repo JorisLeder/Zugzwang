@@ -156,6 +156,18 @@ describe.each(IMPLS)('DataServices contract – $name', (impl) => {
     expect(await data.repos.puzzles.bankVersion()).toBe('v1');
   });
 
+  it('replaceAll swaps the whole bank and keeps attempts that reference removed puzzles', async () => {
+    const { data } = await impl.make({ puzzles: true });
+    await data.progress.recordPuzzleAttempt({
+      puzzleId: 'fixture-two-mates', mode: 'rated', solved: true, firstTry: true, hintsUsed: 0, solutionShown: false, timeMs: 1000, themes: [], puzzleRating: 500, puzzleRd: 80,
+    });
+    const keep = FIXTURE_PUZZLES.find((p) => p.id === 'fixture-knight-fork')!;
+    await data.repos.puzzles.replaceAll([keep]);
+    expect(await data.repos.puzzles.count()).toBe(1);
+    expect(await data.repos.puzzles.get('fixture-two-mates')).toBeNull();
+    expect((await data.repos.puzzleAttempts.list()).map((a) => a.puzzleId)).toEqual(['fixture-two-mates']);
+  });
+
   it('lesson progress: the furthest progress wins (D-13) and is observable', async () => {
     const { data } = await impl.make();
     const seen: number[] = [];

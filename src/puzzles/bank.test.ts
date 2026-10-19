@@ -49,6 +49,33 @@ describe('loadPuzzleBank', () => {
     expect(r).toMatchObject({ version: 'v2', count: 2, updated: true });
   });
 
+  it('replaces the bank on a version change: removed puzzles disappear (PR-4)', async () => {
+    const data = createMemoryDataServices();
+    const repo = data.repos.puzzles;
+    const net = fakeFetch({ '/data/puzzles/manifest.json': manifest('v1', ['a.json']), '/data/puzzles/a.json': [p1, p2] });
+    await loadPuzzleBank(repo, { fetch: net.fn });
+    expect(await repo.count()).toBe(2);
+    net.files['/data/puzzles/manifest.json'] = manifest('v2', ['a.json']);
+    net.files['/data/puzzles/a.json'] = [p1];
+    const r = await loadPuzzleBank(repo, { fetch: net.fn });
+    expect(r).toMatchObject({ version: 'v2', count: 1, updated: true });
+    expect(await repo.get(p2.id)).toBeNull();
+    expect(await repo.get(p1.id)).not.toBeNull();
+  });
+
+  it('a failed chunk download of a new version keeps the old bank and version', async () => {
+    const data = createMemoryDataServices();
+    const repo = data.repos.puzzles;
+    const net = fakeFetch({ '/data/puzzles/manifest.json': manifest('v1', ['a.json']), '/data/puzzles/a.json': [p1, p2] });
+    await loadPuzzleBank(repo, { fetch: net.fn });
+    net.files['/data/puzzles/manifest.json'] = manifest('v2', ['a.json', 'missing.json']);
+    net.files['/data/puzzles/a.json'] = [p1];
+    await expect(loadPuzzleBank(repo, { fetch: net.fn })).rejects.toBeInstanceOf(PuzzleBankError);
+    expect(await repo.bankVersion()).toBe('v1');
+    expect(await repo.count()).toBe(2);
+    expect(await repo.get(p2.id)).not.toBeNull();
+  });
+
   it('works offline with a stored bank and fails clearly without one', async () => {
     const data = createMemoryDataServices();
     const net = fakeFetch({ '/data/puzzles/manifest.json': manifest('v1', ['a.json']), '/data/puzzles/a.json': [p1] });

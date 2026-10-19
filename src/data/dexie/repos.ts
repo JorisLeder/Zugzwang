@@ -111,6 +111,13 @@ export function createRepositories(ctx: DataContext, random: () => number = Math
           await db.puzzles.bulkPut(puzzles.slice(i, i + PUZZLE_CHUNK));
         }
       },
+      replaceAll: (puzzles) =>
+        db.transaction('rw', db.puzzles, async () => {
+          await db.puzzles.clear();
+          for (let i = 0; i < puzzles.length; i += PUZZLE_CHUNK) {
+            await db.puzzles.bulkPut(puzzles.slice(i, i + PUZZLE_CHUNK));
+          }
+        }),
       bankVersion: async () => (await db.getMeta<string>(META.bankVersion)) ?? null,
       setBankVersion: (v) => db.setMeta(META.bankVersion, v),
     },
