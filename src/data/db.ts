@@ -47,6 +47,8 @@ export const META = {
   bankVersion: 'bankVersion',
   /** Last successful full pull (cloud mode). */
   lastPullAt: 'lastPullAt',
+  /** Rated puzzle shown but without an attempt yet (`{puzzleId, startedAt}`). */
+  pendingRated: 'pendingRated',
   /** Entries the backend rejected permanently (`DeadLetter[]`). */
   deadLetters: 'deadLetters',
 } as const;

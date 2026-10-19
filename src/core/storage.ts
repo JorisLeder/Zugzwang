@@ -152,6 +152,12 @@ export interface Repositories {
   explanationFeedback: ExplanationFeedbackRepository;
 }
 
+/** A rated puzzle that was shown but not finished (see `ProgressService.markRatedPuzzleShown`). */
+export interface PendingRatedPuzzle {
+  puzzleId: string;
+  startedAt: string;
+}
+
 /**
  * The only writer of progress (local transaction + outbox entry per write).
  * Rating rules (D-09, D-11): rated puzzle attempts update the puzzle rating (Glicko-2 vs puzzle rating/RD; any hint
@@ -166,6 +172,15 @@ export interface ProgressService {
   recordPuzzleAttempt(
     a: Omit<PuzzleAttempt, 'id' | 'createdAt' | 'ratingBefore' | 'ratingAfter'> & { puzzleRd: number },
   ): Promise<{ attempt: PuzzleAttempt; rating: RatingRecord | null }>;
+  /**
+   * Remembers that the rated puzzle `puzzleId` is on screen (marker `{puzzleId, startedAt}`), so leaving it without an
+   * attempt can be counted as failed on the next start. Idempotent; ignored if the puzzle already has a rated attempt.
+   */
+  markRatedPuzzleShown(puzzleId: string): Promise<void>;
+  /** The rated puzzle that was shown but has no attempt yet, `null` if none. */
+  pendingRatedPuzzle(): Promise<PendingRatedPuzzle | null>;
+  /** Removes the marker. (A rated attempt for the marked puzzle removes it by itself.) */
+  clearPendingRatedPuzzle(): Promise<void>;
   /** Furthest progress wins (max step, completed OR, max stars, D-13). Returns the merged progress. */
   recordLessonProgress(p: LessonProgress): Promise<LessonProgress>;
   /** Creates a game with a client UUID. */

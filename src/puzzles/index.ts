@@ -12,7 +12,7 @@
  * - Themes: `TRAINABLE_THEMES`, `listTrainingThemes`, `themeSuccessRate`, `motifTags`, `openingLabel`.
  * - Demo: `DEMO_PUZZLES` (5 fixed easy puzzles).
  */
-export { puzzleAttemptInput, type PuzzleAttemptInput } from './attempt';
+export { puzzleAttemptInput, settleAbandonedRatedPuzzle, type PuzzleAttemptInput } from './attempt';
 export {
   loadPuzzleBank,
   parseChunk,

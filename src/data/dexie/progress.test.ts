@@ -41,6 +41,24 @@ describe('Dexie ProgressService', () => {
     expect(kinds.filter((k) => k === 'puzzle_attempts:insert')).toHaveLength(30);
   });
 
+  it('rated puzzle marker lives in meta and is cleared by the attempt for that puzzle; floor keeps rating >= 100', async () => {
+    const d = createFakeDevice(new FakeSupabaseServer(), { email: 'lea@example.com', online: false });
+    devices.push(d);
+    await d.data.ready();
+    await d.data.progress.initializeFromSelfAssessment('beginner');
+    await d.data.progress.markRatedPuzzleShown('p1');
+    expect(await d.data.progress.pendingRatedPuzzle()).toMatchObject({ puzzleId: 'p1' });
+    expect((await d.data.db.meta.get('pendingRated'))?.value).toMatchObject({ puzzleId: 'p1' });
+    const failed = { mode: 'rated' as const, solved: false, firstTry: false, hintsUsed: 0 as const, solutionShown: false, timeMs: 1, themes: [], puzzleRating: 150, puzzleRd: 80 };
+    for (let i = 0; i < 8; i++) {
+      const r = await d.data.progress.recordPuzzleAttempt({ ...failed, puzzleId: i === 0 ? 'p1' : `q${i}` });
+      expect(r.rating!.rating).toBeGreaterThanOrEqual(100);
+      if (i === 0) expect(await d.data.progress.pendingRatedPuzzle()).toBeNull();
+    }
+    await d.data.progress.markRatedPuzzleShown('p1'); // already rated: no marker
+    expect(await d.data.progress.pendingRatedPuzzle()).toBeNull();
+  });
+
   it('appendGameEvent queues only the move (the game row was queued by createGame)', async () => {
     const server = new FakeSupabaseServer();
     const d = createFakeDevice(server, { email: 'lea@example.com', online: false });

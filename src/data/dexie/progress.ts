@@ -10,9 +10,10 @@ import { SELF_ASSESSMENT_OPTIONS } from '@/core/profile';
 import type { PuzzleAttempt } from '@/core/puzzles';
 import type { RatingKind, RatingRecord } from '@/core/rating';
 import { RATING_DEFAULTS } from '@/core/rating';
-import type { OutboxEntry, ProgressService } from '@/core/storage';
+import type { OutboxEntry, PendingRatedPuzzle, ProgressService } from '@/core/storage';
 import { newId } from '@/lib/ids';
 import { localDateKey } from '@/lib/time';
+import { META } from '../db';
 import { outbox } from '../outbox';
 import {
   addToDay,
@@ -90,7 +91,7 @@ export function createProgressService(ctx: DataContext): ProgressService & Progr
       const { puzzleRd, ...rest } = input;
       const attempt: PuzzleAttempt = { ...rest, id: newId(), createdAt: ctx.nowIso() };
       if (attempt.mode === 'demo') return { attempt, rating: null }; // demo attempts are not stored
-      const rating = await db.transaction('rw', [db.puzzleAttempts, db.ratings, db.themeStats, db.dailyActivity, db.profile, db.outbox], async () => {
+      const rating = await db.transaction('rw', [db.puzzleAttempts, db.ratings, db.themeStats, db.dailyActivity, db.profile, db.outbox, db.meta], async () => {
         // Strictly increasing timestamps keep the attempt order (rating history, server replay) unambiguous.
         const last = await db.puzzleAttempts.orderBy('createdAt').last();
         if (last && last.createdAt >= attempt.createdAt) attempt.createdAt = new Date(Date.parse(last.createdAt) + 1).toISOString();
@@ -109,12 +110,34 @@ export function createProgressService(ctx: DataContext): ProgressService & Progr
           if (updated.length) await db.themeStats.bulkPut(updated);
         }
         await db.puzzleAttempts.add(attempt);
+        if (attempt.mode === 'rated') {
+          const pending = await db.getMeta<PendingRatedPuzzle>(META.pendingRated);
+          if (pending?.puzzleId === attempt.puzzleId) await db.meta.delete(META.pendingRated);
+        }
         await bumpDaily({ puzzles: 1 });
         await enqueue(ctx, outbox.puzzleAttempt(attempt, ctx.userId(), puzzleRd || RATING_DEFAULTS.puzzleRd, attempt.createdAt));
         return next;
       });
       ctx.enqueued();
       return { attempt: { ...attempt }, rating };
+    },
+
+    async markRatedPuzzleShown(puzzleId) {
+      await db.transaction('rw', [db.puzzleAttempts, db.meta], async () => {
+        const pending = await db.getMeta<PendingRatedPuzzle>(META.pendingRated);
+        if (pending?.puzzleId === puzzleId) return;
+        const done = await db.puzzleAttempts.where('mode').equals('rated').filter((a) => a.puzzleId === puzzleId).count();
+        if (done > 0) return;
+        await db.setMeta(META.pendingRated, { puzzleId, startedAt: ctx.nowIso() } satisfies PendingRatedPuzzle);
+      });
+    },
+
+    async pendingRatedPuzzle() {
+      return (await db.getMeta<PendingRatedPuzzle>(META.pendingRated)) ?? null;
+    },
+
+    async clearPendingRatedPuzzle() {
+      await db.meta.delete(META.pendingRated);
     },
 
     async recordLessonProgress(p) {

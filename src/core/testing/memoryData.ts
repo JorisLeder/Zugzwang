@@ -16,10 +16,11 @@ import type { DailyActivity, Profile, ReviewQueueItem, Settings, ThemeStat } fro
 import { DEFAULT_DAILY_GOAL_MINUTES, DEFAULT_SETTINGS, SELF_ASSESSMENT_OPTIONS } from '../profile';
 import type { Puzzle, PuzzleAttempt, PuzzleQuery } from '../puzzles';
 import type { RatingKind, RatingRecord } from '../rating';
-import { RATING_DEFAULTS } from '../rating';
+import { MIN_PUZZLE_RATING, RATING_DEFAULTS } from '../rating';
 import type {
   DataServices,
   GameListQuery,
+  PendingRatedPuzzle,
   ProgressService,
   Repositories,
   Subscribable,
@@ -57,6 +58,7 @@ interface Db {
   ratings: Map<RatingKind, RatingRecord>;
   puzzles: Map<string, Puzzle>;
   bankVersion: string | null;
+  pendingRated: PendingRatedPuzzle | null;
   attempts: PuzzleAttempt[];
   games: Map<string, Game>;
   gameMoves: Map<string, GameMoveEvent[]>;
@@ -74,6 +76,7 @@ function emptyDb(): Db {
     ratings: new Map(),
     puzzles: new Map(),
     bankVersion: null,
+    pendingRated: null,
     attempts: [],
     games: new Map(),
     gameMoves: new Map(),
@@ -354,7 +357,7 @@ export function createMemoryDataServices(opts: MemoryDataOptions = {}): MemoryDa
         const next = updateGlicko2(before, [
           { opponentRating: attempt.puzzleRating, opponentRd: puzzleRd || RATING_DEFAULTS.puzzleRd, score: clean ? 1 : 0 },
         ]);
-        rating = { ...before, ...next, gamesCount: before.gamesCount + 1, updatedAt: attempt.createdAt, provisional: false };
+        rating = { ...before, ...next, rating: Math.max(MIN_PUZZLE_RATING, next.rating), gamesCount: before.gamesCount + 1, updatedAt: attempt.createdAt, provisional: false };
         db.ratings.set('puzzle', rating);
         attempt.ratingBefore = before.rating;
         attempt.ratingAfter = rating.rating;
@@ -367,9 +370,24 @@ export function createMemoryDataServices(opts: MemoryDataOptions = {}): MemoryDa
         }
       }
       db.attempts.push(clone(attempt));
+      if (attempt.mode === 'rated' && db.pendingRated?.puzzleId === attempt.puzzleId) db.pendingRated = null;
       bumpDaily({ puzzles: 1 });
       changed();
       return { attempt: clone(attempt), rating: clone(rating) };
+    },
+
+    async markRatedPuzzleShown(puzzleId) {
+      if (db.pendingRated?.puzzleId === puzzleId) return;
+      if (db.attempts.some((a) => a.mode === 'rated' && a.puzzleId === puzzleId)) return;
+      db.pendingRated = { puzzleId, startedAt: nowIso() };
+    },
+
+    async pendingRatedPuzzle() {
+      return db.pendingRated ? { ...db.pendingRated } : null;
+    },
+
+    async clearPendingRatedPuzzle() {
+      db.pendingRated = null;
     },
 
     async recordLessonProgress(p) {
@@ -428,7 +446,7 @@ export function createMemoryDataServices(opts: MemoryDataOptions = {}): MemoryDa
           const before = ratingOrDefault('bot');
           const score = result === '1/2-1/2' ? 0.5 : (result === '1-0') === (g.userColor === 'w') ? 1 : 0;
           const upd = updateGlicko2(before, [{ opponentRating: botElo, opponentRd: RATING_DEFAULTS.botRd, score }]);
-          rating = { ...before, ...upd, gamesCount: before.gamesCount + 1, updatedAt: ts, provisional: false };
+          rating = { ...before, ...upd, rating: Math.max(MIN_PUZZLE_RATING, upd.rating), gamesCount: before.gamesCount + 1, updatedAt: ts, provisional: false };
           db.ratings.set('bot', rating);
           next.ratingBefore = before.rating;
           next.ratingAfter = rating.rating;

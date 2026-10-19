@@ -10,7 +10,7 @@ import { useServices } from '@/app/services';
 import type { PuzzleAttempt } from '@/core/puzzles';
 import type { RatingRecord } from '@/core/rating';
 import { formatNumber } from '@/i18n';
-import { puzzleAttemptInput, selectNextRated, type PuzzleOutcome, type RatedSelection } from '@/puzzles';
+import { puzzleAttemptInput, selectNextRated, settleAbandonedRatedPuzzle, type PuzzleOutcome, type RatedSelection } from '@/puzzles';
 import { usePageTitle } from '@/ui/layout';
 import { Badge, Button, RatingDelta } from '@/ui/primitives';
 import { PuzzleEmpty, PuzzleError, PuzzleLoading } from '../components/PuzzlePageStates';
@@ -72,7 +72,11 @@ function RatedSession() {
 
   useEffect(() => {
     let alive = true;
-    select().then(
+    // A rated puzzle left without an attempt counts as failed (PR-1) before the next one is picked.
+    settleAbandonedRatedPuzzle(data)
+      .catch((e: unknown) => console.warn('Abandoned puzzle not settled', e))
+      .then(() => select())
+      .then(
       (sel) => alive && setCurrent(sel),
       (e: unknown) => {
         console.warn('Puzzle selection failed', e);
@@ -82,9 +86,15 @@ function RatedSession() {
     return () => {
       alive = false;
     };
-  }, [select]);
+  }, [select, data]);
 
   const puzzle = current?.kind === 'puzzle' ? current.puzzle : null;
+  const puzzleId = puzzle?.id;
+
+  // Marker for "shown but not finished" (cleared by the attempt itself).
+  useEffect(() => {
+    if (puzzleId) data.progress.markRatedPuzzleShown(puzzleId).catch((e: unknown) => console.warn('Rated marker not saved', e));
+  }, [data, puzzleId]);
 
   const onAttempt = useCallback(
     (outcome: PuzzleOutcome, timeMs: number) => {

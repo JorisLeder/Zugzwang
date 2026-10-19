@@ -18,7 +18,7 @@ export async function wipeUserData(db: ZugzwangDb): Promise<void> {
   const tables = USER_DATA_TABLES.map((t) => db[t]);
   await db.transaction('rw', [...tables, db.meta], async () => {
     await Promise.all(tables.map((t) => t.clear()));
-    await db.meta.bulkDelete([META.ownerId, META.ownerKind, META.lastPullAt]);
+    await db.meta.bulkDelete([META.ownerId, META.ownerKind, META.lastPullAt, META.pendingRated]);
   });
 }
 

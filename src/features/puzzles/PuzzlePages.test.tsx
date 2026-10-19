@@ -7,7 +7,7 @@ import { DEFAULT_SETTINGS, type SelfAssessment } from '@/core/profile';
 import type { Puzzle } from '@/core/puzzles';
 import { createFakeAppServices, createMemoryDataServices, FakeExplanationService, FIXTURE_PUZZLES, seededRandom, type MemoryDataServices } from '@/core/testing';
 import { ChessGame } from '@/lib/chess';
-import { DEMO_PUZZLES, puzzleStartFen } from '@/puzzles';
+import { DEMO_PUZZLES, puzzleStartFen, selectNextRated } from '@/puzzles';
 import { Component as DemoPage } from './pages/DemoPuzzlesPage';
 import { Component as HubPage } from './pages/PuzzlesHubPage';
 import { Component as LearningPage } from './pages/LearningPuzzlesPage';
@@ -316,6 +316,61 @@ describe('Lernmodus', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Gegen Bot ausspielen' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/play/position'));
     expect(new URLSearchParams(router.state.location.search).get('fen')).toBe(puzzleStartFen(p));
+  });
+});
+
+describe('Bewertete Puzzles: nicht beendetes Puzzle (PR-1)', () => {
+  it('counts a shown but abandoned puzzle as failed on the next start and never serves it rated again', async () => {
+    const [a, b] = [fixture('fixture-knight-fork'), fixture('fixture-two-mates')];
+    const first = await setup('/puzzles/rated', { puzzles: [a, b], assessment: 'club' });
+    await screen.findByTestId('puzzle-panel', undefined, WAIT);
+    const shownId = (await waitFor(async () => {
+      const m = await first.data.progress.pendingRatedPuzzle();
+      expect(m).not.toBeNull();
+      return m!.puzzleId;
+    }, WAIT)) as string;
+    expect(await first.data.repos.puzzleAttempts.list()).toHaveLength(0);
+    first.unmount(); // leave without finishing
+    const second = await setup('/puzzles/rated', { puzzles: [a, b], data: first.data });
+    await screen.findByTestId('puzzle-panel', undefined, WAIT);
+    const attempts = await second.data.repos.puzzleAttempts.list();
+    expect(attempts).toHaveLength(1);
+    expect(attempts[0]).toMatchObject({ mode: 'rated', puzzleId: shownId, solved: false, solutionShown: false });
+    expect(attempts[0]!.ratingAfter!).toBeLessThan(attempts[0]!.ratingBefore!);
+    const next = await selectNextRated(second.data.repos, (await second.data.repos.ratings.get('puzzle'))!.rating);
+    expect(next.kind === 'puzzle' && next.puzzle.id).not.toBe(shownId);
+    expect(await second.data.repos.puzzleAttempts.ratedPuzzleIds()).toContain(shownId);
+    // The new puzzle on screen is the other one and carries the new marker.
+    await waitFor(async () => expect((await second.data.progress.pendingRatedPuzzle())?.puzzleId).not.toBe(shownId), WAIT);
+  });
+
+  it('leaves no marker behind when the puzzle is finished normally and records nothing twice', async () => {
+    const p = fixture('fixture-knight-fork');
+    const first = await setup('/puzzles/rated', { puzzles: [p], assessment: 'club' });
+    await waitForTask(p);
+    expect(await first.data.progress.pendingRatedPuzzle()).toMatchObject({ puzzleId: p.id });
+    await solve(p);
+    await screen.findByTestId('rating-result', undefined, WAIT);
+    expect(await first.data.progress.pendingRatedPuzzle()).toBeNull();
+    first.unmount();
+    const second = await setup('/puzzles/rated', { puzzles: [p], data: first.data });
+    await waitFor(() => expect(screen.queryByTestId('puzzle-panel')).toBeNull(), WAIT); // nothing left to serve rated
+    expect(await second.data.repos.puzzleAttempts.list()).toHaveLength(1);
+  });
+
+  it('marker API: ignored for already rated puzzles, cleared by an attempt for it, kept for another puzzle', async () => {
+    const data = createMemoryDataServices({ puzzles: FIXTURE_PUZZLES });
+    await data.progress.initializeFromSelfAssessment('club');
+    await data.progress.markRatedPuzzleShown('x1');
+    await data.progress.markRatedPuzzleShown('x1');
+    expect(await data.progress.pendingRatedPuzzle()).toMatchObject({ puzzleId: 'x1' });
+    const base = { mode: 'rated' as const, solved: true, firstTry: true, hintsUsed: 0 as const, solutionShown: false, timeMs: 1, themes: [], puzzleRating: 800, puzzleRd: 80 };
+    await data.progress.recordPuzzleAttempt({ ...base, puzzleId: 'other' });
+    expect(await data.progress.pendingRatedPuzzle()).toMatchObject({ puzzleId: 'x1' });
+    await data.progress.recordPuzzleAttempt({ ...base, puzzleId: 'x1' });
+    expect(await data.progress.pendingRatedPuzzle()).toBeNull();
+    await data.progress.markRatedPuzzleShown('x1'); // already rated
+    expect(await data.progress.pendingRatedPuzzle()).toBeNull();
   });
 });
 
