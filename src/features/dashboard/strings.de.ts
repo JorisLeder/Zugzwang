@@ -34,6 +34,8 @@ export const STRINGS_DE = {
   resumeGameMeta: (plies: number) => (plies === 0 ? 'Noch kein Zug gespielt' : plies === 1 ? '1 Halbzug gespielt' : `${plies} Halbzüge gespielt`),
   resumeGameAction: 'Partie fortsetzen',
   resumeLessonAction: 'Lektion fortsetzen',
+  resumeTestRetryAction: 'Test wiederholen',
+  resumeTestRetryMeta: (course: string) => `${course} · noch nicht bestanden`,
   resumeLessonMeta: (course: string, step: number, total: number) => `${course} · Weiter bei Schritt ${step} von ${total}`,
   resumeLessonMetaShort: (course: string) => `${course} · angefangen`,
   resumePuzzlesAction: 'Weiter trainieren',

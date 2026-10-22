@@ -9,9 +9,8 @@ import { paths } from '@/app/paths';
 import { useServices } from '@/app/services';
 import { puzzleThemeById } from '@/core/puzzles';
 import { useLesson } from '@/features/lessons/useLessonData';
-import { canResume } from '@/lessons';
 import { Button, Card, CardMeta, CardTitle, EmptyState } from '@/ui/primitives';
-import type { ResumeTarget } from '../logic';
+import { lessonResumeKind, type ResumeTarget } from '../logic';
 import { STRINGS_DE } from '../strings.de';
 import { useGamePlies } from '../useDashboardData';
 
@@ -60,15 +59,18 @@ function GameView({ target, children }: { target: Extract<ResumeTarget, { kind: 
 function LessonView({ target, children }: { target: Extract<ResumeTarget, { kind: 'lesson' }>; children: (v: TargetView) => ReactNode }) {
   const loaded = useLesson(target.course.id, target.lessonId);
   const lesson = loaded.status === 'ready' && loaded.result.ok ? loaded.result.lesson : null;
-  const resumable = lesson && canResume(lesson, target.progress);
+  const kind = lesson ? lessonResumeKind(lesson, target.progress) : 'restart';
+  const retryTest = kind === 'retry_test';
   return children({
     icon: <GraduationCap />,
     title: lesson?.titleDe ?? target.course.titleDe,
     meta:
-      lesson && resumable
+      lesson && kind === 'resume'
         ? STRINGS_DE.resumeLessonMeta(target.course.titleDe, target.progress.currentStep + 1, lesson.steps.length)
-        : STRINGS_DE.resumeLessonMetaShort(target.course.titleDe),
-    action: STRINGS_DE.resumeLessonAction,
+        : retryTest
+          ? STRINGS_DE.resumeTestRetryMeta(target.course.titleDe)
+          : STRINGS_DE.resumeLessonMetaShort(target.course.titleDe),
+    action: retryTest ? STRINGS_DE.resumeTestRetryAction : STRINGS_DE.resumeLessonAction,
     to: paths.lesson(target.course.id, target.lessonId),
   });
 }

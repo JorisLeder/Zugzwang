@@ -3,7 +3,7 @@ import type { Game } from '@/core/games';
 import type { CourseMeta, LessonProgress } from '@/core/lessons';
 import type { Profile } from '@/core/profile';
 import type { PuzzleAttempt } from '@/core/puzzles';
-import { courseOfLesson, dailyGoalProgress, isLessonInProgress, lastPuzzleTarget, lastTrainedTheme, resumeTargets } from './logic';
+import { courseOfLesson, dailyGoalProgress, isLessonInProgress, lessonResumeKind, lastPuzzleTarget, lastTrainedTheme, resumeTargets } from './logic';
 import { onboardingDecision } from './useDashboardData';
 
 const COURSE: CourseMeta = {
@@ -79,6 +79,8 @@ describe('resume targets', () => {
     expect(isLessonInProgress(progress('l1', 0, 'x'))).toBe(false);
     expect(isLessonInProgress(progress('l1', 2, 'x'))).toBe(true);
     expect(isLessonInProgress(progress('l1', 2, 'x', true))).toBe(false);
+    // A mistake or hint on the first step counts as started (LC2-4, same rule as the lesson page).
+    expect(isLessonInProgress({ ...progress('l1', 0, 'x'), stepPenalty: 1 })).toBe(true);
   });
 
   it('resumes theme training with the theme shared by the latest run', () => {
@@ -92,6 +94,24 @@ describe('resume targets', () => {
     expect(lastPuzzleTarget([attempt('learning', [], '2026-01-01T00:00:00Z')])).toMatchObject({ mode: 'learning', themeId: null });
     expect(lastPuzzleTarget([attempt('daily', [], '2026-01-01T00:00:00Z')])).toMatchObject({ mode: 'hub' });
     expect(lastPuzzleTarget([])).toBeNull();
+  });
+});
+
+describe('failed course test on the dashboard (LC2-4)', () => {
+  const test3 = { version: 1, steps: [{}, {}, {}] } as unknown as Parameters<typeof lessonResumeKind>[0];
+
+  it('excludes a failed test (all steps done, not passed) from "in progress" once the lesson is known', () => {
+    const failed = { ...progress('t1', 3, 'x'), score: 0.5 };
+    expect(isLessonInProgress(failed, test3)).toBe(false);
+    expect(isLessonInProgress(progress('t1', 2, 'x'), test3)).toBe(true);
+    expect(isLessonInProgress({ ...progress('t1', 0, 'x'), stepPenalty: 2 }, test3)).toBe(true);
+    expect(isLessonInProgress(progress('t1', 1, 'x', true), test3)).toBe(false);
+  });
+
+  it('tells resume, retry of a failed test and restart after a content change apart', () => {
+    expect(lessonResumeKind(test3, progress('t1', 2, 'x'))).toBe('resume');
+    expect(lessonResumeKind(test3, { ...progress('t1', 3, 'x'), score: 0.5 })).toBe('retry_test');
+    expect(lessonResumeKind(test3, { ...progress('t1', 2, 'x'), lessonVersion: 0 })).toBe('restart');
   });
 });
 

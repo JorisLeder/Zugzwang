@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CourseMeta, Lesson, LessonProgress } from '@/core/lessons';
 import type { UnlockContext } from '@/lessons';
-import { courseStatus, lessonRowState, nextAfter, practicePuzzles, stageState, withProgress } from './logic';
+import { bestResult, courseStatus, lessonRowState, nextAfter, practicePuzzles, stageState, withProgress } from './logic';
 
 function course(id: string, stage: CourseMeta['stage'], lessonIds: string[], extra: Partial<CourseMeta> = {}): CourseMeta {
   return { id, stage, order: 1, version: 1, titleDe: id, descriptionDe: '', status: 'available', lessonIds, ...extra };
@@ -77,6 +77,14 @@ describe('lesson rows', () => {
     expect(lessonRowState(ctx([progress('r1', { completed: false, currentStep: 2, lessonVersion: 0 })]), RULES, 'r1', lesson('r1'))).toEqual({
       status: 'new',
     });
+    // A mistake or hint on the first step (currentStep 0, stepPenalty > 0) is in progress too (LC2-3), as in `canResume`.
+    expect(lessonRowState(ctx([progress('r1', { completed: false, currentStep: 0, stepPenalty: 1 })]), RULES, 'r1', lesson('r1'))).toEqual({
+      status: 'started',
+      step: 0,
+    });
+    expect(lessonRowState(ctx([progress('r1', { completed: false, currentStep: 0 })]), RULES, 'r1', lesson('r1'))).toEqual({ status: 'new' });
+    // A failed test (all steps done, not passed) is not in progress.
+    expect(lessonRowState(ctx([progress('r1', { completed: false, currentStep: 3 })]), RULES, 'r1', lesson('r1'))).toEqual({ status: 'new' });
     const all = ctx([progress('r1', { stars: 2 }), progress('r2'), progress('r-test', { score: 0.8 })]);
     expect(lessonRowState(all, RULES, 'r1', lesson('r1'))).toEqual({ status: 'completed', stars: 2 });
     expect(lessonRowState(all, RULES, 'r-test', lesson('r-test', 3, { kind: 'course_test' }))).toEqual({ status: 'completed', stars: 3, score: 0.8 });
@@ -96,6 +104,17 @@ describe('end screen', () => {
     expect(withProgress(base, progress('r2')).progress.get('r2')?.completed).toBe(true);
     expect(withProgress(base, progress('r1', { completed: false })).progress.get('r1')?.completed).toBe(true);
     expect(withProgress(base, null)).toBe(base);
+  });
+
+  it('bestResult keeps the completed run with the most stars (LC2-5)', () => {
+    const three = progress('r1', { stars: 3 });
+    const one = progress('r1', { stars: 1 });
+    expect(bestResult(null, null)).toBeNull();
+    expect(bestResult(null, one)).toBe(one);
+    expect(bestResult(three, null)).toBe(three);
+    expect(bestResult(three, one)).toBe(three);
+    expect(bestResult(one, three)).toBe(three);
+    expect(bestResult(progress('r1', { completed: false }), one)).toBe(one);
   });
 
   it('"Passende Puzzles": training of the first practice theme, or the theme list', () => {

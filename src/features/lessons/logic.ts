@@ -10,6 +10,7 @@ import {
   isCourseCompleted,
   isCourseOpen,
   isStageCompleted,
+  canResume,
   lessonAccess,
   nextInCourse,
   stageOpenReason,
@@ -55,10 +56,15 @@ export function lessonRowState(ctx: UnlockContext, course: CourseMeta, lessonId:
   if (!access.unlocked) return { status: 'locked', access };
   const saved = ctx.progress.get(lessonId);
   if (saved?.completed) return { status: 'completed', stars: saved.stars, ...(saved.score !== undefined ? { score: saved.score } : {}) };
-  if (saved && lesson && saved.lessonVersion === lesson.version && saved.currentStep > 0 && saved.currentStep < lesson.steps.length) {
-    return { status: 'started', step: saved.currentStep };
-  }
+  if (lesson && canResume(lesson, saved)) return { status: 'started', step: saved.currentStep };
   return { status: 'new' };
+}
+
+/** The better of two stored results for "Dein bestes Ergebnis" (completed beats open, then more stars). */
+export function bestResult(a: LessonProgress | null, b: LessonProgress | null): LessonProgress | null {
+  if (!a || !b) return a ?? b;
+  if (a.completed !== b.completed) return a.completed ? a : b;
+  return b.stars > a.stars ? b : a;
 }
 
 /** Progress map with one record replaced (the just-finished run, before the live map has caught up). */

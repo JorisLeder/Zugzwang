@@ -126,6 +126,26 @@ export function readLessonContent(rootDir: string, dir = LESSONS_DIR): LessonCon
   return content;
 }
 
+/** Share of quizzes whose correct option may be listed first before the validator warns. */
+export const MAX_FIRST_OPTION_SHARE = 0.6;
+
+/**
+ * Warns when most quizzes of a lesson list the correct option first. The player shuffles the options at render time
+ * (`quizOptionOrder`), so this is a content hygiene hint: the order in the file should not give the answer away
+ * where the file is read directly (editors, exports, other renderers).
+ */
+export function checkQuizOptionOrder(lesson: { steps: ReadonlyArray<{ type: string; options?: ReadonlyArray<{ correct: boolean }> }> }): ValidationIssue[] {
+  const quizzes = lesson.steps.filter((st) => st.type === 'quiz' && st.options);
+  if (quizzes.length === 0) return [];
+  const first = quizzes.filter((q) => q.options![0]?.correct).length;
+  if (first / quizzes.length <= MAX_FIRST_OPTION_SHARE) return [];
+  return [
+    {
+      message: `${first} von ${quizzes.length} Quiz-Schritten haben die richtige Antwort an erster Stelle (mehr als ${Math.round(MAX_FIRST_OPTION_SHARE * 100)} %). Die Oberfläche mischt die Antworten, ordne sie trotzdem gemischt an.`,
+    },
+  ];
+}
+
 /** Options of `validateLessonContent`. */
 export interface LessonValidationOptions {
   /** Check the P0-13 launch scope (on for the real content, off for unit-test fixtures). */
@@ -149,6 +169,7 @@ export async function validateLessonContent(content: LessonContent, ctx: Validat
     checked += lesson.steps.length;
     const stat = checkLessonStatic(lesson, course?.stage);
     add(stat, file);
+    add({ errors: [], warnings: checkQuizOptionOrder(lesson) }, file);
     if (ctx.quick) continue;
     const brokenSteps = new Set(stat.errors.map((e) => e.id).filter(Boolean));
     for (const step of lesson.steps) {

@@ -11,7 +11,7 @@
     {
       "id": "haengend",
       "type": "explanation",
-      "textDe": "Eine Figur „hängt“, wenn sie angegriffen und nicht gedeckt ist. Dann kann der Gegner sie einfach schlagen. Viele Partien unter Einsteigern werden so entschieden."
+      "textDe": "Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Sie „hängt“, wenn sie angegriffen und nicht gedeckt ist. Dann kann der Gegner sie einfach schlagen. Viele Partien unter Einsteigern werden so entschieden."
     },
     {
       "id": "pruefen",

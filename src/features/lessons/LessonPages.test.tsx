@@ -222,6 +222,17 @@ describe('Lektion', () => {
     await waitFor(async () => expect((await data.repos.lessonProgress.get('fixture-lesson'))!.stars).toBe(3));
   });
 
+  it('shows the best stars of earlier runs in the same visit after "Lektion wiederholen" (LC2-5)', async () => {
+    await setup(`/learn/${COURSE}/fixture-lesson`, { assessment: 'beginner' });
+    await walkFixtureLesson();
+    expect(screen.getByTestId('lesson-end')).toHaveAttribute('data-stars', '3');
+    expect(screen.queryByText(/Dein bestes Ergebnis/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Lektion wiederholen' }));
+    await walkFixtureLesson({ mistakes: true, hints: true });
+    expect(screen.getByTestId('lesson-end')).toHaveAttribute('data-stars', '1');
+    expect(screen.getByText('Dein bestes Ergebnis: 3 von 3 Sternen')).toBeInTheDocument();
+  });
+
   it('Ausspielen: missing the goal within maxMoves fails, counts a mistake and can be retried', async () => {
     const data = createMemoryDataServices({ timeZone: 'Europe/Berlin' });
     await data.progress.initializeFromSelfAssessment('beginner');

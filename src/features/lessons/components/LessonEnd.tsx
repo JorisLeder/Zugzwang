@@ -25,7 +25,7 @@ export interface LessonEndProps {
   result: LessonResult;
   /** Unlock context including this run's record. */
   ctx: UnlockContext;
-  /** Best stored result before this run (D-13: the best is kept). */
+  /** Best result so far, including earlier runs of this visit (D-13: the best is kept). */
   previous: LessonProgress | null;
   onRepeat: () => void;
   primaryRef?: Ref<HTMLAnchorElement & HTMLButtonElement>;

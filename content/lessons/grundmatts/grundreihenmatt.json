@@ -11,7 +11,7 @@
     {
       "id": "grundreihe",
       "type": "explanation",
-      "textDe": "Der schwarze König steht hinter seinen eigenen Bauern. Die Bauern schützen ihn, nehmen ihm aber auch die Fluchtfelder. Ein Schach auf der Grundreihe ist dann oft Matt.",
+      "textDe": "Die Grundreihe ist die Reihe, auf der die Figuren starten: Reihe 1 für Weiß, Reihe 8 für Schwarz. Der schwarze König steht hinter seinen eigenen Bauern. Die Bauern schützen ihn, nehmen ihm aber auch die Fluchtfelder. Ein Schach auf der Grundreihe ist dann oft Matt.",
       "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1",
       "orientation": "w",
       "arrows": [{ "from": "d1", "to": "d8", "kind": "hint" }],

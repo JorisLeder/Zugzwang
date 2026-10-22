@@ -84,7 +84,7 @@
     {
       "id": "koenig-schlaegt",
       "type": "find_move",
-      "promptDe": "Schlage mit dem König den ungedeckten Bauern.",
+      "promptDe": "Schlage mit dem König den Bauern. Keine schwarze Figur schützt ihn.",
       "fen": "4k3/8/8/4p3/4K3/8/8/8 w - - 0 1",
       "orientation": "w",
       "solution": [{ "move": "e4e5", "children": [] }],

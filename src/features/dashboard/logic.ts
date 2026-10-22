@@ -6,8 +6,9 @@
  * of the latest attempt. All available targets are returned in that order; the first one is the main action.
  */
 import type { Game } from '@/core/games';
-import type { CourseMeta, LessonProgress } from '@/core/lessons';
+import type { CourseMeta, Lesson, LessonProgress } from '@/core/lessons';
 import { PUZZLE_THEMES, type PuzzleAttempt, type PuzzleMode, type PuzzleThemeId } from '@/core/puzzles';
+import { canResume } from '@/lessons';
 import { isSkillTheme } from '@/stats';
 
 /** Puzzle mode to resume (P1 modes fall back to the hub). */
@@ -36,9 +37,31 @@ export function courseOfLesson(courses: readonly CourseMeta[], lessonId: string)
   return courses.find((c) => c.lessonIds.includes(lessonId) || c.testLessonId === lessonId);
 }
 
-/** A started, unfinished lesson (at least one step done). */
-export function isLessonInProgress(p: LessonProgress): boolean {
-  return !p.completed && p.currentStep > 0;
+/**
+ * A started, unfinished lesson: at least one step done, or a mistake/hint recorded on the first step. Without the
+ * lesson this cannot tell a failed course test (all steps done, not passed) from a running one – pass the loaded
+ * lesson to exclude it (`canResume`).
+ */
+export function isLessonInProgress(p: LessonProgress, lesson?: Pick<Lesson, 'version' | 'steps'>): boolean {
+  if (lesson) {
+    const resumable: boolean = canResume(lesson, p);
+    return resumable;
+  }
+  return !p.completed && (p.currentStep > 0 || (p.stepPenalty ?? 0) > 0);
+}
+
+/** What the lesson resume card offers for a stored record once the lesson is loaded. */
+export type LessonResumeKind = 'resume' | 'retry_test' | 'restart';
+
+/**
+ * `resume` = continue at the saved step; `retry_test` = a failed test (all steps done, not passed) – "Test
+ * wiederholen" starts it again; `restart` = the lesson changed, the record no longer fits.
+ */
+export function lessonResumeKind(lesson: Pick<Lesson, 'version' | 'steps'>, p: LessonProgress): LessonResumeKind {
+  const resumable: boolean = canResume(lesson, p);
+  if (resumable) return 'resume';
+  if (!p.completed && p.lessonVersion === lesson.version && p.currentStep >= lesson.steps.length) return 'retry_test';
+  return 'restart';
 }
 
 const MODE_MAP: Partial<Record<PuzzleMode, PuzzleResumeMode>> = { rated: 'rated', learning: 'learning', theme: 'theme' };
@@ -80,7 +103,7 @@ export function resumeTargets(input: ResumeInput): ResumeTarget[] {
   if (game) out.push({ kind: 'game', game });
 
   const lessons = input.lessonProgress
-    .filter(isLessonInProgress)
+    .filter((p) => isLessonInProgress(p))
     .map((progress) => ({ progress, course: courseOfLesson(input.courses, progress.lessonId) }))
     .filter((x): x is { progress: LessonProgress; course: CourseMeta } => !!x.course && x.course.status === 'available')
     .sort((a, b) => b.progress.updatedAt.localeCompare(a.progress.updatedAt));

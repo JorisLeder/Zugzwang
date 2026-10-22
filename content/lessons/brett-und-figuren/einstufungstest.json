@@ -116,7 +116,7 @@
     {
       "id": "haengende-dame",
       "type": "find_move",
-      "promptDe": "Weiß am Zug. Schlage die ungedeckte Figur.",
+      "promptDe": "Weiß am Zug. Schlage die Figur, die niemand schützt.",
       "fen": "4r1k1/pp3pp1/7p/3q4/8/2N4P/PP3PP1/3R2K1 w - - 0 1",
       "orientation": "w",
       "solution": [

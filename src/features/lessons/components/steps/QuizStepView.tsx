@@ -3,9 +3,9 @@
  * tries again; the correct answer completes the step.
  */
 import { Check, X } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '@/lib/cn';
-import type { QuizStep } from '@/lessons';
+import { quizOptionOrder, type QuizStep } from '@/lessons';
 import { Board, FlipBoardButton } from '@/ui/board';
 import { playSound } from '@/ui/sound';
 import { STRINGS_DE } from '../../strings.de';
@@ -13,9 +13,11 @@ import { StepText } from './StepText';
 import { useOrientation, type StepViewProps } from './stepTypes';
 
 /** Quiz. */
-export function QuizStepView({ step, frame, onComplete, onMistake }: StepViewProps<QuizStep>) {
+export function QuizStepView({ step, frame, onComplete, onMistake, seed = '' }: StepViewProps<QuizStep>) {
   const [tried, setTried] = useState<ReadonlySet<string>>(() => new Set());
   const [lastId, setLastId] = useState<string | null>(null);
+  // The content lists the correct answer first: shuffle (stable for this step and run, so re-renders keep the order).
+  const options = useMemo(() => quizOptionOrder(step.options, step.id, seed), [step.options, step.id, seed]);
   const solved = step.options.some((o) => o.correct && tried.has(o.id));
   const [orientation, flip] = useOrientation('w');
   const last = step.options.find((o) => o.id === lastId) ?? null;
@@ -40,7 +42,7 @@ export function QuizStepView({ step, frame, onComplete, onMistake }: StepViewPro
     <div className="flex flex-col gap-4" data-testid="lesson-step" data-step-type="quiz" data-step-id={step.id} data-solved={solved || undefined}>
       <StepText text={step.questionDe} />
       <ul aria-label={STRINGS_DE.quizLabel} className="flex flex-col gap-2">
-        {step.options.map((o) => {
+        {options.map((o) => {
           const wasTried = tried.has(o.id);
           const right = wasTried && o.correct;
           const wrong = wasTried && !o.correct;

@@ -44,6 +44,8 @@ export interface StepViewProps<S> {
   /** Wraps the parts into the lesson frame (header, nav actions). */
   frame: (parts: FrameParts) => ReactElement;
   timings: LessonTimings;
+  /** Seed of this run (changes with every new run of the lesson); quiz options are shuffled with it. */
+  seed?: string;
 }
 
 /** Board orientation from a colour. */

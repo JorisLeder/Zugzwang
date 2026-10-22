@@ -34,8 +34,8 @@
       "questionDe": "Schwarz ist am Zug. Ist das Schachmatt?",
       "fen": "6k1/6Q1/6K1/8/8/8/8/8 b - - 0 1",
       "options": [
-        { "id": "ja", "textDe": "Ja, Schachmatt.", "correct": true, "feedbackDe": "Richtig. Die Dame gibt Schach und wird vom König gedeckt. Alle Fluchtfelder sind angegriffen." },
-        { "id": "schlagen", "textDe": "Nein, Schwarz schlägt die Dame.", "correct": false, "feedbackDe": "Die Dame ist vom weißen König gedeckt. Der König darf sie nicht schlagen." }
+        { "id": "ja", "textDe": "Ja, Schachmatt.", "correct": true, "feedbackDe": "Richtig. Die Dame gibt Schach und wird vom König gedeckt. Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Alle Fluchtfelder sind angegriffen." },
+        { "id": "schlagen", "textDe": "Nein, Schwarz schlägt die Dame.", "correct": false, "feedbackDe": "Die Dame ist vom weißen König gedeckt. Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Der schwarze König darf sie nicht schlagen." }
       ],
       "asserts": [
         { "kind": "isCheckmate", "fen": "6k1/6Q1/6K1/8/8/8/8/8 b - - 0 1", "expect": true },

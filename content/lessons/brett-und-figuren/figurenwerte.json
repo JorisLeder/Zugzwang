@@ -40,7 +40,7 @@
     {
       "id": "tausch",
       "type": "explanation",
-      "textDe": "Vor dem Schlagen vergleichst du: Was bekomme ich, was gebe ich her? Am besten ist eine Figur, die gar nicht gedeckt ist. Dann gewinnst du sie ohne Gegenleistung."
+      "textDe": "Vor dem Schlagen vergleichst du: Was bekomme ich, was gebe ich her? Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Am besten schlägst du eine Figur, die nicht gedeckt ist. Dann gewinnst du sie ohne Gegenleistung."
     },
     {
       "id": "gewinne-turm",

@@ -17,7 +17,7 @@
     {
       "id": "demo-grundreihe",
       "type": "demo",
-      "introDe": "Schwarz zieht einen Bauern. Weiß findet das Matt.",
+      "introDe": "Die Grundreihe ist die Reihe, auf der die Figuren starten: Reihe 1 für Weiß, Reihe 8 für Schwarz. Schwarz zieht einen Bauern. Weiß findet das Matt.",
       "startFen": "6k1/p4ppp/8/8/8/8/5PPP/3Q2K1 b - - 0 1",
       "orientation": "w",
       "moves": [

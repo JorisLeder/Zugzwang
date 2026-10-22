@@ -203,6 +203,28 @@ describe('dashboard', () => {
     await waitFor(() => expect(more[0]).toHaveTextContent(/Weiter bei Schritt 3 von \d+/), WAIT);
   });
 
+  it('a failed course test is offered as "Test wiederholen", not as "Lektion fortsetzen" (LC2-4)', async () => {
+    const data = await onboarded('club');
+    await data.progress.recordLessonProgress({
+      lessonId: 'taktik-grundlagen-test',
+      lessonVersion: 1,
+      currentStep: 7, // all 7 steps done, not passed
+      completed: false,
+      stars: 0,
+      mistakes: 4,
+      hintsUsed: 0,
+      score: 0.4,
+      updatedAt: new Date().toISOString(),
+      completedAt: null,
+    });
+    setup(data);
+    const main = await screen.findByTestId('dashboard-resume-main', {}, WAIT);
+    expect(main).toHaveAttribute('data-kind', 'lesson');
+    await waitFor(() => expect(within(main).getByRole('link', { name: /Test wiederholen/ })).toHaveAttribute('href', '/learn/taktik-grundlagen/taktik-grundlagen-test'), WAIT);
+    expect(main).not.toHaveTextContent('Lektion fortsetzen');
+    expect(main).toHaveTextContent('noch nicht bestanden');
+  });
+
   it('empty state: nothing started yet → rated puzzles; no rated games → "noch keine Wertung" and a fitting bot', async () => {
     const data = await onboarded('beginner');
     setup(data);

@@ -27,7 +27,7 @@ import {
 } from '@/lessons';
 import { BoardMenu } from '@/ui/board';
 import { Button, IconButton } from '@/ui/primitives';
-import { withProgress } from '../logic';
+import { bestResult, withProgress } from '../logic';
 import { STRINGS_DE } from '../strings.de';
 import { useShortcut } from '../useShortcut';
 import { LessonEnd } from './LessonEnd';
@@ -56,7 +56,11 @@ export function LessonPlayer({ lesson, course, saved, ctx, timings = LESSON_TIMI
   const [session, setSession] = useState<LessonSession>(() => createLessonSession(lesson, saved));
   const sessionRef = useRef(session);
   const [lastRecord, setLastRecord] = useState<LessonProgress | null>(null);
+  // Best result: the record read at page open, merged with every run finished in this visit (the end screen compares).
+  const [best, setBest] = useState<LessonProgress | null>(saved);
   const [run, setRun] = useState(0);
+  // Differs per page visit and run, so a retry or a new visit may order the quiz options differently.
+  const [visitSeed] = useState(() => Math.random().toString(36).slice(2, 8));
   const [resumeNotice, setResumeNotice] = useState(session.resumed);
   const nextRef = useRef<HTMLButtonElement>(null);
   const endPrimaryRef = useRef<HTMLAnchorElement & HTMLButtonElement>(null);
@@ -73,6 +77,7 @@ export function LessonPlayer({ lesson, course, saved, ctx, timings = LESSON_TIMI
     (s: LessonSession) => {
       const record = progressRecord(s, lesson);
       setLastRecord(record);
+      if (record.completed) setBest((b) => bestResult(b, record));
       data.progress.recordLessonProgress(record).catch((err: unknown) => console.warn('Lesson progress could not be saved', err));
       if (s.result?.completed && lesson.kind === 'skip_test') {
         data.progress.saveProfile({ stageZeroSkipped: true }).catch((err: unknown) => console.warn('Profile could not be saved', err));
@@ -214,7 +219,7 @@ export function LessonPlayer({ lesson, course, saved, ctx, timings = LESSON_TIMI
         course={course}
         result={session.result}
         ctx={withProgress(ctx, lastRecord)}
-        previous={saved}
+        previous={best}
         onRepeat={restart}
         primaryRef={endPrimaryRef}
         frame={frame}
@@ -230,6 +235,7 @@ export function LessonPlayer({ lesson, course, saved, ctx, timings = LESSON_TIMI
     onHint: hint,
     frame,
     timings,
+    seed: `${visitSeed}-${run}`,
   };
   const key = `${run}-${index}`;
   switch (step.type) {

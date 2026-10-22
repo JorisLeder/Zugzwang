@@ -76,7 +76,7 @@
       "solution": [{ "move": "c1c5", "children": [] }],
       "acceptAnyMate": false,
       "claim": { "kind": "best" },
-      "hintsDe": ["Welche schwarze Figur ist angegriffen und nicht gedeckt?"],
+      "hintsDe": ["Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Welche schwarze Figur ist angegriffen und nicht gedeckt?"],
       "explanationDe": "Txc5: Der Läufer auf c5 war ungedeckt. Jetzt hast du wieder gleich viel Material.",
       "puzzle": { "rating": 250, "themes": ["hangingPiece"] }
     },
