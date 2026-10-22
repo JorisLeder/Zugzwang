@@ -39,10 +39,10 @@ function memStorage(init: Record<string, string>) {
   };
 }
 
-function setup(fetchImpl: () => Promise<Response>) {
+function setup(fetchImpl: () => Promise<Response>, autoRefreshToken = false) {
   const storage = memStorage({ [AUTH_STORAGE_KEY]: JSON.stringify(storedSession()) });
   const client = createClient('https://abc.supabase.co', 'anon', {
-    auth: { persistSession: true, autoRefreshToken: false, detectSessionInUrl: false, flowType: 'pkce', storageKey: AUTH_STORAGE_KEY, storage },
+    auth: { persistSession: true, autoRefreshToken, detectSessionInUrl: false, flowType: 'pkce', storageKey: AUTH_STORAGE_KEY, storage },
     global: { fetch: fetchImpl as unknown as typeof fetch },
   });
   const auth = createSupabaseAuthService({ client: async () => client as unknown as SupabaseLike, storage });
@@ -124,6 +124,40 @@ describe('offline cold start (real supabase-js)', () => {
     expect(auth.session()?.unverified).toBeUndefined();
     expect(auth.session()?.userId).toBe(USER_ID);
     expect(seen.at(-1)).toBeUndefined();
+    await client.auth.stopAutoRefresh();
+  });
+
+  it('DS2-1: signing out offline with an expired token ends the session for good (storage cleared, no re-emit)', async () => {
+    let online = false;
+    const refreshed = { ...storedSession(3600), access_token: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.fresh', refresh_token: 'r2' };
+    const { auth, storage, client } = setup(async () => {
+      if (!online) throw new TypeError('Failed to fetch');
+      return new Response(JSON.stringify(refreshed), { status: 200, headers: { 'content-type': 'application/json' } });
+    }, true);
+    const seen: Array<string | null> = [];
+    auth.observe().subscribe((s) => seen.push(s ? s.userId : null));
+    // The auto refresh ticks forever, so time is advanced in bounded steps instead of running all timers.
+    vi.useFakeTimers();
+    const ready = auth.ready();
+    await vi.advanceTimersByTimeAsync(5 * 60_000);
+    await ready;
+    expect(auth.session()?.unverified).toBe(true);
+
+    const out = auth.signOut();
+    await vi.advanceTimersByTimeAsync(5 * 60_000);
+    await out;
+    expect(auth.session()).toBeNull();
+    expect(storage.m.has(AUTH_STORAGE_KEY)).toBe(false);
+
+    // The connection comes back: the auto refresh must not bring the previous user back.
+    online = true;
+    await vi.advanceTimersByTimeAsync(5 * 60_000);
+    vi.useRealTimers();
+    expect(storage.m.has(AUTH_STORAGE_KEY)).toBe(false);
+    expect(auth.session()).toBeNull();
+    expect(seen.at(-1)).toBeNull();
+    expect(seen.filter((x) => x !== null)).toEqual([USER_ID]); // only the unverified start, no later session event
+    expect(await client.auth.getSession()).toMatchObject({ data: { session: null } });
     await client.auth.stopAutoRefresh();
   });
 });

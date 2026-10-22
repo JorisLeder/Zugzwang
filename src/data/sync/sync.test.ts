@@ -250,6 +250,65 @@ describe('P0-02 GWT 3 – failing saves', () => {
   });
 });
 
+describe('DS2-3 – dead letters', () => {
+  it('dismissDeadLetters empties the list and the status returns to synced', async () => {
+    const server = new FakeSupabaseServer();
+    const a = device(server, { email: EMAIL, sync: { backoffBaseMs: 5, backoffMaxMs: 20 } });
+    await a.data.ready();
+    await a.data.db.outbox.add({
+      id: 'orphan',
+      table: 'game_moves',
+      op: 'insert',
+      payload: { id: 'm1', game_id: 'missing', user_id: 'x', seq: 1, kind: 'move', ply: 1, uci: 'e2e4', san: 'e4', fen_after: null, plies: null, created_at: new Date().toISOString() },
+      enqueuedAt: new Date().toISOString(),
+      attempts: 0,
+      rev: 0,
+    });
+    await a.data.sync.flush();
+    await waitFor(() => a.data.sync.state().deadLetterCount === 1 && a.data.sync.state().pending === 0, 5000);
+    expect(a.data.sync.state().status).toBe('error');
+    await a.data.sync.dismissDeadLetters?.();
+    expect(await a.data.db.getMeta<unknown[]>('deadLetters')).toEqual([]);
+    expect(a.data.sync.state()).toMatchObject({ status: 'synced', pending: 0 });
+    expect(a.data.sync.state().deadLetterCount).toBeUndefined();
+  });
+});
+
+describe('DS2-2 – the same PGN imported on two devices', () => {
+  it('the server copy replaces the local one; its moves and entries are dropped without dead letters', async () => {
+    const server = new FakeSupabaseServer();
+    const a = device(server, { email: EMAIL, sync: { backoffBaseMs: 5, backoffMaxMs: 20 } });
+    const b = device(server, { email: EMAIL, sync: { backoffBaseMs: 5, backoffMaxMs: 20 } });
+    await a.data.ready();
+    await b.data.ready();
+    await a.data.settled();
+    await b.data.settled();
+    const uid = server.userByEmail(EMAIL)!.id;
+    b.setOnline(false);
+    await waitFor(() => b.data.sync.state().status === 'offline');
+    const pgn = { ...newGame(), source: 'pgn' as const, externalId: 'hash1', botId: null, userColor: null, assistance: null };
+    const ga = await a.data.progress.createGame(pgn);
+    await a.data.progress.appendGameEvent({ gameId: ga.id, seq: 1, kind: 'move', ply: 1, uci: 'e2e4', san: 'e4' });
+    await waitFor(() => server.rows('game_moves', uid).length === 1, 5000);
+    // B imports the same PGN while offline, with a move.
+    const gb = await b.data.progress.createGame(pgn);
+    await b.data.progress.appendGameEvent({ gameId: gb.id, seq: 1, kind: 'move', ply: 1, uci: 'e2e4', san: 'e4' });
+    expect(gb.id).not.toBe(ga.id);
+    b.setOnline(true);
+    await waitFor(async () => (await b.data.db.games.get(gb.id)) === undefined && (await b.data.db.games.get(ga.id)) !== undefined, 5000);
+    await waitFor(() => b.data.sync.state().pending === 0, 5000);
+    await b.data.settled();
+    expect((await b.data.db.games.toArray()).map((g) => g.id)).toEqual([ga.id]);
+    expect(await b.data.db.gameMoves.where('gameId').equals(gb.id).count()).toBe(0);
+    expect(await b.data.db.gameMoves.where('gameId').equals(ga.id).count()).toBe(1);
+    expect(await b.data.db.outbox.count()).toBe(0);
+    expect(await b.data.db.getMeta('deadLetters')).toBeUndefined();
+    expect(b.data.sync.state()).toMatchObject({ status: 'synced', pending: 0 });
+    expect(server.rows<GameRow>('games', uid).map((r) => r.id)).toEqual([ga.id]);
+    expect(server.rows('game_moves', uid)).toHaveLength(1);
+  });
+});
+
 describe('P0-02 – push latency', () => {
   it('each action reaches the database ≤ 1 s after the action at 300 ms latency', async () => {
     const server = new FakeSupabaseServer({ latencyMs: 300 });

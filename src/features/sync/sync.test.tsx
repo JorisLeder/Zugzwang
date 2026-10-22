@@ -11,8 +11,9 @@ import { SyncStatusIndicator } from './SyncStatusIndicator';
 function servicesWith(initial: SyncState) {
   const store = createValueStore<SyncState>(initial);
   const flush = vi.fn(async () => {});
-  const data = { ...createMemoryDataServices(), sync: { state: () => store.get(), observe: () => store, flush } };
-  return { services: createFakeAppServices({ data, config: { mode: initial.mode } }), store, flush };
+  const dismissDeadLetters = vi.fn(async () => {});
+  const data = { ...createMemoryDataServices(), sync: { state: () => store.get(), observe: () => store, flush, dismissDeadLetters } };
+  return { services: createFakeAppServices({ data, config: { mode: initial.mode } }), store, flush, dismissDeadLetters };
 }
 
 const cloud = (status: SyncState['status'], extra: Partial<SyncState> = {}): SyncState => ({ mode: 'cloud', online: status !== 'offline', pending: 0, status, ...extra });
@@ -124,5 +125,28 @@ describe('SyncBanners', () => {
     expect(screen.getByText(/Ein Teil deiner Änderungen hat der Server abgelehnt/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Jetzt erneut versuchen' })).not.toBeInTheDocument();
     expect(screen.queryByText(/Gespeichert/)).not.toBeInTheDocument();
+  });
+
+  it('DS2-3: "Verwerfen" asks for confirmation, then discards the dead letters and the banner goes away', async () => {
+    vi.useFakeTimers();
+    const { services, store, dismissDeadLetters } = servicesWith(cloud('error', { deadLetterCount: 1 }));
+    dismissDeadLetters.mockImplementation(async () => store.set(cloud('synced')));
+    render(
+      <ServicesProvider services={services}>
+        <SyncBanners />
+      </ServicesProvider>,
+    );
+    act(() => vi.advanceTimersByTime(ERROR_BANNER_DELAY_MS + 100));
+    act(() => screen.getByRole('button', { name: 'Verwerfen' }).click());
+    expect(dismissDeadLetters).not.toHaveBeenCalled();
+    expect(screen.getByText(/konnten nicht auf dem Server gespeichert werden/)).toBeInTheDocument();
+    // Cancel keeps everything.
+    act(() => screen.getByRole('button', { name: 'Abbrechen' }).click());
+    expect(dismissDeadLetters).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Verwerfen' })).toBeInTheDocument();
+    act(() => screen.getByRole('button', { name: 'Verwerfen' }).click());
+    await act(async () => screen.getByRole('button', { name: 'Ja, verwerfen' }).click());
+    expect(dismissDeadLetters).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('sync-banners')?.textContent ?? '').not.toMatch(/abgelehnt|Server gespeichert/);
   });
 });

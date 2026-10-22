@@ -24,6 +24,7 @@ export function SyncBanners() {
   const [dismissed, setDismissed] = useState(localBannerDismissed);
   const [helpOpen, setHelpOpen] = useState(false);
   const [errorVisible, setErrorVisible] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   const failing = state.status === 'error';
   useEffect(() => {
@@ -32,11 +33,17 @@ export function SyncBanners() {
     return () => {
       clearTimeout(t);
       setErrorVisible(false); // the next failure waits again
+      setConfirmDiscard(false);
     };
   }, [failing]);
 
   const showLocal = state.mode === 'local' && !dismissed;
   const showError = state.mode === 'cloud' && failing && errorVisible;
+  const canDiscard = typeof data.sync.dismissDeadLetters === 'function';
+  const discard = () => {
+    setConfirmDiscard(false);
+    void data.sync.dismissDeadLetters?.();
+  };
   if (!showLocal && !showError && !helpOpen) return null;
 
   const learnMore = (
@@ -60,7 +67,30 @@ export function SyncBanners() {
             {SYNC_DE.localBanner}
           </Banner>
         )}
-        {showError && onlyDeadLetters(state) && <Banner tone="warning">{SYNC_DE.deadLetterBanner}</Banner>}
+        {showError && onlyDeadLetters(state) && (
+          <Banner
+            tone="warning"
+            action={
+              canDiscard &&
+              (confirmDiscard ? (
+                <span className="flex shrink-0 gap-1">
+                  <Button variant="link" size="sm" onClick={discard}>
+                    {SYNC_DE.discardConfirmAction}
+                  </Button>
+                  <Button variant="link" size="sm" onClick={() => setConfirmDiscard(false)}>
+                    {SYNC_DE.discardCancel}
+                  </Button>
+                </span>
+              ) : (
+                <Button variant="link" size="sm" onClick={() => setConfirmDiscard(true)}>
+                  {SYNC_DE.discard}
+                </Button>
+              ))
+            }
+          >
+            {confirmDiscard ? SYNC_DE.discardConfirm : SYNC_DE.deadLetterBanner}
+          </Banner>
+        )}
         {showError && !onlyDeadLetters(state) && (
           <Banner
             tone="warning"

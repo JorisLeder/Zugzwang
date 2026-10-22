@@ -48,6 +48,11 @@ export const SYNC_DE = {
   lastSynced: (time: string) => `Zuletzt synchronisiert um ${time} Uhr.`,
   localBanner: 'Lokaler Modus – Fortschritt nur auf diesem Gerät',
   deadLetterBanner: 'Ein Teil deiner Änderungen hat der Server abgelehnt und konnte nicht gespeichert werden. Alles andere ist gesichert.',
+  discard: 'Verwerfen',
+  discardConfirm:
+    'Diese Änderungen konnten nicht auf dem Server gespeichert werden. Wenn du sie verwirfst, bleiben sie nur auf diesem Gerät und der Hinweis verschwindet.',
+  discardConfirmAction: 'Ja, verwerfen',
+  discardCancel: 'Abbrechen',
   errorBanner: 'Nicht synchronisiert – es wird automatisch erneut versucht. Nichts geht verloren.',
   learnMore: 'Mehr erfahren',
   retryNow: 'Jetzt erneut versuchen',

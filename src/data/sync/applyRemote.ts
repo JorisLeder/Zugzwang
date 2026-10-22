@@ -139,13 +139,14 @@ async function applyUpsert(db: ZugzwangDb, table: TableName, row: Row, pending: 
 }
 
 /**
- * The same imported game (`source` + `externalId`, e.g. a PGN) exists locally under another id – it was imported on
+ * The same imported PGN game (`source` + `externalId`) exists locally under another id – it was imported on
  * two devices and the server kept the other copy (unique `games_user_source_external_id_key`). The server copy wins:
  * the local one is deleted together with its moves and its pending outbox entries (they would be rejected by the
  * server for good). A local analysis moves to the server copy unless that already has one.
  */
 async function adoptServerCopy(db: ZugzwangDb, server: Game): Promise<void> {
-  if (!server.externalId || server.source === 'bot') return;
+  // Only imported PGNs: the push adapter treats just those as duplicates (other sources are rejected for good).
+  if (!server.externalId || server.source !== 'pgn') return;
   const twins = (await db.games.where('[source+externalId]').equals([server.source, server.externalId]).toArray()).filter((g) => g.id !== server.id);
   for (const twin of twins) {
     const refersTo = (e: OutboxRow, key: string) => (e.payload as Row | null)?.[key] === twin.id;

@@ -114,6 +114,8 @@ export interface SyncEngine extends SyncService {
   notifyEnqueued(): void;
   /** Pulls everything from the backend and applies it (after login, on reconnect). */
   pullAll(): Promise<void>;
+  /** Discards the dead letters (entries the server rejected for good) and recomputes the status. */
+  dismissDeadLetters(): Promise<void>;
   /** Subscribes to realtime changes (returns the unsubscribe function). */
   subscribeRealtime(): () => void;
   /** Resolves once no flush (or refresh of server values) is running or scheduled by a write (tests). */
