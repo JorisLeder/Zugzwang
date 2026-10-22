@@ -144,3 +144,20 @@ describe('tag values with quotes and backslashes survive the import round trip',
     expect(first(pgnWithOwnTags(g)).headers.Event).toBe(value);
   });
 });
+
+describe('tags with invalid names do not break the review load path', () => {
+  it('imports the game, keeps the external id and loads the stored pgn', () => {
+    const base = '[Event "E"]\n[White "W"]\n[Black "B"]\n';
+    const plain = first(`${base}\n1. e4 e5 2. Nf3 *\n`);
+    const g = first(`${base}[Time-Control "300+5"]\n[Opening:Name "x"]\n\n1. e4 e5 2. Nf3 *\n`);
+    expect(pgnExternalId(g)).toBe(pgnExternalId(plain));
+    expect(Object.keys(g.headers)).not.toContain('Time-Control');
+    const record = importedGameRecord(g, '2026-01-01T00:00:00Z');
+    expect(record.headers).not.toHaveProperty('Time-Control');
+    expect(pgnWithOwnTags(g)).not.toMatch(/Time-Control|Opening:Name/);
+    const line = loadGameLine({ ...record, id: 'g1', createdAt: '', updatedAt: '' }, []);
+    expect(line.ok).toBe(true);
+    if (line.ok) expect(line.moves.map((m) => m.san)).toEqual(['e4', 'e5', 'Nf3']);
+    expect(ChessGame.fromPgn(record.pgn).history()).toHaveLength(3);
+  });
+});

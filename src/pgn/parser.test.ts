@@ -237,3 +237,32 @@ describe('parsePgnWithDiagnostics – German errors with line numbers', () => {
     expect(tooMany.messageDe).toMatch(/mehr als 100 Partien/);
   });
 });
+
+describe('parsePgnWithDiagnostics – invalid tag names and trailing movetext', () => {
+  it('skips tags whose name chess.js cannot read (letters only) and keeps the game readable', () => {
+    const text = '[Event "E"]\n[White "W"]\n[Black "B"]\n[Time-Control "300+5"]\n[Opening:Name "x"]\n[Eco_Code "C20"]\n[Tag2 "y"]\n[Annotator "Ann"]\n\n1. e4 e5 2. Nf3 *';
+    const [g] = parseOk(text);
+    expect(g!.headers).toEqual({ Event: 'E', White: 'W', Black: 'B', Annotator: 'Ann', Result: '*' });
+    expect(g!.pgn).not.toMatch(/Time-Control|Opening:Name|Eco_Code|Tag2/);
+    const replay = ChessGame.fromPgn(g!.pgn);
+    expect(replay.history().map((m) => m.san)).toEqual(['e4', 'e5', 'Nf3']);
+    expect(replay.headers().Annotator).toBe('Ann');
+  });
+
+  it('rejects movetext after a result marker that does not start at move 1', () => {
+    const e = parseError('[Event "x"]\n\n1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7# 1-0\n5. e4 *');
+    expect(e.line).toBe(4);
+    expect(e.messageDe).toMatch(/^Zeile 4: Hier stehen Züge ab Zug 5 ohne eigene Tags/);
+    expect(e.gameIndex).toBe(1);
+    // Also without tags in the first game.
+    expect(parseError('1. e4 e5 *\n\n2. Nf3 *').line).toBe(3);
+  });
+
+  it('still accepts a headerless game that starts at move 1 or has a start position', () => {
+    const games = parseOk('[Event "x"]\n\n1. e4 e5 1-0\n1. d4 d5 *');
+    expect(games).toHaveLength(2);
+    expect(games[1]!.moves.map((m) => m.san)).toEqual(['d4', 'd5']);
+    const fen = '[SetUp "1"]\n[FEN "4k3/8/8/8/8/8/8/4K2R w K - 0 7"]\n\n7. Rh2 *';
+    expect(parseOk(fen)).toHaveLength(1);
+  });
+});

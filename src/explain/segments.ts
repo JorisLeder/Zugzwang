@@ -77,12 +77,15 @@ export function assemble(sentences: readonly Sentence[], source: ExplanationText
 
 const ABBREVIATIONS = /\b(?:z\.\s?B\.|d\.\s?h\.|u\.\s?a\.|bzw\.|ca\.|evtl\.|ggf\.|usw\.|vgl\.|Nr\.)/gi;
 
+/** German ordinals ("Im 12. Zug"): digits, a period, whitespace and a letter. */
+const ORDINALS = /(?<![\d.])\d{1,3}\.(?=\s+\p{L})/gu;
+
 /**
  * Number of sentences in a text (sentence ends: `.`, `!`, `?` followed by a space or the end; common German
- * abbreviations such as "z. B." do not end a sentence).
+ * abbreviations such as "z. B." and ordinals such as "12. Zug" do not end a sentence).
  */
 export function countSentences(text: string): number {
-  const t = text.replace(ABBREVIATIONS, 'ABK').trim();
+  const t = text.replace(ABBREVIATIONS, 'ABK').replace(ORDINALS, 'ORD').trim();
   if (!t) return 0;
   const ends = t.match(/[.!?]+(?=\s|$)/g)?.length ?? 0;
   return /[.!?]$/.test(t) ? ends : ends + 1;

@@ -90,6 +90,8 @@ function parseGame(tokens: PgnToken[], start: number, index: number): { game: Pg
   const first = tokens[start];
   const startLine = first?.line ?? 1;
 
+  const hasTagSection = tokens[start]?.type === 'tagOpen';
+
   // Tag pair section.
   while (tokens[i]?.type === 'tagOpen') {
     const open = tokens[i]!;
@@ -99,8 +101,12 @@ function parseGame(tokens: PgnToken[], start: number, index: number): { game: Pg
     if (value?.type !== 'string') throw new PgnError(name, PGN_DE.tagMissingValue(name.value));
     const close = tokens[i + 3];
     if (close?.type !== 'tagClose') throw new PgnError(value, PGN_DE.tagMissingClose(name.value));
-    headers[name.value] = value.value;
-    tagLines[name.value] = { line: open.line, column: open.column };
+    // chess.js reads tag names of letters only: "Time-Control", "Opening:Name", "Eco_Code" or "Tag2" would make the
+    // stored pgn unreadable for the review, so such tags are skipped (not stored, not written back).
+    if (/^[A-Za-z]+$/.test(name.value)) {
+      headers[name.value] = value.value;
+      tagLines[name.value] = { line: open.line, column: open.column };
+    }
     i += 4;
     while (tokens[i]?.type === 'comment') i += 1;
   }
@@ -162,6 +168,10 @@ function parseGame(tokens: PgnToken[], start: number, index: number): { game: Pg
     if (t.type === 'string') throw new PgnError(t, PGN_DE.unexpectedString);
     if (t.type !== 'symbol') continue;
     // Symbol: move number or SAN.
+    if (!sawMovetext && !hasTagSection && !fenTag && /^\d+$/.test(t.value) && Number(t.value) !== 1) {
+      // Movetext without tags that does not start at move 1: leftover moves after a result marker, not a game.
+      throw new PgnError(t, PGN_DE.strayMovetext(t.value));
+    }
     sawMovetext = true;
     if (/^\d+$/.test(t.value)) continue;
     if (t.value === '--' || t.value === 'Z0' || t.value === '0000') {

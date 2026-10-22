@@ -93,6 +93,54 @@ describe('validateExplanationSegments (LLM validator, P0-11)', () => {
     expect(validateExplanationSegments([t('Der Läufer auf c4 und der Bauer auf e4 sind gedeckt.')], FACTS)).toMatchObject({ ok: true });
   });
 
+  it('detects move spellings with other captures, dashes, castling, move numbers and pawn checks', () => {
+    // Facts: 14. Qc2 (played), best Rxf2 – none of the moves below is part of them.
+    const bad = [
+      'Besser war D\u00D7e5 mit Gewinn.',
+      'Besser war D:e5 mit Gewinn.',
+      'Rochade 0\u20130 ist stark.',
+      'Rochiere O\u2013O bald.',
+      'Rochiere O\u2014O\u2014O bald.',
+      'Rochiere 0\u20110\u20110 bald.',
+      'Spiele e2\u2013e4 sofort.',
+      'Spiele e2\u2014e4 sofort.',
+      'Spiele e2\u2011e4 sofort.',
+      'Spiele e2:e4 sofort.',
+      'Spiele e2\u00D7d3 sofort.',
+      'Spiele o-o.',
+      'Spiele o-o-o.',
+      'Spiele 0-0-0 sofort.',
+      'Nach 1.d4 d5 ist es gleich.',
+      'Nach 1. d4 d5 ist es gleich.',
+      'Nach 12...Sf6 ist es gleich.',
+      'Nach 12\u2026Sf6 ist es gleich.',
+      'Dann kommt e8+ mit Schach.',
+      'Dann kommt d7# mit Matt.',
+      'Nach exd5 und e:d5 ist es gleich.',
+    ];
+    for (const text of bad) expect(validateExplanationSegments([t(text)], FACTS), text).toEqual({ ok: false, reason: 'unmarked_move' });
+    // Marked moves that are not in the facts are rejected as moves of the facts.
+    expect(validateExplanationSegments([t('Besser war '), m('Qxe5'), t('.')], FACTS)).toEqual({ ok: false, reason: 'move_not_in_facts' });
+    expect(validateExplanationSegments([t('Rochade '), m('O-O'), t(' ist stark.')], FACTS)).toEqual({ ok: false, reason: 'move_not_in_facts' });
+  });
+
+  it('does not flag ordinary German text, results, times or plain squares', () => {
+    const good = [
+      'Nach 12 Z\u00FCgen ist die Partie vorbei.',
+      'Im 12. Zug verlierst du die Dame.',
+      'Die Partie endete 1-0 f\u00FCr Wei\u00DF.',
+      'Die Partie endete 1:0 f\u00FCr Wei\u00DF.',
+      'Das Ergebnis war 0-1 und danach 1/2-1/2.',
+      'Um 10:30 Uhr war Schluss.',
+      'Der Bauer auf e4 und der Turm auf d1 stehen gut.',
+      'Der Turm geht von a1 nach a8 – das ist eine offene Linie.',
+      'Das ist Plan A \u2013 oder Plan B.',
+      'So-so, das war nichts.',
+      'Am 3. Februar ging es um 5 Punkte.',
+    ];
+    for (const text of good) expect(validateExplanationSegments([t(text)], FACTS), text).toMatchObject({ ok: true });
+  });
+
   it('rejects empty, too long and more than three sentences', () => {
     expect(validateExplanationSegments([m('Rxf2')], FACTS)).toEqual({ ok: false, reason: 'empty' });
     expect(validateExplanationSegments([t('  ')], FACTS)).toEqual({ ok: false, reason: 'empty' });
@@ -111,5 +159,10 @@ describe('helpers', () => {
     expect(countSentences('Ein Turm, z. B. auf d1, hilft.')).toBe(1);
     expect(countSentences('Ohne Punkt')).toBe(1);
     expect(countSentences('')).toBe(0);
+  });
+
+  it('countSentences ignores German ordinals', () => {
+    expect(countSentences('Im 12. Zug verlierst du die Dame. Das ist schlecht. Merke dir das.')).toBe(3);
+    expect(countSentences('Im 12. Zug verlierst du die Dame.')).toBe(1);
   });
 });

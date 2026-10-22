@@ -15,6 +15,8 @@ export const PGN_DE = {
   unexpectedString: 'Text in Anführungszeichen ist nur in Tags erlaubt, z. B. [White "Anna"].',
   unexpectedBracket: 'Die Klammer „]“ gehört zu keinem Tag.',
   tagAfterMoves: 'Ein Tag steht mitten in den Zügen. Trenne Partien mit einem Ergebnis wie „1-0“ oder „*“.',
+  strayMovetext: (moveNumber: string) =>
+    `Hier stehen Züge ab Zug ${moveNumber} ohne eigene Tags, nach dem Ergebnis der vorigen Partie. Gib der Partie Tags wie [Event "…"] oder lösche die übrigen Züge.`,
   invalidFen: (detail: string) => `Die Startstellung im FEN-Tag ist ungültig: ${detail}`,
   unsupportedVariant: (variant: string) => `Die Variante „${variant}“ wird nicht unterstützt – nur normales Schach.`,
   invalidMove: (san: string, moveNumber: number, side: string) =>

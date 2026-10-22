@@ -60,13 +60,29 @@ export function splitMarkers(segments: readonly ExplanationSegment[]): Explanati
   return out;
 }
 
+/** Dashes people write in moves: hyphen-minus, en dash, em dash, non-breaking hyphen. */
+const DASH = '[-\\u2013\\u2014\\u2011]';
+/** Capture signs: `x`, multiplication sign, colon. */
+const CAPTURE = '[x\\u00D7:]';
+const PROMO = '(?:=?[QRBNDTLS])?';
+const SAN_BODY = [
+  `[KQRBNDTLS][a-h]?[1-8]?${CAPTURE}?[a-h][1-8]${PROMO}[+#]?`, // piece moves, "D×e5", "Tad1"
+  `[a-h]${CAPTURE}[a-h][1-8]${PROMO}[+#]?`, // pawn captures, "exd5", "e:d5"
+  `[a-h][18]=?[QRBNDTLS][+#]?`, // promotions, "e8=T", "e8D+"
+  `[a-h][1-8](?:${DASH}|${CAPTURE})[a-h][1-8]${PROMO}[+#]?`, // long algebraic, "e2–e4", "e2:e4"
+  `[a-h][1-8][+#]`, // pawn checks and mates, "e8+", "d7#"
+  `[O0o]${DASH}[O0o](?:${DASH}[O0o])?[+#]?`, // castling in any case and dash
+].join('|');
+/** A move number in front of a move: "1.d4", "12. Sf6", "12...Sf6", "12…Sf6". */
+const NUMBERED = `\\d{1,3}(?:\\.{1,3}|\\u2026)\\s?(?:${SAN_BODY}|[a-h][1-8])`;
+
 /**
- * Move-like tokens in prose: piece moves with English or German letters ("Nf3", "Sxe5", "Dh5+", "Tad1"), pawn
- * captures ("exd5"), pawn promotions ("e8=T", "e8D+"), long algebraic moves ("e7-e8", "e2xe4"), castling
- * ("O-O", "0-0-0") and chess figurines (U+2654-U+265F). Plain squares ("e4", "auf c4") are allowed.
+ * Move-like tokens in prose: piece moves with English or German letters ("Nf3", "Sxe5", "D×e5", "Tad1"), pawn
+ * captures ("exd5", "e:d5"), pawn promotions ("e8=T", "e8D+"), pawn checks ("e8+"), long algebraic moves
+ * ("e7-e8", "e2–e4", "e2:e4"), castling ("O-O", "0–0", "o-o-o"), move-numbered moves ("1.d4", "12...Sf6") and
+ * chess figurines (U+2654-U+265F). Plain squares ("e4", "auf c4"), results ("1-0", "1:0") and times are allowed.
  */
-const MOVE_LIKE =
-  /[\u2654-\u265F]|(?<![\p{L}\d])(?:[KQRBNDTLS][a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[a-h]x[a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[a-h][18]=?[QRBNDTLS][+#]?|[a-h][1-8][-x][a-h][1-8](?:=?[QRBNDTLS])?[+#]?|[O0]-[O0](?:-[O0])?[+#]?)(?![\p{L}\d])/u;
+const MOVE_LIKE = new RegExp(`[\\u2654-\\u265F]|(?<![\\p{L}\\d])(?:${NUMBERED}|${SAN_BODY})(?![\\p{L}\\d])`, 'u');
 
 /** Validates LLM segments against the facts (see the file header). */
 export function validateExplanationSegments(segments: readonly ExplanationSegment[], facts: ExplanationFacts): ValidationResult {
