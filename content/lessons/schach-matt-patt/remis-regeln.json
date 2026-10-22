@@ -33,9 +33,9 @@
       "questionDe": "Weiß hat König und Läufer, Schwarz nur den König. Wie geht es weiter?",
       "fen": "8/8/4k3/8/8/3KB3/8/8 w - - 0 1",
       "options": [
+        { "id": "weiter", "textDe": "Die Partie läuft weiter.", "correct": false, "feedbackDe": "Kein Matt ist mehr möglich. Darum endet die Partie sofort." },
         { "id": "remis", "textDe": "Remis – mit König und Läufer kann man nicht mattsetzen.", "correct": true, "feedbackDe": "Richtig. Die Partie ist sofort Remis." },
-        { "id": "weiss", "textDe": "Weiß gewinnt.", "correct": false, "feedbackDe": "Mit einem Läufer allein ist kein Matt möglich." },
-        { "id": "weiter", "textDe": "Die Partie läuft weiter.", "correct": false, "feedbackDe": "Kein Matt ist mehr möglich. Darum endet die Partie sofort." }
+        { "id": "weiss", "textDe": "Weiß gewinnt.", "correct": false, "feedbackDe": "Mit einem Läufer allein ist kein Matt möglich." }
       ],
       "asserts": [{ "kind": "isInsufficientMaterial", "fen": "8/8/4k3/8/8/3KB3/8/8 w - - 0 1", "expect": true }]
     },
@@ -66,9 +66,9 @@
       "type": "quiz",
       "questionDe": "Dieselbe Stellung steht zum dritten Mal auf dem Brett. Was gilt?",
       "options": [
-        { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig. Er muss es beanspruchen – es passiert nicht von selbst." },
         { "id": "automatisch", "textDe": "Die Partie ist sofort automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst, wenn die Stellung zum fünften Mal vorkommt." },
-        { "id": "verliert", "textDe": "Wer die Stellung wiederholt, verliert.", "correct": false, "feedbackDe": "Wiederholen ist erlaubt. Es führt zum Remis." }
+        { "id": "verliert", "textDe": "Wer die Stellung wiederholt, verliert.", "correct": false, "feedbackDe": "Wiederholen ist erlaubt. Es führt zum Remis." },
+        { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig. Er muss es beanspruchen – es passiert nicht von selbst." }
       ]
     },
     {
@@ -108,9 +108,9 @@
       "type": "quiz",
       "questionDe": "Seit 50 Zügen hat niemand einen Bauern gezogen oder etwas geschlagen. Was gilt?",
       "options": [
+        { "id": "weiter", "textDe": "Die Partie geht weiter, bis einer mattsetzt.", "correct": false, "feedbackDe": "Nach 50 Zügen darf Remis beansprucht werden." },
         { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig: die 50-Züge-Regel." },
-        { "id": "automatisch", "textDe": "Die Partie ist automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst nach 75 Zügen." },
-        { "id": "weiter", "textDe": "Die Partie geht weiter, bis einer mattsetzt.", "correct": false, "feedbackDe": "Nach 50 Zügen darf Remis beansprucht werden." }
+        { "id": "automatisch", "textDe": "Die Partie ist automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst nach 75 Zügen." }
       ]
     }
   ]

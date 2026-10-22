@@ -46,9 +46,9 @@
       "type": "quiz",
       "questionDe": "Bei welcher Taktik steht die wertvollere Figur vorn und muss weichen?",
       "options": [
+        { "id": "gabel", "textDe": "Bei der Gabel", "correct": false, "feedbackDe": "Bei der Gabel werden zwei Figuren in verschiedenen Richtungen angegriffen." },
         { "id": "spiess", "textDe": "Beim Spieß", "correct": true, "feedbackDe": "Richtig. Danach fällt die Figur dahinter." },
-        { "id": "fesselung", "textDe": "Bei der Fesselung", "correct": false, "feedbackDe": "Bei der Fesselung steht die wertvollere Figur hinten." },
-        { "id": "gabel", "textDe": "Bei der Gabel", "correct": false, "feedbackDe": "Bei der Gabel werden zwei Figuren in verschiedenen Richtungen angegriffen." }
+        { "id": "fesselung", "textDe": "Bei der Fesselung", "correct": false, "feedbackDe": "Bei der Fesselung steht die wertvollere Figur hinten." }
       ]
     },
     {

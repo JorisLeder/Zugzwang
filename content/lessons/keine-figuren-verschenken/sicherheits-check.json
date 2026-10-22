@@ -41,9 +41,9 @@
       "type": "quiz",
       "questionDe": "Du hast einen Zug gefunden. Was prüfst du, bevor du ihn spielst?",
       "options": [
+        { "id": "schoen", "textDe": "Ob der Zug schön aussieht", "correct": false, "feedbackDe": "Wichtiger ist, dass er nichts verschenkt." },
         { "id": "check", "textDe": "Ob danach eine meiner Figuren hängt und was mein Gegner dann spielen kann", "correct": true, "feedbackDe": "Richtig. Das ist der Sicherheits-Check." },
-        { "id": "schnell", "textDe": "Nichts – Hauptsache, ich ziehe schnell.", "correct": false, "feedbackDe": "Schnelle Züge ohne Prüfung kosten oft Figuren." },
-        { "id": "schoen", "textDe": "Ob der Zug schön aussieht", "correct": false, "feedbackDe": "Wichtiger ist, dass er nichts verschenkt." }
+        { "id": "schnell", "textDe": "Nichts – Hauptsache, ich ziehe schnell.", "correct": false, "feedbackDe": "Schnelle Züge ohne Prüfung kosten oft Figuren." }
       ]
     },
     {

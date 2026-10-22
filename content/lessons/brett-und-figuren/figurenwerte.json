@@ -21,9 +21,9 @@
       "type": "quiz",
       "questionDe": "Wie viele Punkte ist die Dame ungefähr wert?",
       "options": [
+        { "id": "drei", "textDe": "3", "correct": false, "feedbackDe": "3 Punkte sind Springer und Läufer wert." },
         { "id": "neun", "textDe": "9", "correct": true, "feedbackDe": "Richtig. Die Dame ist fast so viel wert wie zwei Türme." },
-        { "id": "fuenf", "textDe": "5", "correct": false, "feedbackDe": "5 Punkte ist der Turm wert." },
-        { "id": "drei", "textDe": "3", "correct": false, "feedbackDe": "3 Punkte sind Springer und Läufer wert." }
+        { "id": "fuenf", "textDe": "5", "correct": false, "feedbackDe": "5 Punkte ist der Turm wert." }
       ]
     },
     {
@@ -60,9 +60,9 @@
       "type": "quiz",
       "questionDe": "Was ist mehr wert: ein Turm oder ein Läufer und ein Bauer zusammen?",
       "options": [
-        { "id": "turm", "textDe": "Der Turm (5 gegen 4)", "correct": true, "feedbackDe": "Richtig: Läufer und Bauer sind zusammen 4 Punkte." },
         { "id": "laeufer", "textDe": "Läufer und Bauer", "correct": false, "feedbackDe": "Rechne nach: 3 + 1 = 4, der Turm ist 5 wert." },
-        { "id": "gleich", "textDe": "Beide gleich viel", "correct": false, "feedbackDe": "Fast – aber der Turm ist einen Punkt mehr wert." }
+        { "id": "gleich", "textDe": "Beide gleich viel", "correct": false, "feedbackDe": "Fast – aber der Turm ist einen Punkt mehr wert." },
+        { "id": "turm", "textDe": "Der Turm (5 gegen 4)", "correct": true, "feedbackDe": "Richtig: Läufer und Bauer sind zusammen 4 Punkte." }
       ]
     },
     {

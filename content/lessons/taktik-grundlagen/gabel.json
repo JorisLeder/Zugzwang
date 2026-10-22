@@ -69,9 +69,9 @@
       "questionDe": "Weiß hat Sc7+ gespielt. Was greift der Springer an?",
       "fen": "r3k3/ppN2ppp/8/8/8/8/5PPP/6K1 b - - 1 1",
       "options": [
+        { "id": "bauer", "textDe": "Den Bauern b7", "correct": false, "feedbackDe": "Ein Springer auf c7 greift b7 nicht an." },
         { "id": "beide", "textDe": "Den König e8 und den Turm a8", "correct": true, "feedbackDe": "Richtig: eine Gabel mit Schach." },
-        { "id": "koenig", "textDe": "Nur den König", "correct": false, "feedbackDe": "Schau auch auf a8." },
-        { "id": "bauer", "textDe": "Den Bauern b7", "correct": false, "feedbackDe": "Ein Springer auf c7 greift b7 nicht an." }
+        { "id": "koenig", "textDe": "Nur den König", "correct": false, "feedbackDe": "Schau auch auf a8." }
       ],
       "asserts": [{ "kind": "isCheck", "fen": "r3k3/ppN2ppp/8/8/8/8/5PPP/6K1 b - - 1 1", "expect": true }]
     },
@@ -117,9 +117,9 @@
       "type": "quiz",
       "questionDe": "Warum ist der Springer so gut für Gabeln?",
       "options": [
-        { "id": "sprung", "textDe": "Er springt in viele Richtungen und kann nicht abgeblockt werden.", "correct": true, "feedbackDe": "Richtig. Deshalb übersieht man Springergabeln leicht." },
         { "id": "stark", "textDe": "Er ist die stärkste Figur.", "correct": false, "feedbackDe": "Die stärkste Figur ist die Dame. Der Springer ist 3 Punkte wert." },
-        { "id": "weit", "textDe": "Er zieht so weit er will.", "correct": false, "feedbackDe": "Der Springer zieht immer genau einen L-Sprung." }
+        { "id": "weit", "textDe": "Er zieht so weit er will.", "correct": false, "feedbackDe": "Der Springer zieht immer genau einen L-Sprung." },
+        { "id": "sprung", "textDe": "Er springt in viele Richtungen und kann nicht abgeblockt werden.", "correct": true, "feedbackDe": "Richtig. Deshalb übersieht man Springergabeln leicht." }
       ]
     }
   ]

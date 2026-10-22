@@ -57,8 +57,8 @@
       "questionDe": "Weiß hat Ta8+ gespielt. Ist das Matt?",
       "fen": "R5k1/5pp1/7p/8/8/8/5PPP/6K1 b - - 1 1",
       "options": [
-        { "id": "nein", "textDe": "Nein, der König flieht nach h7.", "correct": true, "feedbackDe": "Richtig. Der Bauer h6 hat dem König ein Fluchtfeld geschaffen." },
-        { "id": "ja", "textDe": "Ja, das ist Matt.", "correct": false, "feedbackDe": "Prüfe die Fluchtfelder: h7 ist frei und nicht angegriffen." }
+        { "id": "ja", "textDe": "Ja, das ist Matt.", "correct": false, "feedbackDe": "Prüfe die Fluchtfelder: h7 ist frei und nicht angegriffen." },
+        { "id": "nein", "textDe": "Nein, der König flieht nach h7.", "correct": true, "feedbackDe": "Richtig. Der Bauer h6 hat dem König ein Fluchtfeld geschaffen." }
       ],
       "asserts": [
         { "kind": "isCheck", "fen": "R5k1/5pp1/7p/8/8/8/5PPP/6K1 b - - 1 1", "expect": true },

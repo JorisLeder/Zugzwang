@@ -46,9 +46,9 @@
       "questionDe": "Wie heißt dieses Matt?",
       "fen": "6rk/5Npp/8/8/8/8/8/6K1 b - - 1 1",
       "options": [
+        { "id": "patt", "textDe": "Patt", "correct": false, "feedbackDe": "Der König steht im Schach. Das ist Matt, kein Patt." },
         { "id": "erstickt", "textDe": "Ersticktes Matt", "correct": true, "feedbackDe": "Richtig. Der Springer setzt matt, weil der König eingesperrt ist." },
-        { "id": "grundreihe", "textDe": "Grundreihenmatt", "correct": false, "feedbackDe": "Beim Grundreihenmatt gibt ein Turm oder eine Dame auf der Grundreihe Schach." },
-        { "id": "patt", "textDe": "Patt", "correct": false, "feedbackDe": "Der König steht im Schach. Das ist Matt, kein Patt." }
+        { "id": "grundreihe", "textDe": "Grundreihenmatt", "correct": false, "feedbackDe": "Beim Grundreihenmatt gibt ein Turm oder eine Dame auf der Grundreihe Schach." }
       ],
       "asserts": [{ "kind": "isCheckmate", "fen": "6rk/5Npp/8/8/8/8/8/6K1 b - - 1 1", "expect": true }]
     },

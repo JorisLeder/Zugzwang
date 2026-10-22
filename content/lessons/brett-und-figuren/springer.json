@@ -79,9 +79,9 @@
       "questionDe": "Auf wie viele Felder kann der Springer auf a1 ziehen?",
       "fen": "7k/7p/8/8/8/8/8/N6K w - - 0 1",
       "options": [
+        { "id": "acht", "textDe": "Auf 8 Felder", "correct": false, "feedbackDe": "Acht Felder hat er nur in der Mitte des Bretts." },
         { "id": "zwei", "textDe": "Auf 2 Felder: b3 und c2", "correct": true, "feedbackDe": "Richtig. In der Ecke hat der Springer nur zwei Felder. In der Mitte sind es acht." },
-        { "id": "vier", "textDe": "Auf 4 Felder", "correct": false, "feedbackDe": "Zähle nach: Von a1 erreicht er nur b3 und c2." },
-        { "id": "acht", "textDe": "Auf 8 Felder", "correct": false, "feedbackDe": "Acht Felder hat er nur in der Mitte des Bretts." }
+        { "id": "vier", "textDe": "Auf 4 Felder", "correct": false, "feedbackDe": "Zähle nach: Von a1 erreicht er nur b3 und c2." }
       ],
       "asserts": [
         { "kind": "isLegalMove", "fen": "7k/7p/8/8/8/8/8/N6K w - - 0 1", "move": "a1b3", "expect": true },
@@ -106,9 +106,9 @@
       "type": "quiz",
       "questionDe": "Welche Figur darf über andere Figuren springen?",
       "options": [
-        { "id": "springer", "textDe": "Der Springer", "correct": true, "feedbackDe": "Richtig. Alle anderen Figuren brauchen einen freien Weg." },
         { "id": "laeufer", "textDe": "Der Läufer", "correct": false, "feedbackDe": "Der Läufer braucht eine freie Diagonale." },
-        { "id": "dame", "textDe": "Die Dame", "correct": false, "feedbackDe": "Auch die Dame darf nicht über andere Figuren ziehen." }
+        { "id": "dame", "textDe": "Die Dame", "correct": false, "feedbackDe": "Auch die Dame darf nicht über andere Figuren ziehen." },
+        { "id": "springer", "textDe": "Der Springer", "correct": true, "feedbackDe": "Richtig. Alle anderen Figuren brauchen einen freien Weg." }
       ]
     }
   ]

@@ -57,8 +57,8 @@
       "questionDe": "Schwarz hat c7–c5 schon vor einem Zug gespielt. Darf Weiß jetzt noch dxc6 en passant spielen?",
       "fen": "4k3/8/8/2pP4/8/8/8/4K3 w - - 0 3",
       "options": [
-        { "id": "nein", "textDe": "Nein – en passant geht nur im direkt folgenden Zug.", "correct": true, "feedbackDe": "Richtig. Die Chance ist vorbei." },
-        { "id": "ja", "textDe": "Ja, en passant geht immer.", "correct": false, "feedbackDe": "Nur sofort nach dem Doppelschritt darf en passant geschlagen werden." }
+        { "id": "ja", "textDe": "Ja, en passant geht immer.", "correct": false, "feedbackDe": "Nur sofort nach dem Doppelschritt darf en passant geschlagen werden." },
+        { "id": "nein", "textDe": "Nein – en passant geht nur im direkt folgenden Zug.", "correct": true, "feedbackDe": "Richtig. Die Chance ist vorbei." }
       ],
       "asserts": [{ "kind": "isLegalMove", "fen": "4k3/8/8/2pP4/8/8/8/4K3 w - - 0 3", "move": "d5c6", "expect": false }]
     },
@@ -67,9 +67,9 @@
       "type": "quiz",
       "questionDe": "Was darf en passant geschlagen werden?",
       "options": [
-        { "id": "bauer", "textDe": "Ein Bauer, der gerade einen Doppelschritt gemacht hat", "correct": true, "feedbackDe": "Richtig. Und schlagen darf auch nur ein Bauer." },
         { "id": "jede", "textDe": "Jede Figur, die neben einem Bauern steht", "correct": false, "feedbackDe": "En passant gibt es nur zwischen Bauern." },
-        { "id": "ein-feld", "textDe": "Ein Bauer, der nur ein Feld gezogen hat", "correct": false, "feedbackDe": "En passant gibt es nur nach einem Doppelschritt. Sonst schlägt der Bauer ganz normal schräg." }
+        { "id": "ein-feld", "textDe": "Ein Bauer, der nur ein Feld gezogen hat", "correct": false, "feedbackDe": "En passant gibt es nur nach einem Doppelschritt. Sonst schlägt der Bauer ganz normal schräg." },
+        { "id": "bauer", "textDe": "Ein Bauer, der gerade einen Doppelschritt gemacht hat", "correct": true, "feedbackDe": "Richtig. Und schlagen darf auch nur ein Bauer." }
       ]
     },
     {

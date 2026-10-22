@@ -28,9 +28,9 @@
       "questionDe": "Schwarz ist am Zug. Was liegt vor?",
       "fen": "k7/8/1Q6/8/8/8/8/7K b - - 0 1",
       "options": [
+        { "id": "zug", "textDe": "Schwarz zieht Ka7.", "correct": false, "feedbackDe": "a7 wird von der Dame angegriffen." },
         { "id": "patt", "textDe": "Patt – Remis", "correct": true, "feedbackDe": "Richtig. Schwarz hat keinen Zug und steht nicht im Schach." },
-        { "id": "matt", "textDe": "Schachmatt – Weiß gewinnt", "correct": false, "feedbackDe": "Die Dame gibt kein Schach. Ohne Schach ist es kein Matt." },
-        { "id": "zug", "textDe": "Schwarz zieht Ka7.", "correct": false, "feedbackDe": "a7 wird von der Dame angegriffen." }
+        { "id": "matt", "textDe": "Schachmatt – Weiß gewinnt", "correct": false, "feedbackDe": "Die Dame gibt kein Schach. Ohne Schach ist es kein Matt." }
       ],
       "asserts": [
         { "kind": "isStalemate", "fen": "k7/8/1Q6/8/8/8/8/7K b - - 0 1", "expect": true },

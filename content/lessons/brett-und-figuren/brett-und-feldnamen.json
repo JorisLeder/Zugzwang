@@ -47,8 +47,8 @@
       "type": "quiz",
       "questionDe": "Welche Farbe hat das Feld h1, die Ecke rechts unten aus Sicht von Weiß?",
       "options": [
-        { "id": "hell", "textDe": "Hell", "correct": true, "feedbackDe": "Richtig. Merke dir: Rechts unten liegt immer ein helles Feld." },
-        { "id": "dunkel", "textDe": "Dunkel", "correct": false, "feedbackDe": "Nicht ganz. Das Brett liegt so, dass rechts unten ein helles Feld ist." }
+        { "id": "dunkel", "textDe": "Dunkel", "correct": false, "feedbackDe": "Nicht ganz. Das Brett liegt so, dass rechts unten ein helles Feld ist." },
+        { "id": "hell", "textDe": "Hell", "correct": true, "feedbackDe": "Richtig. Merke dir: Rechts unten liegt immer ein helles Feld." }
       ]
     },
     {
@@ -79,9 +79,9 @@
       "type": "quiz",
       "questionDe": "Auf welchem Feld steht der weiße König in der Grundstellung?",
       "options": [
-        { "id": "e1", "textDe": "e1", "correct": true, "feedbackDe": "Genau. Die weiße Dame steht daneben auf d1." },
         { "id": "d1", "textDe": "d1", "correct": false, "feedbackDe": "Auf d1 steht die Dame. Der König steht auf e1." },
-        { "id": "e8", "textDe": "e8", "correct": false, "feedbackDe": "Auf e8 steht der schwarze König." }
+        { "id": "e8", "textDe": "e8", "correct": false, "feedbackDe": "Auf e8 steht der schwarze König." },
+        { "id": "e1", "textDe": "e1", "correct": true, "feedbackDe": "Genau. Die weiße Dame steht daneben auf d1." }
       ]
     },
     {

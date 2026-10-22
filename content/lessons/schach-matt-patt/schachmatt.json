@@ -34,8 +34,8 @@
       "questionDe": "Schwarz ist am Zug. Ist das Schachmatt?",
       "fen": "6k1/6Q1/6K1/8/8/8/8/8 b - - 0 1",
       "options": [
-        { "id": "ja", "textDe": "Ja, Schachmatt.", "correct": true, "feedbackDe": "Richtig. Die Dame gibt Schach und wird vom König gedeckt. Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Alle Fluchtfelder sind angegriffen." },
-        { "id": "schlagen", "textDe": "Nein, Schwarz schlägt die Dame.", "correct": false, "feedbackDe": "Die Dame ist vom weißen König gedeckt. Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Der schwarze König darf sie nicht schlagen." }
+        { "id": "schlagen", "textDe": "Nein, Schwarz schlägt die Dame.", "correct": false, "feedbackDe": "Die Dame ist vom weißen König gedeckt. Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Der schwarze König darf sie nicht schlagen." },
+        { "id": "ja", "textDe": "Ja, Schachmatt.", "correct": true, "feedbackDe": "Richtig. Die Dame gibt Schach und wird vom König gedeckt. Eine Figur ist gedeckt, wenn eine eigene Figur auf ihr Feld zurückschlagen könnte. Alle Fluchtfelder sind angegriffen." }
       ],
       "asserts": [
         { "kind": "isCheckmate", "fen": "6k1/6Q1/6K1/8/8/8/8/8 b - - 0 1", "expect": true },
@@ -84,9 +84,9 @@
       "type": "quiz",
       "questionDe": "Was ist das Ziel im Schach?",
       "options": [
-        { "id": "matt", "textDe": "Den gegnerischen König mattsetzen", "correct": true, "feedbackDe": "Genau. Wer mattsetzt, gewinnt die Partie." },
         { "id": "alle", "textDe": "Alle gegnerischen Figuren schlagen", "correct": false, "feedbackDe": "Man muss nicht alles schlagen. Es zählt nur das Matt." },
-        { "id": "koenig", "textDe": "Den König schlagen", "correct": false, "feedbackDe": "Der König wird nie geschlagen. Die Partie endet schon mit dem Matt." }
+        { "id": "koenig", "textDe": "Den König schlagen", "correct": false, "feedbackDe": "Der König wird nie geschlagen. Die Partie endet schon mit dem Matt." },
+        { "id": "matt", "textDe": "Den gegnerischen König mattsetzen", "correct": true, "feedbackDe": "Genau. Wer mattsetzt, gewinnt die Partie." }
       ]
     },
     {

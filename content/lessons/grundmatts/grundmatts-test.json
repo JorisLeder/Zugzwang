@@ -49,9 +49,9 @@
       "type": "quiz",
       "questionDe": "Was ist beim Mattsetzen mit König und Dame die größte Gefahr?",
       "options": [
+        { "id": "zeit", "textDe": "Dass es zu schnell geht", "correct": false, "feedbackDe": "Schnelligkeit ist kein Problem. Gefährlich ist das Patt." },
         { "id": "patt", "textDe": "Ein Patt", "correct": true, "feedbackDe": "Richtig. Lass dem König immer ein Feld, bis du mattsetzen kannst." },
-        { "id": "dame", "textDe": "Dass der König die Dame schlägt", "correct": false, "feedbackDe": "Das passiert nur, wenn die Dame ungedeckt neben ihm steht – leicht zu vermeiden." },
-        { "id": "zeit", "textDe": "Dass es zu schnell geht", "correct": false, "feedbackDe": "Schnelligkeit ist kein Problem. Gefährlich ist das Patt." }
+        { "id": "dame", "textDe": "Dass der König die Dame schlägt", "correct": false, "feedbackDe": "Das passiert nur, wenn die Dame ungedeckt neben ihm steht – leicht zu vermeiden." }
       ]
     },
     {

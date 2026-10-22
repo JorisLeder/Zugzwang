@@ -55,9 +55,9 @@
       "type": "quiz",
       "questionDe": "In welche Figuren darf ein Bauer umgewandelt werden?",
       "options": [
+        { "id": "koenig", "textDe": "In jede Figur, auch einen König", "correct": false, "feedbackDe": "Ein König ist nicht erlaubt." },
         { "id": "vier", "textDe": "Dame, Turm, Läufer oder Springer der eigenen Farbe", "correct": true, "feedbackDe": "Richtig. Ein König ist nicht erlaubt, und Bauer bleiben darf er auch nicht." },
-        { "id": "dame", "textDe": "Nur in eine Dame", "correct": false, "feedbackDe": "Du darfst auch Turm, Läufer oder Springer wählen." },
-        { "id": "koenig", "textDe": "In jede Figur, auch einen König", "correct": false, "feedbackDe": "Ein König ist nicht erlaubt." }
+        { "id": "dame", "textDe": "Nur in eine Dame", "correct": false, "feedbackDe": "Du darfst auch Turm, Läufer oder Springer wählen." }
       ]
     },
     {

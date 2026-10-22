@@ -32,9 +32,9 @@
       "questionDe": "Auf welches Feld kann der Springer auf d4 ziehen?",
       "fen": "4k3/7p/8/8/3N4/8/8/4K3 w - - 0 1",
       "options": [
+        { "id": "f4", "textDe": "f4", "correct": false, "feedbackDe": "Der Springer zieht in Form eines L, nicht gerade zur Seite." },
         { "id": "f5", "textDe": "f5", "correct": true, "feedbackDe": "Richtig: zwei Felder nach rechts, eins nach oben." },
-        { "id": "d6", "textDe": "d6", "correct": false, "feedbackDe": "Zwei Felder geradeaus ohne Seitenschritt – so zieht der Springer nicht." },
-        { "id": "f4", "textDe": "f4", "correct": false, "feedbackDe": "Der Springer zieht in Form eines L, nicht gerade zur Seite." }
+        { "id": "d6", "textDe": "d6", "correct": false, "feedbackDe": "Zwei Felder geradeaus ohne Seitenschritt – so zieht der Springer nicht." }
       ],
       "asserts": [
         { "kind": "isLegalMove", "fen": "4k3/7p/8/8/3N4/8/8/4K3 w - - 0 1", "move": "d4f5", "expect": true },
@@ -48,9 +48,9 @@
       "questionDe": "Schwarz ist am Zug. Was liegt vor?",
       "fen": "k7/2Q5/1K6/8/8/8/8/8 b - - 0 1",
       "options": [
-        { "id": "patt", "textDe": "Patt – Remis", "correct": true, "feedbackDe": "Richtig. Schwarz hat keinen regelgemäßen Zug und steht nicht im Schach." },
         { "id": "matt", "textDe": "Schachmatt – Weiß gewinnt", "correct": false, "feedbackDe": "Der schwarze König steht nicht im Schach. Ohne Schach ist es kein Matt." },
-        { "id": "weiter", "textDe": "Schwarz zieht Kb8.", "correct": false, "feedbackDe": "b8 wird von der Dame angegriffen. Schwarz hat keinen Zug." }
+        { "id": "weiter", "textDe": "Schwarz zieht Kb8.", "correct": false, "feedbackDe": "b8 wird von der Dame angegriffen. Schwarz hat keinen Zug." },
+        { "id": "patt", "textDe": "Patt – Remis", "correct": true, "feedbackDe": "Richtig. Schwarz hat keinen regelgemäßen Zug und steht nicht im Schach." }
       ],
       "asserts": [
         { "kind": "isStalemate", "fen": "k7/2Q5/1K6/8/8/8/8/8 b - - 0 1", "expect": true },
@@ -76,8 +76,8 @@
       "questionDe": "Der schwarze Läufer greift den Turm h1 an. Darf Weiß trotzdem kurz rochieren?",
       "fen": "r3k2r/8/8/8/8/5b2/8/R3K2R w KQkq - 0 1",
       "options": [
-        { "id": "ja", "textDe": "Ja. Nur der König darf nicht im Schach stehen und kein angegriffenes Feld überqueren oder betreten.", "correct": true, "feedbackDe": "Richtig. Dass der Turm angegriffen ist, verhindert die Rochade nicht." },
-        { "id": "nein", "textDe": "Nein, weil der Turm angegriffen ist.", "correct": false, "feedbackDe": "Für den Turm gibt es diese Regel nicht. Es zählen nur die Felder des Königs." }
+        { "id": "nein", "textDe": "Nein, weil der Turm angegriffen ist.", "correct": false, "feedbackDe": "Für den Turm gibt es diese Regel nicht. Es zählen nur die Felder des Königs." },
+        { "id": "ja", "textDe": "Ja. Nur der König darf nicht im Schach stehen und kein angegriffenes Feld überqueren oder betreten.", "correct": true, "feedbackDe": "Richtig. Dass der Turm angegriffen ist, verhindert die Rochade nicht." }
       ],
       "asserts": [{ "kind": "isLegalMove", "fen": "r3k2r/8/8/8/8/5b2/8/R3K2R w KQkq - 0 1", "move": "e1g1", "expect": true }]
     },
@@ -98,9 +98,9 @@
       "type": "quiz",
       "questionDe": "Ein Bauer erreicht die letzte Reihe. Was gilt?",
       "options": [
+        { "id": "geschlagen", "textDe": "Er darf nur eine schon geschlagene Figur werden.", "correct": false, "feedbackDe": "Die Wahl hängt nicht von geschlagenen Figuren ab." },
         { "id": "wahl", "textDe": "Er wird in Dame, Turm, Läufer oder Springer der eigenen Farbe umgewandelt.", "correct": true, "feedbackDe": "Richtig. Du wählst frei, auch wenn die Figur noch auf dem Brett steht." },
-        { "id": "dame", "textDe": "Er wird immer zur Dame.", "correct": false, "feedbackDe": "Du darfst auch Turm, Läufer oder Springer wählen." },
-        { "id": "geschlagen", "textDe": "Er darf nur eine schon geschlagene Figur werden.", "correct": false, "feedbackDe": "Die Wahl hängt nicht von geschlagenen Figuren ab." }
+        { "id": "dame", "textDe": "Er wird immer zur Dame.", "correct": false, "feedbackDe": "Du darfst auch Turm, Läufer oder Springer wählen." }
       ]
     },
     {
@@ -108,9 +108,9 @@
       "type": "quiz",
       "questionDe": "Dieselbe Stellung entsteht zum dritten Mal. Was gilt?",
       "options": [
-        { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig: Remis durch dreimalige Stellungswiederholung. Es muss beansprucht werden." },
         { "id": "automatisch", "textDe": "Die Partie ist automatisch Remis.", "correct": false, "feedbackDe": "Automatisch Remis ist es erst, wenn die Stellung zum fünften Mal vorkommt." },
-        { "id": "verloren", "textDe": "Wer wiederholt, verliert.", "correct": false, "feedbackDe": "Wiederholen ist erlaubt. Es führt zum Remis, nicht zur Niederlage." }
+        { "id": "verloren", "textDe": "Wer wiederholt, verliert.", "correct": false, "feedbackDe": "Wiederholen ist erlaubt. Es führt zum Remis, nicht zur Niederlage." },
+        { "id": "anspruch", "textDe": "Der Spieler am Zug kann Remis beanspruchen.", "correct": true, "feedbackDe": "Richtig: Remis durch dreimalige Stellungswiederholung. Es muss beansprucht werden." }
       ]
     },
     {

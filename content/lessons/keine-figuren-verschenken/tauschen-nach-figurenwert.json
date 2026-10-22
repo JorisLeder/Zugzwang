@@ -42,8 +42,8 @@
       "questionDe": "Der Springer d5 ist vom Bauern e6 gedeckt. Lohnt sich Dxd5?",
       "fen": "6k1/ppp2pp1/4p2p/3n4/8/7P/PPP2PP1/3Q2K1 w - - 0 1",
       "options": [
-        { "id": "nein", "textDe": "Nein – nach exd5 hat Weiß die Dame für einen Springer gegeben.", "correct": true, "feedbackDe": "Richtig: 9 Punkte für 3 Punkte ist ein schlechter Tausch." },
-        { "id": "ja", "textDe": "Ja – die Dame gewinnt einen Springer.", "correct": false, "feedbackDe": "Der Bauer e6 schlägt zurück. Dann ist die Dame weg." }
+        { "id": "ja", "textDe": "Ja – die Dame gewinnt einen Springer.", "correct": false, "feedbackDe": "Der Bauer e6 schlägt zurück. Dann ist die Dame weg." },
+        { "id": "nein", "textDe": "Nein – nach exd5 hat Weiß die Dame für einen Springer gegeben.", "correct": true, "feedbackDe": "Richtig: 9 Punkte für 3 Punkte ist ein schlechter Tausch." }
       ],
       "asserts": [{ "kind": "isLegalMove", "fen": "6k1/ppp2pp1/4p2p/3Q4/8/7P/PPP2PP1/6K1 b - - 0 1", "move": "e6d5", "expect": true }]
     },
@@ -69,9 +69,9 @@
       "type": "quiz",
       "questionDe": "Welcher Tausch ist gut für dich?",
       "options": [
-        { "id": "s-t", "textDe": "Du gibst einen Springer und bekommst einen Turm.", "correct": true, "feedbackDe": "Richtig: 3 Punkte für 5 Punkte." },
         { "id": "t-l", "textDe": "Du gibst einen Turm und bekommst einen Läufer.", "correct": false, "feedbackDe": "Das kostet dich 2 Punkte." },
-        { "id": "d-t", "textDe": "Du gibst die Dame und bekommst einen Turm.", "correct": false, "feedbackDe": "Das kostet dich 4 Punkte." }
+        { "id": "d-t", "textDe": "Du gibst die Dame und bekommst einen Turm.", "correct": false, "feedbackDe": "Das kostet dich 4 Punkte." },
+        { "id": "s-t", "textDe": "Du gibst einen Springer und bekommst einen Turm.", "correct": true, "feedbackDe": "Richtig: 3 Punkte für 5 Punkte." }
       ]
     }
   ]

@@ -51,9 +51,9 @@
       "type": "quiz",
       "questionDe": "Was bedeutet der Zug Lb5?",
       "options": [
+        { "id": "springer", "textDe": "Ein Springer zieht nach b5.", "correct": false, "feedbackDe": "Der Springer hat den Buchstaben S." },
         { "id": "laeufer", "textDe": "Ein Läufer zieht nach b5.", "correct": true, "feedbackDe": "Richtig: L steht für Läufer." },
-        { "id": "bauer", "textDe": "Ein Bauer zieht nach b5.", "correct": false, "feedbackDe": "Ein Bauernzug hätte keinen Buchstaben: b5." },
-        { "id": "springer", "textDe": "Ein Springer zieht nach b5.", "correct": false, "feedbackDe": "Der Springer hat den Buchstaben S." }
+        { "id": "bauer", "textDe": "Ein Bauer zieht nach b5.", "correct": false, "feedbackDe": "Ein Bauernzug hätte keinen Buchstaben: b5." }
       ]
     },
     {
@@ -73,9 +73,9 @@
       "type": "quiz",
       "questionDe": "Was bedeutet Dxf7#?",
       "options": [
-        { "id": "matt", "textDe": "Die Dame schlägt auf f7 und setzt matt.", "correct": true, "feedbackDe": "Richtig: x heißt schlagen, # heißt Matt." },
         { "id": "schach", "textDe": "Die Dame schlägt auf f7 und gibt nur Schach.", "correct": false, "feedbackDe": "Nur Schach wäre +. Das Zeichen # steht für Matt." },
-        { "id": "zieht", "textDe": "Die Dame zieht nach f7, ohne zu schlagen.", "correct": false, "feedbackDe": "Das x zeigt, dass geschlagen wird." }
+        { "id": "zieht", "textDe": "Die Dame zieht nach f7, ohne zu schlagen.", "correct": false, "feedbackDe": "Das x zeigt, dass geschlagen wird." },
+        { "id": "matt", "textDe": "Die Dame schlägt auf f7 und setzt matt.", "correct": true, "feedbackDe": "Richtig: x heißt schlagen, # heißt Matt." }
       ]
     },
     {

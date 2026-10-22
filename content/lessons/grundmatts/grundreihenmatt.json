@@ -47,9 +47,9 @@
       "questionDe": "Weiß am Zug. Schwarz droht Td1#. Welcher Zug verhindert das Matt?",
       "fen": "3r2k1/ppp2pp1/7p/8/8/1P6/PBP2PPP/6K1 w - - 0 1",
       "options": [
+        { "id": "c4", "textDe": "c4", "correct": false, "feedbackDe": "c4 ändert nichts an der Grundreihe: Td1# bleibt Matt." },
         { "id": "h3", "textDe": "h3 – der König bekommt ein Fluchtfeld.", "correct": true, "feedbackDe": "Richtig. So ein Fluchtfeld nennt man auch Luftloch." },
-        { "id": "a3", "textDe": "a3", "correct": false, "feedbackDe": "Nach a3 folgt Td1#. Der König hat noch kein Fluchtfeld." },
-        { "id": "c4", "textDe": "c4", "correct": false, "feedbackDe": "c4 ändert nichts an der Grundreihe: Td1# bleibt Matt." }
+        { "id": "a3", "textDe": "a3", "correct": false, "feedbackDe": "Nach a3 folgt Td1#. Der König hat noch kein Fluchtfeld." }
       ],
       "asserts": [
         { "kind": "isCheckmate", "fen": "6k1/ppp2pp1/7p/8/8/PP6/1BP2PPP/3r2K1 w - - 1 2", "expect": true },

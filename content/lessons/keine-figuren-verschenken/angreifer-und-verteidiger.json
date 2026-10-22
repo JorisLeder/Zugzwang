@@ -38,9 +38,9 @@
       "questionDe": "Der Springer d5 wird einmal angegriffen und einmal gedeckt. Was passiert nach Sxd5?",
       "fen": "6k1/ppp2pp1/5n1p/3n4/8/2N4P/PPP2PP1/6K1 w - - 0 1",
       "options": [
+        { "id": "verlust", "textDe": "Weiß verliert einen Springer.", "correct": false, "feedbackDe": "Weiß bekommt auch einen Springer. Es ist ein gleicher Tausch." },
         { "id": "tausch", "textDe": "Sxd5 Sxd5 – ein gleicher Tausch, Springer gegen Springer", "correct": true, "feedbackDe": "Richtig. Ein Angreifer gegen einen Verteidiger ergibt einen Tausch." },
-        { "id": "gewinn", "textDe": "Weiß gewinnt einen Springer.", "correct": false, "feedbackDe": "Schwarz schlägt mit dem Springer f6 zurück." },
-        { "id": "verlust", "textDe": "Weiß verliert einen Springer.", "correct": false, "feedbackDe": "Weiß bekommt auch einen Springer. Es ist ein gleicher Tausch." }
+        { "id": "gewinn", "textDe": "Weiß gewinnt einen Springer.", "correct": false, "feedbackDe": "Schwarz schlägt mit dem Springer f6 zurück." }
       ],
       "asserts": [{ "kind": "isLegalMove", "fen": "6k1/ppp2pp1/5n1p/3n4/8/2N4P/PPP2PP1/6K1 w - - 0 1", "move": "c3d5", "expect": true }]
     },
@@ -96,9 +96,9 @@
       "type": "quiz",
       "questionDe": "Eine Figur wird zweimal angegriffen und nur einmal gedeckt. Was gilt meistens?",
       "options": [
-        { "id": "gewinn", "textDe": "Du kannst sie gewinnen.", "correct": true, "feedbackDe": "Richtig. Achte aber auf die Werte: Schlage zuerst mit der billigeren Figur." },
         { "id": "nichts", "textDe": "Du kannst nichts gewinnen.", "correct": false, "feedbackDe": "Mit einem Angreifer mehr bleibt am Ende deine Figur übrig." },
-        { "id": "verlust", "textDe": "Du verlierst eine Figur.", "correct": false, "feedbackDe": "Zähle nach: Der letzte Schlagzug gehört dir." }
+        { "id": "verlust", "textDe": "Du verlierst eine Figur.", "correct": false, "feedbackDe": "Zähle nach: Der letzte Schlagzug gehört dir." },
+        { "id": "gewinn", "textDe": "Du kannst sie gewinnen.", "correct": true, "feedbackDe": "Richtig. Achte aber auf die Werte: Schlage zuerst mit der billigeren Figur." }
       ]
     }
   ]

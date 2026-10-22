@@ -58,8 +58,8 @@
       "questionDe": "Der weiße König steht im Schach. Darf Weiß jetzt rochieren?",
       "fen": "4r1k1/8/8/8/8/8/5PPP/4K2R w K - 0 1",
       "options": [
-        { "id": "nein", "textDe": "Nein – aus dem Schach heraus darf man nicht rochieren.", "correct": true, "feedbackDe": "Richtig. Wehre zuerst das Schach ab." },
-        { "id": "ja", "textDe": "Ja, die Rochade wehrt das Schach ab.", "correct": false, "feedbackDe": "Steht der König im Schach, ist die Rochade verboten." }
+        { "id": "ja", "textDe": "Ja, die Rochade wehrt das Schach ab.", "correct": false, "feedbackDe": "Steht der König im Schach, ist die Rochade verboten." },
+        { "id": "nein", "textDe": "Nein – aus dem Schach heraus darf man nicht rochieren.", "correct": true, "feedbackDe": "Richtig. Wehre zuerst das Schach ab." }
       ],
       "asserts": [
         { "kind": "isCheck", "fen": "4r1k1/8/8/8/8/8/5PPP/4K2R w K - 0 1", "expect": true },
@@ -86,8 +86,8 @@
       "questionDe": "Der schwarze Läufer greift b1 an. Darf Weiß lang rochieren (0-0-0)?",
       "fen": "4k3/8/8/8/4b3/8/8/R3K3 w Q - 0 1",
       "options": [
-        { "id": "ja", "textDe": "Ja – über b1 zieht nur der Turm, nicht der König.", "correct": true, "feedbackDe": "Richtig. Der König zieht über d1 nach c1. Beide Felder sind sicher." },
-        { "id": "nein", "textDe": "Nein – b1 ist angegriffen.", "correct": false, "feedbackDe": "Der Turm darf über ein angegriffenes Feld ziehen. Nur für den König gilt das Verbot." }
+        { "id": "nein", "textDe": "Nein – b1 ist angegriffen.", "correct": false, "feedbackDe": "Der Turm darf über ein angegriffenes Feld ziehen. Nur für den König gilt das Verbot." },
+        { "id": "ja", "textDe": "Ja – über b1 zieht nur der Turm, nicht der König.", "correct": true, "feedbackDe": "Richtig. Der König zieht über d1 nach c1. Beide Felder sind sicher." }
       ],
       "asserts": [{ "kind": "isLegalMove", "fen": "4k3/8/8/8/4b3/8/8/R3K3 w Q - 0 1", "move": "e1c1", "expect": true }]
     },

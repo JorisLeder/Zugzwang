@@ -37,8 +37,8 @@
       "questionDe": "Schwarz ist am Zug. Was ist passiert?",
       "fen": "7k/8/6QK/8/8/8/8/8 b - - 0 1",
       "options": [
-        { "id": "patt", "textDe": "Patt – Remis, der Sieg ist verschenkt.", "correct": true, "feedbackDe": "Leider ja. Schwarz hat keinen Zug und steht nicht im Schach." },
-        { "id": "matt", "textDe": "Schachmatt", "correct": false, "feedbackDe": "Der König steht nicht im Schach. Darum ist es kein Matt." }
+        { "id": "matt", "textDe": "Schachmatt", "correct": false, "feedbackDe": "Der König steht nicht im Schach. Darum ist es kein Matt." },
+        { "id": "patt", "textDe": "Patt – Remis, der Sieg ist verschenkt.", "correct": true, "feedbackDe": "Leider ja. Schwarz hat keinen Zug und steht nicht im Schach." }
       ],
       "asserts": [{ "kind": "isStalemate", "fen": "7k/8/6QK/8/8/8/8/8 b - - 0 1", "expect": true }]
     },

@@ -49,9 +49,9 @@
       "type": "quiz",
       "questionDe": "Welche ersten Züge prüfst du bei einem Matt in 2 zuerst?",
       "options": [
+        { "id": "koenig", "textDe": "Züge des eigenen Königs", "correct": false, "feedbackDe": "Manchmal hilft der König – aber zuerst prüfst du die zwingenden Züge." },
         { "id": "zwingend", "textDe": "Schachs und Opfer, die den Gegner zwingen", "correct": true, "feedbackDe": "Richtig. Danach hat der Gegner nur wenige Antworten." },
-        { "id": "bauern", "textDe": "Bauernzüge am Rand", "correct": false, "feedbackDe": "Die führen selten schnell zum Matt." },
-        { "id": "koenig", "textDe": "Züge des eigenen Königs", "correct": false, "feedbackDe": "Manchmal hilft der König – aber zuerst prüfst du die zwingenden Züge." }
+        { "id": "bauern", "textDe": "Bauernzüge am Rand", "correct": false, "feedbackDe": "Die führen selten schnell zum Matt." }
       ]
     },
     {

@@ -80,9 +80,9 @@
       "type": "quiz",
       "questionDe": "Ein Läufer steht auf einem hellen Feld. Kann er jemals ein dunkles Feld erreichen?",
       "options": [
+        { "id": "schlagen", "textDe": "Ja, wenn er eine Figur schlägt.", "correct": false, "feedbackDe": "Auch beim Schlagen zieht der Läufer schräg und bleibt auf seiner Farbe." },
         { "id": "nein", "textDe": "Nein, er bleibt immer auf hellen Feldern.", "correct": true, "feedbackDe": "Richtig. Darum gibt es einen hellfeldrigen und einen dunkelfeldrigen Läufer." },
-        { "id": "zwei", "textDe": "Ja, nach zwei Zügen.", "correct": false, "feedbackDe": "Auf einer Diagonale haben alle Felder dieselbe Farbe." },
-        { "id": "schlagen", "textDe": "Ja, wenn er eine Figur schlägt.", "correct": false, "feedbackDe": "Auch beim Schlagen zieht der Läufer schräg und bleibt auf seiner Farbe." }
+        { "id": "zwei", "textDe": "Ja, nach zwei Zügen.", "correct": false, "feedbackDe": "Auf einer Diagonale haben alle Felder dieselbe Farbe." }
       ]
     },
     {

@@ -88,8 +88,8 @@
       "type": "quiz",
       "questionDe": "Darf ein Bauer rückwärts ziehen?",
       "options": [
-        { "id": "nie", "textDe": "Nein, nie.", "correct": true, "feedbackDe": "Richtig. Der Bauer ist die einzige Figur, die nur nach vorn zieht." },
-        { "id": "schlagen", "textDe": "Ja, wenn er schlägt.", "correct": false, "feedbackDe": "Auch beim Schlagen zieht der Bauer nach vorn – schräg." }
+        { "id": "schlagen", "textDe": "Ja, wenn er schlägt.", "correct": false, "feedbackDe": "Auch beim Schlagen zieht der Bauer nach vorn – schräg." },
+        { "id": "nie", "textDe": "Nein, nie.", "correct": true, "feedbackDe": "Richtig. Der Bauer ist die einzige Figur, die nur nach vorn zieht." }
       ]
     },
     {

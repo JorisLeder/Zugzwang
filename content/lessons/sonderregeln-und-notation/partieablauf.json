@@ -56,9 +56,9 @@
       "type": "quiz",
       "questionDe": "Weiß hat König und Dame, Schwarz nur den König. Die Zeit von Weiß läuft ab. Wie endet die Partie?",
       "options": [
+        { "id": "weiss", "textDe": "Weiß gewinnt, weil Weiß mehr Material hat.", "correct": false, "feedbackDe": "Material allein gewinnt keine Partie." },
         { "id": "remis", "textDe": "Remis – Schwarz kann mit dem König allein nie mattsetzen.", "correct": true, "feedbackDe": "Richtig. Kann der Gegner nicht mehr mattsetzen, ist es Remis." },
-        { "id": "schwarz", "textDe": "Schwarz gewinnt, weil die Zeit von Weiß abgelaufen ist.", "correct": false, "feedbackDe": "Schwarz hat nur den König. Damit ist kein Matt möglich." },
-        { "id": "weiss", "textDe": "Weiß gewinnt, weil Weiß mehr Material hat.", "correct": false, "feedbackDe": "Material allein gewinnt keine Partie." }
+        { "id": "schwarz", "textDe": "Schwarz gewinnt, weil die Zeit von Weiß abgelaufen ist.", "correct": false, "feedbackDe": "Schwarz hat nur den König. Damit ist kein Matt möglich." }
       ]
     },
     {
@@ -66,9 +66,9 @@
       "type": "quiz",
       "questionDe": "Was bedeutet das Ergebnis 0-1?",
       "options": [
-        { "id": "schwarz", "textDe": "Schwarz hat gewonnen.", "correct": true, "feedbackDe": "Richtig. Die erste Zahl gehört zu Weiß, die zweite zu Schwarz." },
         { "id": "weiss", "textDe": "Weiß hat gewonnen.", "correct": false, "feedbackDe": "Ein Sieg für Weiß wäre 1-0." },
-        { "id": "remis", "textDe": "Remis", "correct": false, "feedbackDe": "Ein Remis schreibt man ½-½." }
+        { "id": "remis", "textDe": "Remis", "correct": false, "feedbackDe": "Ein Remis schreibt man ½-½." },
+        { "id": "schwarz", "textDe": "Schwarz hat gewonnen.", "correct": true, "feedbackDe": "Richtig. Die erste Zahl gehört zu Weiß, die zweite zu Schwarz." }
       ]
     },
     {

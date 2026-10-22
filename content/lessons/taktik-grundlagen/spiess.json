@@ -52,9 +52,9 @@
       "type": "quiz",
       "questionDe": "Was ist der Unterschied zwischen Spieß und Fesselung?",
       "options": [
+        { "id": "springer", "textDe": "Einen Spieß macht nur der Springer.", "correct": false, "feedbackDe": "Spieße machen Läufer, Türme und Damen – Figuren, die weit ziehen." },
         { "id": "vorn", "textDe": "Beim Spieß steht die wertvollere Figur vorn, bei der Fesselung hinten.", "correct": true, "feedbackDe": "Richtig. Beim Spieß muss die vordere Figur weichen." },
-        { "id": "gleich", "textDe": "Es gibt keinen Unterschied.", "correct": false, "feedbackDe": "Es kommt darauf an, welche Figur vorn steht." },
-        { "id": "springer", "textDe": "Einen Spieß macht nur der Springer.", "correct": false, "feedbackDe": "Spieße machen Läufer, Türme und Damen – Figuren, die weit ziehen." }
+        { "id": "gleich", "textDe": "Es gibt keinen Unterschied.", "correct": false, "feedbackDe": "Es kommt darauf an, welche Figur vorn steht." }
       ]
     },
     {

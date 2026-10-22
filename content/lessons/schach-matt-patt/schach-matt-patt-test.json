@@ -26,9 +26,9 @@
       "questionDe": "Weiß steht im Schach. Welcher Zug wehrt es ab?",
       "fen": "4r1k1/8/8/8/8/2B5/8/4K3 w - - 0 1",
       "options": [
+        { "id": "ke2", "textDe": "Ke2", "correct": false, "feedbackDe": "Auf e2 stünde der König immer noch im Schach." },
         { "id": "le5", "textDe": "Le5", "correct": true, "feedbackDe": "Richtig. Der Läufer stellt sich zwischen Turm und König." },
-        { "id": "lb4", "textDe": "Lb4", "correct": false, "feedbackDe": "Nach Lb4 steht der König weiter im Schach." },
-        { "id": "ke2", "textDe": "Ke2", "correct": false, "feedbackDe": "Auf e2 stünde der König immer noch im Schach." }
+        { "id": "lb4", "textDe": "Lb4", "correct": false, "feedbackDe": "Nach Lb4 steht der König weiter im Schach." }
       ],
       "asserts": [
         { "kind": "isLegalMove", "fen": "4r1k1/8/8/8/8/2B5/8/4K3 w - - 0 1", "move": "c3e5", "expect": true },
@@ -55,9 +55,9 @@
       "questionDe": "Schwarz ist am Zug. Was liegt vor?",
       "fen": "7k/7P/6K1/8/8/8/8/8 b - - 0 1",
       "options": [
-        { "id": "patt", "textDe": "Patt – Remis", "correct": true, "feedbackDe": "Richtig. Schwarz hat keinen Zug und steht nicht im Schach." },
         { "id": "matt", "textDe": "Schachmatt", "correct": false, "feedbackDe": "Der König steht nicht im Schach." },
-        { "id": "schlagen", "textDe": "Schwarz schlägt den Bauern h7.", "correct": false, "feedbackDe": "Der Bauer ist vom König auf g6 gedeckt." }
+        { "id": "schlagen", "textDe": "Schwarz schlägt den Bauern h7.", "correct": false, "feedbackDe": "Der Bauer ist vom König auf g6 gedeckt." },
+        { "id": "patt", "textDe": "Patt – Remis", "correct": true, "feedbackDe": "Richtig. Schwarz hat keinen Zug und steht nicht im Schach." }
       ],
       "asserts": [{ "kind": "isStalemate", "fen": "7k/7P/6K1/8/8/8/8/8 b - - 0 1", "expect": true }]
     },

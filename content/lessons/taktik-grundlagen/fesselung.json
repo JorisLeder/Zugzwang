@@ -35,8 +35,8 @@
       "questionDe": "Schwarz am Zug. Darf der Springer c6 ziehen?",
       "fen": "4k3/ppp2ppp/2n5/1B6/8/8/PPP2PPP/6K1 b - - 0 1",
       "options": [
-        { "id": "nein", "textDe": "Nein – er ist gefesselt, dahinter steht der König.", "correct": true, "feedbackDe": "Richtig. Kein Zug darf den eigenen König ins Schach stellen." },
-        { "id": "ja", "textDe": "Ja, der Springer darf überall hin springen.", "correct": false, "feedbackDe": "Zieht der Springer weg, gibt der Läufer dem König Schach. Das ist verboten." }
+        { "id": "ja", "textDe": "Ja, der Springer darf überall hin springen.", "correct": false, "feedbackDe": "Zieht der Springer weg, gibt der Läufer dem König Schach. Das ist verboten." },
+        { "id": "nein", "textDe": "Nein – er ist gefesselt, dahinter steht der König.", "correct": true, "feedbackDe": "Richtig. Kein Zug darf den eigenen König ins Schach stellen." }
       ],
       "asserts": [
         { "kind": "isLegalMove", "fen": "4k3/ppp2ppp/2n5/1B6/8/8/PPP2PPP/6K1 b - - 0 1", "move": "c6e5", "expect": false },

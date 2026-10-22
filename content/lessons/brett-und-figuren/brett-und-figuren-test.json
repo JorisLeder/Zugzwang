@@ -28,9 +28,9 @@
       "type": "quiz",
       "questionDe": "Wie heißt das Feld links unten aus Sicht von Weiß?",
       "options": [
+        { "id": "a8", "textDe": "a8", "correct": false, "feedbackDe": "a8 ist links oben." },
         { "id": "a1", "textDe": "a1", "correct": true, "feedbackDe": "Richtig: Linie a, Reihe 1." },
-        { "id": "h1", "textDe": "h1", "correct": false, "feedbackDe": "h1 ist rechts unten." },
-        { "id": "a8", "textDe": "a8", "correct": false, "feedbackDe": "a8 ist links oben." }
+        { "id": "h1", "textDe": "h1", "correct": false, "feedbackDe": "h1 ist rechts unten." }
       ]
     },
     {
@@ -62,9 +62,9 @@
       "type": "quiz",
       "questionDe": "Wie schlägt ein Bauer?",
       "options": [
-        { "id": "schraeg", "textDe": "Schräg nach vorn, ein Feld weit", "correct": true, "feedbackDe": "Richtig. Geradeaus kann der Bauer nicht schlagen." },
         { "id": "gerade", "textDe": "Gerade nach vorn", "correct": false, "feedbackDe": "Gerade nach vorn zieht er nur, er schlägt schräg." },
-        { "id": "rueck", "textDe": "Schräg nach hinten", "correct": false, "feedbackDe": "Ein Bauer zieht und schlägt nie nach hinten." }
+        { "id": "rueck", "textDe": "Schräg nach hinten", "correct": false, "feedbackDe": "Ein Bauer zieht und schlägt nie nach hinten." },
+        { "id": "schraeg", "textDe": "Schräg nach vorn, ein Feld weit", "correct": true, "feedbackDe": "Richtig. Geradeaus kann der Bauer nicht schlagen." }
       ]
     },
     {

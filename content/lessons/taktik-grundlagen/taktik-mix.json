@@ -56,9 +56,9 @@
       "questionDe": "Weiß hat Ta5+ gespielt. Welche Taktik ist das?",
       "fen": "8/8/8/R3k2r/8/8/8/6K1 b - - 1 1",
       "options": [
+        { "id": "fesselung", "textDe": "Eine Fesselung", "correct": false, "feedbackDe": "Bei einer Fesselung stünde die wertvollere Figur hinten." },
         { "id": "spiess", "textDe": "Ein Spieß", "correct": true, "feedbackDe": "Richtig. Der König muss weichen, der Turm dahinter fällt." },
-        { "id": "gabel", "textDe": "Eine Gabel", "correct": false, "feedbackDe": "Bei einer Gabel greift eine Figur in zwei Richtungen an. Hier stehen König und Turm hintereinander." },
-        { "id": "fesselung", "textDe": "Eine Fesselung", "correct": false, "feedbackDe": "Bei einer Fesselung stünde die wertvollere Figur hinten." }
+        { "id": "gabel", "textDe": "Eine Gabel", "correct": false, "feedbackDe": "Bei einer Gabel greift eine Figur in zwei Richtungen an. Hier stehen König und Turm hintereinander." }
       ],
       "asserts": [{ "kind": "isCheck", "fen": "8/8/8/R3k2r/8/8/8/6K1 b - - 1 1", "expect": true }]
     },
@@ -110,9 +110,9 @@
       "type": "quiz",
       "questionDe": "Du suchst eine Taktik. Womit fängst du an?",
       "options": [
-        { "id": "csd", "textDe": "Mit allen Schachs, Schlagzügen und Drohungen", "correct": true, "feedbackDe": "Richtig. Diese Züge zwingen den Gegner und verraten die meisten Taktiken." },
         { "id": "ruhig", "textDe": "Mit ruhigen Zügen am Rand", "correct": false, "feedbackDe": "Ruhige Züge sind manchmal stark, aber zuerst prüfst du die forcierenden Züge." },
-        { "id": "koenig", "textDe": "Mit Zügen des eigenen Königs", "correct": false, "feedbackDe": "Taktiken entstehen meist durch Angriffe auf gegnerische Figuren." }
+        { "id": "koenig", "textDe": "Mit Zügen des eigenen Königs", "correct": false, "feedbackDe": "Taktiken entstehen meist durch Angriffe auf gegnerische Figuren." },
+        { "id": "csd", "textDe": "Mit allen Schachs, Schlagzügen und Drohungen", "correct": true, "feedbackDe": "Richtig. Diese Züge zwingen den Gegner und verraten die meisten Taktiken." }
       ]
     }
   ]

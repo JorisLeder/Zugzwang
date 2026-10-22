@@ -40,9 +40,9 @@
       "questionDe": "Der schwarze Turm greift d1 an. Welche Rochade ist erlaubt?",
       "fen": "4k3/8/8/8/8/8/3r4/R3K2R w KQ - 0 1",
       "options": [
+        { "id": "beide", "textDe": "Beide", "correct": false, "feedbackDe": "Die lange Rochade führt den König über das angegriffene Feld d1." },
         { "id": "kurz", "textDe": "Nur 0-0", "correct": true, "feedbackDe": "Richtig. Bei 0-0-0 müsste der König über das angegriffene Feld d1 ziehen." },
-        { "id": "lang", "textDe": "Nur 0-0-0", "correct": false, "feedbackDe": "Der König darf nicht über d1 ziehen, weil der Turm es angreift." },
-        { "id": "beide", "textDe": "Beide", "correct": false, "feedbackDe": "Die lange Rochade führt den König über das angegriffene Feld d1." }
+        { "id": "lang", "textDe": "Nur 0-0-0", "correct": false, "feedbackDe": "Der König darf nicht über d1 ziehen, weil der Turm es angreift." }
       ],
       "asserts": [
         { "kind": "isLegalMove", "fen": "4k3/8/8/8/8/8/3r4/R3K2R w KQ - 0 1", "move": "e1g1", "expect": true },
@@ -66,9 +66,9 @@
       "type": "quiz",
       "questionDe": "Weiß zieht e2–e4 an deinem Bauern d4 vorbei. Wann darfst du en passant schlagen?",
       "options": [
-        { "id": "sofort", "textDe": "Nur sofort im nächsten Zug", "correct": true, "feedbackDe": "Richtig. Danach ist die Chance vorbei." },
         { "id": "spaeter", "textDe": "Auch noch ein paar Züge später", "correct": false, "feedbackDe": "En passant geht nur im direkt folgenden Zug." },
-        { "id": "nie", "textDe": "Gar nicht, das darf nur Weiß", "correct": false, "feedbackDe": "Beide Seiten dürfen en passant schlagen." }
+        { "id": "nie", "textDe": "Gar nicht, das darf nur Weiß", "correct": false, "feedbackDe": "Beide Seiten dürfen en passant schlagen." },
+        { "id": "sofort", "textDe": "Nur sofort im nächsten Zug", "correct": true, "feedbackDe": "Richtig. Danach ist die Chance vorbei." }
       ]
     },
     {

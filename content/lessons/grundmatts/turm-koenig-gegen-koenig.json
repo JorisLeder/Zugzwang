@@ -46,8 +46,8 @@
       "questionDe": "Weiß hat Th8+ gespielt. Ist das Matt?",
       "fen": "4k2R/8/2K5/8/8/8/8/8 b - - 1 1",
       "options": [
-        { "id": "nein", "textDe": "Nein – der König entkommt auf die 7. Reihe.", "correct": true, "feedbackDe": "Richtig. Der weiße König steht nicht gegenüber und deckt e7 und f7 nicht." },
-        { "id": "ja", "textDe": "Ja, das ist Matt.", "correct": false, "feedbackDe": "Prüfe e7 und f7: Dort ist der König sicher." }
+        { "id": "ja", "textDe": "Ja, das ist Matt.", "correct": false, "feedbackDe": "Prüfe e7 und f7: Dort ist der König sicher." },
+        { "id": "nein", "textDe": "Nein – der König entkommt auf die 7. Reihe.", "correct": true, "feedbackDe": "Richtig. Der weiße König steht nicht gegenüber und deckt e7 und f7 nicht." }
       ],
       "asserts": [
         { "kind": "isCheck", "fen": "4k2R/8/2K5/8/8/8/8/8 b - - 1 1", "expect": true },
@@ -84,9 +84,9 @@
       "type": "quiz",
       "questionDe": "Wann gibt der Turm am Rand das Matt?",
       "options": [
-        { "id": "gegenueber", "textDe": "Wenn sich die Könige gegenüberstehen", "correct": true, "feedbackDe": "Richtig. Dann deckt dein König alle Fluchtfelder vor dem Rand." },
         { "id": "immer", "textDe": "Immer, sobald der König am Rand steht", "correct": false, "feedbackDe": "Ohne den eigenen König entkommt der gegnerische König." },
-        { "id": "nie", "textDe": "Mit einem Turm geht kein Matt.", "correct": false, "feedbackDe": "Doch – König und Turm setzen immer matt." }
+        { "id": "nie", "textDe": "Mit einem Turm geht kein Matt.", "correct": false, "feedbackDe": "Doch – König und Turm setzen immer matt." },
+        { "id": "gegenueber", "textDe": "Wenn sich die Könige gegenüberstehen", "correct": true, "feedbackDe": "Richtig. Dann deckt dein König alle Fluchtfelder vor dem Rand." }
       ]
     }
   ]

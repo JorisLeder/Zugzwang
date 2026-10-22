@@ -55,9 +55,9 @@
       "questionDe": "Schwarz steht im Doppelschach. Was kann Schwarz tun?",
       "fen": "r2qk2r/ppp2ppp/8/1B6/8/8/PPP2PPP/4R1K1 b - - 1 1",
       "options": [
+        { "id": "schlagen", "textDe": "Eine der schachgebenden Figuren schlagen", "correct": false, "feedbackDe": "Das andere Schach bliebe bestehen." },
         { "id": "koenig", "textDe": "Nur mit dem König ziehen", "correct": true, "feedbackDe": "Richtig. Gegen zwei Schachs hilft kein Dazwischenziehen und kein Schlagen." },
-        { "id": "dazwischen", "textDe": "Eine Figur dazwischenstellen", "correct": false, "feedbackDe": "Damit wehrst du nur eines der beiden Schachs ab." },
-        { "id": "schlagen", "textDe": "Eine der schachgebenden Figuren schlagen", "correct": false, "feedbackDe": "Das andere Schach bliebe bestehen." }
+        { "id": "dazwischen", "textDe": "Eine Figur dazwischenstellen", "correct": false, "feedbackDe": "Damit wehrst du nur eines der beiden Schachs ab." }
       ],
       "asserts": [
         { "kind": "isCheck", "fen": "r2qk2r/ppp2ppp/8/1B6/8/8/PPP2PPP/4R1K1 b - - 1 1", "expect": true },

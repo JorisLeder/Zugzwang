@@ -99,8 +99,8 @@
       "questionDe": "Darf der weiße König nach c5 ziehen?",
       "fen": "2r1k3/8/8/8/3K4/8/8/8 w - - 0 1",
       "options": [
-        { "id": "nein", "textDe": "Nein, der Turm auf c8 greift das Feld c5 an.", "correct": true, "feedbackDe": "Richtig. Der König darf nie auf ein angegriffenes Feld ziehen." },
-        { "id": "ja", "textDe": "Ja, c5 ist frei.", "correct": false, "feedbackDe": "Das Feld ist frei, aber der Turm auf c8 greift es an." }
+        { "id": "ja", "textDe": "Ja, c5 ist frei.", "correct": false, "feedbackDe": "Das Feld ist frei, aber der Turm auf c8 greift es an." },
+        { "id": "nein", "textDe": "Nein, der Turm auf c8 greift das Feld c5 an.", "correct": true, "feedbackDe": "Richtig. Der König darf nie auf ein angegriffenes Feld ziehen." }
       ],
       "asserts": [
         { "kind": "isLegalMove", "fen": "2r1k3/8/8/8/3K4/8/8/8 w - - 0 1", "move": "d4c5", "expect": false },
@@ -112,9 +112,9 @@
       "type": "quiz",
       "questionDe": "Wie zieht die Dame?",
       "options": [
-        { "id": "beides", "textDe": "Gerade und schräg, so weit sie will", "correct": true, "feedbackDe": "Genau: wie Turm und Läufer zusammen." },
         { "id": "schraeg", "textDe": "Nur schräg", "correct": false, "feedbackDe": "Nur schräg zieht der Läufer. Die Dame kann auch gerade ziehen." },
-        { "id": "ein-feld", "textDe": "Nur ein Feld weit", "correct": false, "feedbackDe": "Nur ein Feld weit zieht der König." }
+        { "id": "ein-feld", "textDe": "Nur ein Feld weit", "correct": false, "feedbackDe": "Nur ein Feld weit zieht der König." },
+        { "id": "beides", "textDe": "Gerade und schräg, so weit sie will", "correct": true, "feedbackDe": "Genau: wie Turm und Läufer zusammen." }
       ]
     }
   ]

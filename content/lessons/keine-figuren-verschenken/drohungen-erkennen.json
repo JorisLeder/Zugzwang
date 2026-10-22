@@ -53,9 +53,9 @@
       "questionDe": "Weiß ist am Zug. Was droht Schwarz?",
       "fen": "5rk1/ppp2ppp/3b4/8/7q/2N5/PPPQ1PPP/5RK1 w - - 0 1",
       "options": [
+        { "id": "nichts", "textDe": "Schwarz droht nichts.", "correct": false, "feedbackDe": "Doch: Die Dame und der Läufer zielen gemeinsam auf h2." },
         { "id": "matt", "textDe": "Dxh2# – Matt auf h2", "correct": true, "feedbackDe": "Richtig. Dame und Läufer d6 zielen beide auf h2." },
-        { "id": "schach", "textDe": "Dxf2+ – ein Schach mit der Dame", "correct": false, "feedbackDe": "Nach Dxf2+ schlägt der Turm f1 die Dame. Gefährlich ist h2." },
-        { "id": "nichts", "textDe": "Schwarz droht nichts.", "correct": false, "feedbackDe": "Doch: Die Dame und der Läufer zielen gemeinsam auf h2." }
+        { "id": "schach", "textDe": "Dxf2+ – ein Schach mit der Dame", "correct": false, "feedbackDe": "Nach Dxf2+ schlägt der Turm f1 die Dame. Gefährlich ist h2." }
       ],
       "asserts": [{ "kind": "isCheckmate", "fen": "5rk1/ppp2ppp/3b4/8/8/2N5/PPPQ1PPq/5RK1 w - - 0 2", "expect": true }]
     },
@@ -80,9 +80,9 @@
       "type": "quiz",
       "questionDe": "Dein Gegner hat gerade gezogen. Was fragst du dich zuerst?",
       "options": [
-        { "id": "droht", "textDe": "Was droht er jetzt?", "correct": true, "feedbackDe": "Richtig. Erst die Drohung erkennen, dann den eigenen Zug suchen." },
         { "id": "angriff", "textDe": "Wie greife ich sofort an?", "correct": false, "feedbackDe": "Angreifen ist gut – aber erst, wenn du weißt, was dir droht." },
-        { "id": "egal", "textDe": "Nichts, ich spiele meinen Plan weiter.", "correct": false, "feedbackDe": "Wer die Drohungen übersieht, verliert oft Figuren oder wird mattgesetzt." }
+        { "id": "egal", "textDe": "Nichts, ich spiele meinen Plan weiter.", "correct": false, "feedbackDe": "Wer die Drohungen übersieht, verliert oft Figuren oder wird mattgesetzt." },
+        { "id": "droht", "textDe": "Was droht er jetzt?", "correct": true, "feedbackDe": "Richtig. Erst die Drohung erkennen, dann den eigenen Zug suchen." }
       ]
     }
   ]
