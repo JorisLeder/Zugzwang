@@ -86,11 +86,21 @@ async function load(repo: PuzzleRepository, opts: LoadPuzzleBankOptions): Promis
   if (stored === manifest.version && (await repo.count()) > 0) {
     return { version: stored, count: await repo.count(), updated: false, offline: false };
   }
-  const chunks = await Promise.all(
-    manifest.chunks.map(async (c) => parseChunk(await fetchJson(doFetch, bankUrl(baseUrl, c.file), opts.signal), c.file)),
-  );
+  let chunks: Puzzle[][];
+  try {
+    chunks = await Promise.all(
+      manifest.chunks.map(async (c) => parseChunk(await fetchJson(doFetch, bankUrl(baseUrl, c.file), opts.signal), c.file)),
+    );
+  } catch (e) {
+    // A usable stored bank stays untouched and is served as if offline; only without one is the failure fatal.
+    if (stored !== null) {
+      const count = await repo.count();
+      if (count > 0) return { version: stored, count, updated: false, offline: true };
+    }
+    throw e instanceof PuzzleBankError ? e : new PuzzleBankError('Puzzle bank unavailable', e);
+  }
   // All chunks of the new version are loaded: replace (not merge) so puzzles removed from the bank disappear. A failed
-  // chunk download throws above and leaves the old bank and its version untouched.
+  // chunk download returns/throws above and leaves the old bank and its version untouched.
   await repo.replaceAll(chunks.flat());
   await repo.setBankVersion(manifest.version);
   return { version: manifest.version, count: await repo.count(), updated: true, offline: false };

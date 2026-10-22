@@ -70,10 +70,17 @@ describe('loadPuzzleBank', () => {
     await loadPuzzleBank(repo, { fetch: net.fn });
     net.files['/data/puzzles/manifest.json'] = manifest('v2', ['a.json', 'missing.json']);
     net.files['/data/puzzles/a.json'] = [p1];
-    await expect(loadPuzzleBank(repo, { fetch: net.fn })).rejects.toBeInstanceOf(PuzzleBankError);
+    expect(await loadPuzzleBank(repo, { fetch: net.fn })).toEqual({ version: 'v1', count: 2, updated: false, offline: true });
     expect(await repo.bankVersion()).toBe('v1');
     expect(await repo.count()).toBe(2);
     expect(await repo.get(p2.id)).not.toBeNull();
+  });
+
+  it('a failed chunk download without a stored bank still throws', async () => {
+    const data = createMemoryDataServices();
+    const net = fakeFetch({ '/data/puzzles/manifest.json': manifest('v1', ['missing.json']) });
+    await expect(loadPuzzleBank(data.repos.puzzles, { fetch: net.fn })).rejects.toBeInstanceOf(PuzzleBankError);
+    expect(await data.repos.puzzles.bankVersion()).toBeNull();
   });
 
   it('works offline with a stored bank and fails clearly without one', async () => {
