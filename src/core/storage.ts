@@ -257,6 +257,8 @@ export interface SyncService {
   observe(): Subscribable<SyncState>;
   /** Pushes pending entries now. */
   flush(): Promise<void>;
+  /** Discards the entries the server rejected for good (dead letters) and recomputes the status. */
+  dismissDeadLetters?(): Promise<void>;
 }
 
 /** Logged-in user. Local mode has a permanent `local` session. */

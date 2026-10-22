@@ -146,6 +146,8 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
   let retryTimer: ReturnType<typeof setTimeout> | null = null;
   let started = false;
   let derivedDue = false;
+  /** The server reported an imported game as already stored under another id: pull its copy (replaces the local one). */
+  let duplicateGamePullDue = false;
   let refreshing: Promise<void> | null = null;
   const unsubs: Array<() => void> = [];
 
@@ -231,12 +233,25 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
     }
   }
 
+  /** Pulls the server copy of a game imported on two devices; `applyRemote` then drops the local copy and its entries. */
+  async function pullDuplicateGames(): Promise<void> {
+    try {
+      await engine.pullAll();
+      duplicateGamePullDue = false;
+    } catch (e) {
+      console.warn('Sync: pulling the server copy of a duplicate game failed', e);
+    }
+    await recount();
+  }
+
   async function flushOnce(): Promise<void> {
     if (!online.isOnline() || !canSync()) return;
     clearRetry();
+    if (duplicateGamePullDue) await pullDuplicateGames();
     let afterSeq = 0;
     let pushed = 0;
     let failed: PushResult | undefined;
+    let failedIds: string[] = [];
     for (;;) {
       const batch: OutboxRow[] = await db.outbox.where('seq').above(afterSeq).limit(batchSize).toArray();
       if (!batch.length) break;
@@ -274,8 +289,20 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
       });
       if (dropped.length) console.warn(`Sync: ${dropped.length} Eintrag/Einträge vom Server dauerhaft abgelehnt`, dropped.map((d) => d.lastError));
       pushed += okIds.length;
-      if (bad.length) failed ??= bad[0];
+      if (bad.length) {
+        failed ??= bad[0];
+        failedIds.push(...bad.map((r) => r.id));
+      }
       await recount();
+      if (batch.some((b) => b.table === 'games' && byId.get(b.id)?.duplicate)) {
+        duplicateGamePullDue = true;
+        await pullDuplicateGames();
+        // Rejected entries of the replaced local game are gone now – that is not a failure.
+        if (failedIds.length && (await db.outbox.where('id').anyOf(failedIds).count()) === 0) {
+          failed = undefined;
+          failedIds = [];
+        }
+      }
       if (bad.some((r) => r.retryable !== false)) break; // keep the order: retry later
     }
     if (failed) {
@@ -336,6 +363,11 @@ export function createSyncEngine(opts: SyncEngineOptions): SyncEngine {
         debounceTimer = null;
         void engine.flush();
       }, debounceMs);
+    },
+
+    async dismissDeadLetters() {
+      await db.meta.put({ key: META.deadLetters, value: [] });
+      await recount();
     },
 
     async pullAll() {

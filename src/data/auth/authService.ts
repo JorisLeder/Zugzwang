@@ -12,7 +12,7 @@
 import type { AuthService, AuthSession, Subscribable } from '@/core/storage';
 import { createValueStore } from '@/lib/observable';
 import { AUTH_STORAGE_KEY } from '../supabase/client';
-import type { SbError, SbSession, SupabaseProvider } from '../supabase/types';
+import type { SbError, SbSession, SupabaseLike, SupabaseProvider } from '../supabase/types';
 
 /** Error codes of auth failures (the UI shows its own German text per code). */
 export type AuthErrorCode = 'local-mode' | 'invalid-email' | 'rate-limited' | 'network' | 'callback' | 'pkce-verifier' | 'unknown';
@@ -105,7 +105,7 @@ export interface SupabaseAuthOptions {
   /** Absolute URL of `/auth/callback` (default: current origin). */
   redirectUrl?: () => string;
   /** Where supabase-js persists the session (default: `localStorage`; `null` = no offline fallback). */
-  storage?: Pick<Storage, 'getItem'> | null;
+  storage?: (Pick<Storage, 'getItem'> & Partial<Pick<Storage, 'removeItem'>>) | null;
   /** Storage key of the persisted session (default `AUTH_STORAGE_KEY`). */
   storageKey?: string;
   /** Browser connectivity (default `navigator.onLine`). */
@@ -134,6 +134,17 @@ export function createSupabaseAuthService(opts: SupabaseAuthOptions): CloudAuthS
     if (cur === undefined || JSON.stringify(cur) !== JSON.stringify(next)) store.set(next);
   };
   const set = (s: SbSession | null | undefined) => setSession(toAuthSession(s));
+  /** A failed sign-out stopped the auto refresh; the next login restarts it. */
+  let autoRefreshStopped = false;
+  const restartAutoRefresh = async (client: SupabaseLike) => {
+    if (!autoRefreshStopped) return;
+    autoRefreshStopped = false;
+    try {
+      await client.auth.startAutoRefresh?.();
+    } catch {
+      /* ignore */
+    }
+  };
 
   /** The refresh failed for network reasons (as opposed to a rejected refresh token, which signs the user out). */
   const isOfflineError = (e: SbError | null | undefined): boolean =>
@@ -212,6 +223,7 @@ export function createSupabaseAuthService(opts: SupabaseAuthOptions): CloudAuthS
       } else if (accessToken && refreshToken) result = await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
       if (result) {
         if (result.error || !result.data.session) throw toAuthError(result.error, 'callback');
+        await restartAutoRefresh(client);
         set(result.data.session);
         return;
       }
@@ -221,8 +233,29 @@ export function createSupabaseAuthService(opts: SupabaseAuthOptions): CloudAuthS
     async signOut() {
       const client = await opts.client();
       // `local`: ends the session on this device only (other devices stay logged in).
-      const { error } = await client.auth.signOut({ scope: 'local' });
-      if (error) console.warn('Auth: sign-out failed on the server', error);
+      let failed: unknown = null;
+      try {
+        const { error } = await client.auth.signOut({ scope: 'local' });
+        failed = error;
+      } catch (e) {
+        failed = e;
+      }
+      if (failed) {
+        // supabase-js returns early on e.g. AuthRetryableFetchError (offline) without removing the stored session; the
+        // auto refresh would bring it back later. End the session on this device ourselves.
+        console.warn('Auth: sign-out failed on the server', failed);
+        try {
+          await client.auth.stopAutoRefresh?.();
+          autoRefreshStopped = true;
+        } catch {
+          /* ignore */
+        }
+        try {
+          storage?.removeItem?.(storageKey);
+        } catch {
+          /* ignore */
+        }
+      }
       store.set(null);
     },
 
